@@ -26,7 +26,7 @@ Find the current patient UI design draft at [our figma page](https://www.figma.c
 5. Enter waiting room by clicking Button on welcome page
 6. App displays number of patients in front of you, estimated time and waiting number
 7. When doctor is ready, receptionist clicks on "call patient"
-8. Patient view changes to "Bitte in die Praxis kommen"
+8. Patient view changes to "Bitte in die Praxis kommen"..
 
 
 *SMS:*
