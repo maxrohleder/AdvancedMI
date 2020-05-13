@@ -96,7 +96,7 @@ Find the current patient UI design draft at
 > Dr. Müller
 >  
 > ---
-![alt text](\SMS.jpeg)
+![alt text](https://raw.githubusercontent.com/maxrohleder/AdvancedMI/master/SMS.jpeg)
 
 > ---
 
