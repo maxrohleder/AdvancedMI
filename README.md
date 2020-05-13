@@ -1,5 +1,7 @@
 # Digital Waitingroom
 
+Find the current patient UI design draft at [our figma page](https://www.figma.com/file/NUWYQQ6T5zKVLng4IAdxSJ/digital-waiting?node-id=0%3A1).
+
 - [Digital Waitingroom](#digital-waitingroom)
   - [User Stories](#user-stories)
     - [Emergency/Accute visit w/o scheduled appointment](#emergencyaccute-visit-wo-scheduled-appointment)
