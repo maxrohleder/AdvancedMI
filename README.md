@@ -1,5 +1,14 @@
 # Digital Waitingroom
 
+- [Digital Waitingroom](#digital-waitingroom)
+  - [User Stories](#user-stories)
+    - [Emergency/Accute visit w/o scheduled appointment](#emergencyaccute-visit-wo-scheduled-appointment)
+  - [Working points](#working-points)
+    - [Minimum Viable Product (minimum feature set):](#minimum-viable-product-minimum-feature-set)
+    - [Additional Features](#additional-features)
+  - [Timeline](#timeline)
+  - [Open Questions](#open-questions)
+
 ## User Stories
 
 ### Emergency/Accute visit w/o scheduled appointment
