@@ -7,9 +7,7 @@
   - [User Stories](#user-stories)
     - [Emergency/Accute visit w/o scheduled appointment](#emergencyaccute-visit-wo-scheduled-appointment)
     - [Regular/Scheduled appointment](#regularscheduled-appointment)
-    - [*SMS:*](#sms)
-- [Working points](#working-points)
-    - [Minimum Viable Product (minimum feature set):](#minimum-viable-product-minimum-feature-set)
+  - [Minimum Viable Product](#minimum-viable-product)
     - [Additional Features](#additional-features)
   - [Open Questions](#open-questions)
   - [Project Architecture](#project-architecture)
@@ -17,15 +15,16 @@
 ## Motivation|Idea
 Develop the digital waiting room!
 
-This product would tackle the problem of crowded waiting rooms and the therefrom arising problems like risk of infection and patient throughput bottlenecks. Also, we would contribute to reducing the staggering 9000+ hours of patient management in a 800 bed hospital (as stated in the slides).
+This product would tackle the problem of crowded waiting rooms and the therefrom arising problems like risk of infection and patient throughput bottlenecks. Also, we would contribute to reducing the staggering 9000+ hours of patient management in a 800 bed hospital.
 
-The goal is to develop a progressive web app, which acts as a interface between clinical staff and the patient. The most important feature so far (and my proposed MVP) is the live-update of the queue. Using this queue, the patient can estimate how long his wait time will be and spend this time outside the hazardous clinic.
+The goal is to develop a progressive web app, which acts as a interface between clinical staff and the patient. The most important feature is the live-update of the queue position. Using this estimate, the patient can get a feeling for how long his wait will be and spend this time outside.
 
-Find the current patient UI design draft at   
-[our figma page](https://www.figma.com/file/NUWYQQ6T5zKVLng4IAdxSJ/digital-waiting?node-id=0%3A1).
+Find the current patient UI design draft at [our figma page](https://www.figma.com/file/NUWYQQ6T5zKVLng4IAdxSJ/digital-waiting?node-id=0%3A1).
 
 
 ## User Stories
+
+These two user stories exemplary show our envisioned use of the application. 
 
 ### Emergency/Accute visit w/o scheduled appointment
 
@@ -79,35 +78,15 @@ Find the current patient UI design draft at
 11. Patient view changes to "Bitte in die Praxis kommen"
 
 
-### *SMS:*
->---  
-> Hallo NAME,
->  
-> hier findest du den digitalen Warteraum:
-> www.wartefrei.de/queues/21/number=17  
->  Deine Nummer ist 17. 
-> 
-> Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten!  
-> Bitte halte dich 
-> von anderen fern, um das Infektionrisiko zu senken.
-> 
-> 
-> Deine Praxis  
-> Dr. Müller
->  
-> ---
+This is how the sms could look like:
+
 <img src="https://raw.githubusercontent.com/maxrohleder/AdvancedMI/master/SMS.jpeg" alt="alt text" width="200" height="222">
 
->---
+## Minimum Viable Product
 
+One waiting queue per doctors office. The welcome page can be accessed with the placeID appended to the base url. E.g.:
 
-# Working points
-
-Here is a overview over the functions that the App should provide.
-
-### Minimum Viable Product (minimum feature set):
-
-One waiting queue per doctors office. The welcome page of a medical institution can be accessed with the placeID appended to the base url.
+digitalwaiting.de/UK-Erlangen
 
 - back-end
   - functionalities:
@@ -133,7 +112,7 @@ One waiting queue per doctors office. The welcome page of a medical institution 
 - Multiple queues (corona, emergency, normal) or (Dr. Maier, Dr. Schmidt)
 - Estimate waiting time based on moving average
 - Enable a primitive form of patient-receptionist communication (confirm proximity button @ patient front-end)
-- integrate with scheduling tool and appointment tool
+- Integrate with scheduling tool and appointment tool
 
 ## Open Questions
 
