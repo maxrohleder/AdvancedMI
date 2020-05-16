@@ -8,8 +8,8 @@ Find the current patient UI design draft at [our figma page](https://www.figma.c
   - [Working points](#working-points)
     - [Minimum Viable Product (minimum feature set):](#minimum-viable-product-minimum-feature-set)
     - [Additional Features](#additional-features)
-  - [Timeline](#timeline)
   - [Open Questions](#open-questions)
+  - [Project Architecture](#project-architecture)
 
 ## User Stories
 
@@ -44,7 +44,7 @@ Here is a overview over the functions that the App should provide.
 
 ### Minimum Viable Product (minimum feature set):
 
-One waiting queue
+One waiting queue per doctors office. The welcome page of a medical institution can be accessed with the placeID appended to the base url.
 
 - back-end
   - functionalities:
@@ -72,15 +72,20 @@ One waiting queue
 - Enable a primitive form of patient-receptionist communication (confirm proximity button @ patient front-end)
 - integrate with scheduling tool and appointment tool
 
-## Timeline
-
 ## Open Questions
 
 - Active patient front-end polling or backend-initiated push notification?
 - Encryption (serverside, front-end key in session token?)
-- Ensure
 - How does the patient get to the queue page?
   - Receive Waiting Room ID and personal Waiting Room #
   - Receive A Mail/SMS Upon registration at the front desk via phone
   - Sign in to doctors office completely remote?
     - select doctors office
+
+## Project Architecture
+
+This project is (as outlined before) structured into backend and front end. The used software stack is described in [Architecture](architecture.md). 
+
+There is one flask-based webserver, which exposes the administrative functionality of the project via a REST-Api. The sources for these backend functions can be found in the folder `./backend`.
+
+The client side of the application was written using React. The code can be seen in the folder called `./frontend`.
