@@ -9,7 +9,7 @@ ROOM = 'Wartezimmer'
 
 @app.route('/')
 def index():
-    emit('general', )
+    socketio.emit('general', ROOM)
     info = "<!DOCTYPE html>\
             <html lang=\"en\">\
             <head></head>\

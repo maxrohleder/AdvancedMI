@@ -3,30 +3,30 @@ import './styles/PatientApp.css';
 import openSocket from 'socket.io-client';
 
 
-const socket = openSocket('http://127.0.0.1:5000/');
+const socket = openSocket('http://127.0.0.1:8000/');
 
-function subscribeToRoom(cb) {
-  socket.join('general', (room_name) => {
-                          console.log(room_name);
-                          cb(null, room_name)
+function setTimer(cb) {
+  socket.on('timeChannel', (time) => {
+                          cb(null, time)
                         }
             );
+  socket.emit('setTimer', 1000);
 }
 
 class PatientApp extends React.Component {
     constructor(props) {
         super(props);  
         this.state = {
-            room: 'not set yet'
+            time: 'not set yet'
         }
-        subscribeToRoom(
-          (err, name) => this.setState( { room: name } )
+        setTimer(
+          (err, new_time) => this.setState( { time: new_time } )
         );
     }
 
     render() {
       return (
-        <div>timestamp: { this.state.room }</div>
+        <div>timestamp: { this.state.time }</div>
       );
     }
   }
