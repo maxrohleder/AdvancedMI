@@ -5,28 +5,27 @@ import openSocket from 'socket.io-client';
 
 const socket = openSocket('http://127.0.0.1:8000/');
 
-function setTimer(cb) {
-  socket.on('timeChannel', (time) => {
-                          cb(null, time)
+function setCalledCb(cb) {
+  socket.on('called', (number) => {
+                          cb(null, number)
                         }
             );
-  socket.emit('setTimer', 1000);
 }
 
 class PatientApp extends React.Component {
     constructor(props) {
         super(props);  
         this.state = {
-            time: 'not set yet'
+            called: null
         }
-        setTimer(
-          (err, new_time) => this.setState( { time: new_time } )
+        setCalledCb(
+          (err, num) => this.setState( { called: num } )
         );
     }
 
     render() {
       return (
-        <div>timestamp: { this.state.time }</div>
+        <div>patient called: { this.state.called }</div>
       );
     }
   }

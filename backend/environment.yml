@@ -1,8 +1,0 @@
-name: webdev
-channels:
-  - conda-forge
-dependencies:
-  - python=3.6
-  - flask
-  - flask-socketio
-  - eventlet 
