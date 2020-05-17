@@ -5,8 +5,8 @@
 - [Digital Waitingroom](#digital-waitingroom)
   - [Motivation|Idea](#motivationidea)
   - [User Stories](#user-stories)
-    - [Emergency/Accute visit w/o scheduled appointment](#emergencyaccute-visit-wo-scheduled-appointment)
-    - [Regular/Scheduled appointment](#regularscheduled-appointment)
+    - [Emergency visit without appointment](#emergency-visit-without-appointment)
+    - [Scheduled appointment](#scheduled-appointment)
   - [Minimum Viable Product](#minimum-viable-product)
     - [Additional Features](#additional-features)
   - [Open Questions](#open-questions)
@@ -26,7 +26,7 @@ Find the current patient UI design draft at [our figma page](https://www.figma.c
 
 These two user stories exemplary show our envisioned use of the application. 
 
-### Emergency/Accute visit w/o scheduled appointment
+### Emergency visit without appointment
 
 1. Calls doctors office and requests direct treatment
 2. Receptionist enters new patient user profile
@@ -41,7 +41,7 @@ These two user stories exemplary show our envisioned use of the application.
 7. When doctor is ready, receptionist clicks on "call patient"
 8. Patient view changes to "Bitte in die Praxis kommen"
 
-### Regular/Scheduled appointment
+### Scheduled appointment
 1. Calls doctors office and requests treatment
 2. Receptionist enters new patient user profile
    1. Checks calendar ->appointment->25.05.2020,12:30
@@ -86,8 +86,7 @@ This is how the sms could look like:
 
 One waiting queue per doctors office. The welcome page can be accessed with the placeID appended to the base url. E.g.:
 
-digitalwaiting.de/UK-Erlangen
-
+`digitalwaiting.de/UK-Erlangen`
 - back-end
   - functionalities:
     - store patient pseudonyms, waiting number and status (waiting, called, done)
