@@ -7,6 +7,10 @@ const router = express.Router();
 
 const port = 8000;
 
+
+WAITING = []
+CALLED = []
+
 // --------------------------------------------------------
 // ---------------------all api routes---------------------
 router.get("/", (req, res) => {
@@ -33,7 +37,6 @@ app.io = io;
 
 // --------------------------------------------------------
 // -------------------all socket cbs-----------------------
-
 io.on("connection", (socket) => {
   console.log("New client connected");
 

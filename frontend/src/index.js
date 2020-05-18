@@ -10,10 +10,12 @@ ReactDOM.render(
   <Router>
     <Switch>
       <Route path="/admin/:placeId" component={ AdminApp } />
+      <Route path="/:waitingID" component={ PatientApp } />
       <Route path="/" component={ PatientApp } />
     </Switch>
   </Router>, document.getElementById('root')
 );
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
