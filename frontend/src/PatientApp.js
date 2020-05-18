@@ -1,8 +1,12 @@
 import React from "react";
 import "./styles/PatientApp.css";
 import openSocket from "socket.io-client";
+import "./styles/PatientApp.css";
 
-const socket = openSocket("http://127.0.0.1:8000/");
+const APIendpoint = "http://127.0.0.1";
+const port = 8000;
+
+const socket = openSocket(APIendpoint + ":" + port);
 
 function setCalledCb(cb) {
   socket.on("called", (number) => {
@@ -14,6 +18,10 @@ class PatientApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      placeID: props.match.params.placeID,
+      name: null,
+      address: null,
+      field: null,
       number: props.match.params.waitingID,
       called: null,
       waiting: null,
@@ -21,12 +29,39 @@ class PatientApp extends React.Component {
     setCalledCb((err, num) => this.setState({ called: num }));
   }
 
+  componentDidMount() {
+    var apicall = APIendpoint + ":" + port + "/" + this.state.placeID;
+    fetch(apicall)
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({
+          name: data.name,
+          address: data.address,
+          field: data.field,
+        });
+      })
+      .catch(console.log);
+  }
+
   render() {
-    if (this.state.number == this.state.called) {
-      return <div color="ffffff">Bitte in die Praxis kommen.</div>;
+    let status;
+    if (this.state.number === this.state.called) {
+      status = <div>Bitte in die Praxis kommen.</div>;
     } else {
-      return <div color="000000">Bitte warten.</div>;
+      status = <div>Bitte warten.</div>;
     }
+
+    return (
+      <div>
+        <div>
+          {this.state.name} <br></br>
+          {this.state.field} <br></br>
+          {this.state.address} <br></br>
+        </div>
+        Your waiting number is: {this.state.number}
+        {status}
+      </div>
+    );
   }
 }
 
