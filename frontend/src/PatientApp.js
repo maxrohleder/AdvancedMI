@@ -1,6 +1,8 @@
 import React from "react";
 import "./styles/PatientApp.css";
 import openSocket from "socket.io-client";
+import "./styles/PatientApp.css";
+import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
@@ -55,20 +57,29 @@ class PatientApp extends React.Component {
     }
 
     return (
-      <React.Fragment>
-        <div>
-          Your PlaceID is: {this.state.placeID}
-          <br />
-          {this.state.name} <br></br>
-          {this.state.field} <br></br>
-          {this.state.address} <br></br>
+      <div className="app">
+        <div className="header">
+          <div>
+            Digitaler <span>Warteraum</span>
+          </div>
+          <div>Home</div>
         </div>
-        Your ID number is: {this.state.number}
-        <br></br>
-        Your waiting number is: {this.state.waitingNumber}
-        <br></br>
-        {status}
-      </React.Fragment>
+
+        <div className="place-info">
+          <div>
+            <h1>{this.state.name}</h1>
+            {this.state.field}
+            <br />
+            {this.state.address}
+          </div>
+          <Logo id="img" />
+        </div>
+
+        <div className="card">
+          <div className="circle">{status}</div>
+          Your waiting number is: {this.state.number}
+        </div>
+      </div>
     );
   }
 }

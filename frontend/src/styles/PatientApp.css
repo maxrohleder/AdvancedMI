@@ -1,135 +1,75 @@
-.welcome-background-image {
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  height: 100vh;
-  width: 100vw;
+:root {
+  --primary-highlight-color: rgba(20, 170, 228, 1);
+  --secondary-highlight-color: rgba(20, 138, 228, 0.54);
+  --shadow-color: #3f3f3f2a;
+  caret-color: transparent;
+}
 
+.header {
+  padding: 3%;
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
 }
 
-.welcome-background-image main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+.header span {
+  font-style: italic;
+  font-weight: bold;
+  font-size: large;
 }
 
-.welcome-patient-text-wrapper {
-  margin-top: 20px;
-  text-align: center;
-  color: #333;
-  padding: 0 20px;
-}
-
-.welcome-patient-headline {
-  text-align: center;
-  color: #333;
-  text-transform: uppercase;
-}
-
-.welcome-patient-subheadline {
-  font-size: 22px;
-  padding: 0 20px;
-}
-
-.welcome-input-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-left: 20px;
-  width: 80%;
-}
-
-.welcome-patient-id-input {
-  background: rgba(10, 10, 10, 0.781);
+.place-info {
+  background-image: linear-gradient(
+    to bottom right,
+    var(--secondary-highlight-color),
+    var(--primary-highlight-color)
+  );
   color: white;
-  width: 100%;
-  height: 50px;
-  border-width: 0px;
-  border-radius: 100px;
-  text-indent: 40px;
-}
-
-.welcome-patient-button:before {
-  content: "\2192"; /* arrow-right */
-}
-
-.welcome-patient-button:hover {
-  background: rgb(192, 106, 7);
-}
-
-.welcome-patient-button {
-  height: 50px;
-  width: 100%;
-  border-radius: 30px;
-  background: rgb(245, 133, 6);
-  margin-top: 20px;
   display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
+  padding: 3vh 5vw 3vh 5vw;
 }
 
-.screenreader-text {
-  position: absolute;
-  left: -10000px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+#img {
+  max-width: 100px;
+  width: 30vw;
 }
 
-.create-new-area {
-  color: rgb(245, 133, 6);
-}
+.circle {
+  width: 40vw;
+  height: 40vw;
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 50%;
+  background-color: white;
+  border: 0.4em solid var(--primary-highlight-color);
+  box-shadow: 5px 5px 5px var(--shadow-color);
 
-.create-new-area:hover {
-  color: rgb(192, 106, 7);
-}
-
-input:focus {
-  outline-width: 0;
-}
-
-.welcome-patient-footer {
   display: flex;
+  flex-direction: column;
   justify-content: center;
-  width: 100%;
-  background: rgba(3, 3, 3, 0.4);
 }
 
-.welcome-patient-virus-logo {
-  width: 240px;
-}
+.card {
+  /* use flexbox https://css-tricks.com/snippets/css/a-guide-to-flexbox/*/
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
 
-@media (min-width: 450px) {
-  .welcome-input-wrapper {
-    width: 350px;
-  }
-}
+  /* dimensions of card */
+  width: 80vw;
+  height: 59vh;
+  margin: 5vh 10vw 5vh 10vw; /*top right bottom left*/
 
-@media (min-width: 1000px) {
-  .welcome-patient-text-wrapper {
-    margin-top: 0;
-  }
+  /* contents in card (em = device font size) */
+  text-align: center;
+  font-size: 1.5em;
 
-  .welcome-input-wrapper {
-    width: 40%;
-    flex-direction: row;
-  }
-
-  .welcome-patient-button {
-    margin-top: 0;
-    margin-left: 20px;
-    max-width: 80px;
-  }
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+  background: #ffffff;
+  border: 2px solid #eaf0f7;
+  box-sizing: border-box;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  border-radius: 6px;
 }
