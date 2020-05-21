@@ -29,7 +29,7 @@ class PatientApp extends React.Component {
     };
     setCalledCb((err, num) => this.setState({ called: num }));
     socket.on("update", (e) => {
-      var id = e.list.find((x) => x.id == this.state.number).waitingNumber;
+      var id = e.list.find((x) => x.id === this.state.number).waitingNumber;
       this.setState({ waitingNumber: id });
     });
   }

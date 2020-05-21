@@ -10,7 +10,7 @@ class LoginForAdmin extends Component {
   handleChange = (event) => {
     var target = event.target;
     console.log(target.id);
-    if (target.id == "praxis") {
+    if (target.id === "praxis") {
       this.setState({ praxisID: event.target.value });
       console.log("updated : " + target.id + " : " + event.target.value);
     } else {
