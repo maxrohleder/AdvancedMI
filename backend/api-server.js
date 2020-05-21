@@ -33,6 +33,7 @@ const app = express();
 app.use(cors());
 const server = http.createServer(app);
 const io = socketIo(server);
+io.origins("*:*");
 
 // making sockets available in rest api
 app.io = io;
