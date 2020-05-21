@@ -1,7 +1,6 @@
 import React from "react";
 import "./styles/PatientApp.css";
 import openSocket from "socket.io-client";
-import "./styles/PatientApp.css";
 
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
@@ -13,7 +12,6 @@ function setCalledCb(cb) {
     cb(null, number);
   });
 }
-
 class PatientApp extends React.Component {
   constructor(props) {
     super(props);
@@ -23,10 +21,15 @@ class PatientApp extends React.Component {
       address: null,
       field: null,
       number: props.match.params.waitingID,
+      waitingNumber: null,
       called: null,
       waiting: null,
     };
     setCalledCb((err, num) => this.setState({ called: num }));
+    socket.on("update", (e) => {
+      var id = e.list.find((x) => x.id == this.state.number).waitingNumber;
+      this.setState({ waitingNumber: id });
+    });
   }
 
   componentDidMount() {
@@ -52,15 +55,20 @@ class PatientApp extends React.Component {
     }
 
     return (
-      <div>
+      <React.Fragment>
         <div>
+          Your PlaceID is: {this.state.placeID}
+          <br />
           {this.state.name} <br></br>
           {this.state.field} <br></br>
           {this.state.address} <br></br>
         </div>
-        Your waiting number is: {this.state.number}
+        Your ID number is: {this.state.number}
+        <br></br>
+        Your waiting number is: {this.state.waitingNumber}
+        <br></br>
         {status}
-      </div>
+      </React.Fragment>
     );
   }
 }

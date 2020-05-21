@@ -15,6 +15,19 @@ const getDetails = (placeID) => {
   };
 };
 
+const updateWaitingNumber = () => {
+  return {
+    list: [
+      { id: 5, waitingNumber: 5 },
+      { id: 6, waitingNumber: 8 },
+      { id: 7, waitingNumber: 6 },
+      { id: 8, waitingNumber: 9 },
+      { id: 9, waitingNumber: 1 },
+      { id: 10, waitingNumber: 2 },
+    ],
+  };
+};
+
 // creating the http and socket server
 const app = express();
 app.use(cors());
@@ -30,7 +43,16 @@ app.get("/", (req, res) => {
   res.send({ response: "I am alive" }).status(200);
 });
 
+app.get("/update", (req, res) => {
+  req.app.io.emit("update", updateWaitingNumber());
+  console.log("updated ", updateWaitingNumber());
+  res
+    .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
+    .status(200);
+});
+
 app.get("/:placeID", (req, res) => {
+  var number = req.params.number;
   console.log("place details requested");
   res.send(getDetails(req.params.placeID)).status(200);
 });
@@ -41,6 +63,7 @@ app.get("/call/:number", (req, res) => {
   console.log("emitted patient number ", number);
   res.send({ response: "called " + number }).status(200);
 });
+
 // ---------------------all api routes---------------------
 // --------------------------------------------------------
 
