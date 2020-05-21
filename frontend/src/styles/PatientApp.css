@@ -3,6 +3,7 @@
   --secondary-highlight-color: rgba(20, 138, 228, 0.54);
   --shadow-color: #3f3f3f2a;
   caret-color: transparent;
+  color: #67758d;
 }
 
 .header {
@@ -46,6 +47,7 @@
   border: 0.4em solid var(--primary-highlight-color);
   box-shadow: 5px 5px 5px var(--shadow-color);
 
+  font-size: 3em;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -72,4 +74,9 @@
   box-sizing: border-box;
   box-shadow: 5px 5px 5px var(--shadow-color);
   border-radius: 6px;
+}
+
+.card span {
+  font-style: italic;
+  font-size: 1.5em;
 }

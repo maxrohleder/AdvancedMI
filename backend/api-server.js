@@ -18,12 +18,12 @@ const getDetails = (placeID) => {
 const updateWaitingNumber = () => {
   return {
     list: [
-      { id: 5, waitingNumber: 5 },
-      { id: 6, waitingNumber: 8 },
-      { id: 7, waitingNumber: 6 },
-      { id: 8, waitingNumber: 9 },
-      { id: 9, waitingNumber: 1 },
-      { id: 10, waitingNumber: 2 },
+      { id: 5, pos: 5 },
+      { id: 6, pos: 8 },
+      { id: 7, pos: 6 },
+      { id: 8, pos: 9 },
+      { id: 9, pos: 1 },
+      { id: 10, pos: 2 },
     ],
   };
 };
@@ -71,6 +71,10 @@ app.get("/call/:number", (req, res) => {
 // -------------------all socket cbs-----------------------
 io.on("connection", (socket) => {
   console.log("New client connected");
+
+  // send inital information
+  socket.emit("update", updateWaitingNumber());
+  socket.emit("timing", 10);
 
   // end timer on disconnect
   socket.on("disconnect", () => {
