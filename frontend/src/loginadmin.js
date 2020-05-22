@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import LoginForAdmin from "./components/loginForAdmin.jsx";
+import LoginForAdmin from "./components/loginForAdmin.js";
 
 class LoginAdmin extends Component {
   state = {};

@@ -77,7 +77,9 @@ class PatientApp extends React.Component {
 
         <div className="card">
           <div className="circle">{status}</div>
-          Your waiting number is: {this.state.number}
+          Your ID number is: {this.state.number}
+          <br />
+          Your Waiting number is: {this.state.waitingNumber}
         </div>
       </div>
     );
