@@ -10,7 +10,7 @@ class LoginForUser extends Component {
   handleChange = (event) => {
     var target = event.target;
     console.log(target.id);
-    if (target.id == "praxis") {
+    if (target.id === "praxis") {
       this.setState({ praxisID: event.target.value });
       console.log("updated : " + target.id + " : " + event.target.value);
     } else {
@@ -29,11 +29,11 @@ class LoginForUser extends Component {
     if (praxisID == null) {
       alert("Gultige PraxisID eingeben ...: " + praxisID);
     } else {
-      if (this.state.isPraxis && userID == "") {
+      if (this.state.isPraxis && userID === "") {
         alert("Gultige User ID eingeben ...: " + userID);
         //return;
       }
-      if (this.state.isPraxis && userID != "") {
+      if (this.state.isPraxis && userID !== "") {
         alert(
           "CHK if  User ID is valid for praxisID  ...: " +
             userID +
@@ -49,9 +49,11 @@ class LoginForUser extends Component {
   };
 
   isPraxis = () => {
-    if (this.props.praxisID != undefined) {
-      this.state.praxisID = this.props.praxisID;
-      this.state.isPraxis = true;
+    if (this.props.praxisID !== undefined) {
+      this.setState({
+        praxisID: this.props.praxisID,
+        isPraxis: true,
+      });
       return (
         <div>
           <button onClick={() => this.clickBackButton()}>Back to Login</button>

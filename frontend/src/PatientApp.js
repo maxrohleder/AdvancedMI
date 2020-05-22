@@ -10,28 +10,53 @@ const port = 8000;
 const socket = openSocket(APIendpoint + ":" + port);
 
 function setCalledCb(cb) {
-  socket.on("called", (number) => {
-    cb(null, number);
+  socket.on("called", (patId) => {
+    cb(null, patId);
   });
 }
+
+function setUpdateCb(cb) {
+  socket.on("update", (data) => {
+    cb(null, data.list);
+  });
+}
+
+function setTimingCb(cb) {
+  socket.on("timing", (dt) => {
+    cb(null, dt);
+  });
+}
+
 class PatientApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       placeID: props.match.params.placeID,
+      patientID: props.match.params.waitingID,
+
       name: null,
       address: null,
       field: null,
-      number: props.match.params.waitingID,
-      waitingNumber: null,
-      called: null,
-      waiting: null,
+
+      waitingPosition: null, // calculated on update
+      minPerPerson: null, // used to calculate time estimate
+      isCalled: null,
     };
-    setCalledCb((err, num) => this.setState({ called: num }));
-    socket.on("update", (e) => {
-      var id = e.list.find((x) => x.id == this.state.number).waitingNumber;
-      this.setState({ waitingNumber: id });
+
+    // subscribe to called
+    setCalledCb((err, num) => {
+      var c = num === this.state.patientID;
+      this.setState({ isCalled: c });
     });
+
+    // subscribe to update
+    setUpdateCb((err, lst) => {
+      var pos = lst.find((x) => x.id == this.state.patientID).pos;
+      this.setState({ waitingPosition: pos });
+    });
+
+    // subscribe to timing
+    setTimingCb((err, dt) => this.setState({ minPerPerson: dt }));
   }
 
   componentDidMount() {
@@ -50,10 +75,16 @@ class PatientApp extends React.Component {
 
   render() {
     let status;
-    if (this.state.number === this.state.called) {
+    if (this.state.isCalled) {
       status = <div>Bitte in die Praxis kommen.</div>;
     } else {
-      status = <div>Bitte warten.</div>;
+      var timeEstimate = this.state.waitingPosition * this.state.minPerPerson;
+      status = (
+        <div>
+          Ihre ungefähre Wartezeit beträgt <br />
+          <span>{timeEstimate} Minuten.</span>
+        </div>
+      );
     }
 
     return (
@@ -76,10 +107,9 @@ class PatientApp extends React.Component {
         </div>
 
         <div className="card">
-          <div className="circle">{status}</div>
-          Your ID number is: {this.state.number}
-          <br />
-          Your Waiting number is: {this.state.waitingNumber}
+          Patienten vor Ihnen:
+          <div className="circle">{this.state.waitingPosition}</div>
+          {status}
         </div>
       </div>
     );
