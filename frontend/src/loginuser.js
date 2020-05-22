@@ -14,7 +14,10 @@ class LoginUser extends Component {
         <p>hey user</p>
         Your PlaceID is: {this.state.placeID}
         <br />
-        <LoginForUser praxisID={this.state.placeID} />
+        <LoginForUser
+          praxisID={this.state.placeID}
+          isPraxis={!("" === this.state.placeID)}
+        />
         <br />
       </React.Fragment>
     );

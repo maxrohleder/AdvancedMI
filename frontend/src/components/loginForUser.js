@@ -4,7 +4,11 @@ import React, { Component } from "react";
 class LoginForUser extends Component {
   constructor(props) {
     super(props);
-    this.state = { praxisID: null, userID: null, isPraxis: false };
+    this.state = {
+      praxisID: props.praxisID,
+      userID: null,
+      isPraxis: props.isPraxis,
+    };
   }
 
   handleChange = (event) => {
@@ -49,11 +53,7 @@ class LoginForUser extends Component {
   };
 
   isPraxis = () => {
-    if (this.props.praxisID !== undefined) {
-      this.setState({
-        praxisID: this.props.praxisID,
-        isPraxis: true,
-      });
+    if (this.props.isPraxis === true) {
       return (
         <div>
           <button onClick={() => this.clickBackButton()}>Back to Login</button>
@@ -92,6 +92,7 @@ class LoginForUser extends Component {
         <button onClick={() => this.clickAdminButton()}>Admin</button>
 
         {this.isPraxis()}
+
         <form onSubmit={this.handleSubmit}>
           <label>
             UserID:
