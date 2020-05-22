@@ -1,7 +1,6 @@
 import React from "react";
 import "./styles/PatientApp.css";
 import openSocket from "socket.io-client";
-import "./styles/PatientApp.css";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";

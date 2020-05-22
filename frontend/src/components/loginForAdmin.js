@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-//import Jumbotron from "../react-bootstrap/Jumbotron";
 
 class LoginForAdmin extends Component {
   constructor(props) {
@@ -41,12 +40,10 @@ class LoginForAdmin extends Component {
 
   render() {
     return (
-      <React.Fragment>
-        <img src={"https://picsum.photos/200"} alt="" />
+      <div className={"form-admin"}>
         <form onSubmit={this.handleSubmit}>
-          {" "}
           <label>
-            Praxis:
+            Praxis: <br />
             <input
               type="text"
               name="praxis"
@@ -58,8 +55,9 @@ class LoginForAdmin extends Component {
           <br />
           <label>
             Passwort:
+            <br />
             <input
-              type="text"
+              type="password"
               name="password"
               id="password"
               value2={this.state.password}
@@ -67,9 +65,11 @@ class LoginForAdmin extends Component {
             />
           </label>
           <br />
-          <input type="submit" value="Submit" />
+          <div className="container-button">
+            <input type="submit" value="Betreten" />
+          </div>
         </form>
-      </React.Fragment>
+      </div>
     );
   }
 }

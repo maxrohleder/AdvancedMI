@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 //import Jumbotron from "../react-bootstrap/Jumbotron";
+import "../styles/LoginUser.css";
 
 class LoginForUser extends Component {
   constructor(props) {
@@ -55,14 +56,16 @@ class LoginForUser extends Component {
   isPraxis = () => {
     if (this.props.isPraxis === true) {
       return (
-        <div>
-          <button onClick={() => this.clickBackButton()}>Back to Login</button>
-          <p>Wilkommen in Praxis : {this.props.praxisID}</p>
+        <div className="isPraxis">
+          <span>
+            Wilkommen in Praxis :<br />
+          </span>
+          <p>{this.props.praxisID}</p>
         </div>
       );
     } else {
       return (
-        <div>
+        <React.Fragment>
           <label>
             Praxis:
             <input
@@ -73,27 +76,16 @@ class LoginForUser extends Component {
               onChange={this.handleChange}
             />
           </label>
-        </div>
+          <br />
+        </React.Fragment>
       );
     }
   };
-  clickAdminButton = () => {
-    window.open("http://localhost:3000/admin", "_blank");
-  };
-  clickBackButton = () => {
-    window.open("http://localhost:3000", "_blank");
-  };
   render() {
     return (
-      <React.Fragment>
-        <img src={"https://picsum.photos/200"} alt="" />
-        <br />
-
-        <button onClick={() => this.clickAdminButton()}>Admin</button>
-
-        {this.isPraxis()}
-
+      <div className="form-user">
         <form onSubmit={this.handleSubmit}>
+          {this.isPraxis()}
           <label>
             UserID:
             <input
@@ -105,9 +97,11 @@ class LoginForUser extends Component {
             />
           </label>
           <br />
-          <input type="submit" value="Submit" />
+          <div className="container-button">
+            <input type="submit" value="Betreten" />
+          </div>
         </form>
-      </React.Fragment>
+      </div>
     );
   }
 }
