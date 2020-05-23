@@ -11,6 +11,10 @@
   display: flex;
   justify-content: space-between;
 }
+.header a {
+  color: black;
+  opacity: 0.5;
+}
 
 .header span {
   font-style: italic;

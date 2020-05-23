@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 //import Jumbotron from "../react-bootstrap/Jumbotron";
 import "../styles/LoginUser.css";
+const APIendpoint = "http://127.0.0.1";
+const port = 8000;
 
 class LoginForUser extends Component {
   constructor(props) {
@@ -9,6 +11,10 @@ class LoginForUser extends Component {
       praxisID: props.praxisID,
       userID: null,
       isPraxis: props.isPraxis,
+
+      name: null,
+      address: null,
+      field: null,
     };
   }
 
@@ -45,9 +51,9 @@ class LoginForUser extends Component {
             " --> " +
             praxisID
         );
-        window.open(newPageUrl, "_blank");
+        window.open(newPageUrl, "_self");
       } else if (!this.state.isPraxis) {
-        window.open(newPageUrl, "_blank");
+        window.open(newPageUrl, "_self");
       }
     }
     event.preventDefault();
@@ -58,9 +64,10 @@ class LoginForUser extends Component {
       return (
         <div className="isPraxis">
           <span>
-            Wilkommen in Praxis :<br />
+            Wilkommen
+            <br />
           </span>
-          <p>{this.props.praxisID}</p>
+          Bitte geben sie ihre <span>UserID</span> ein
         </div>
       );
     } else {
@@ -81,13 +88,19 @@ class LoginForUser extends Component {
       );
     }
   };
+  isPraxis_hide = () => {
+    var x = "";
+    x = this.props.isPraxis === true ? "" : "UserID";
+    return x;
+  };
+
   render() {
     return (
       <div className="form-user">
         <form onSubmit={this.handleSubmit}>
           {this.isPraxis()}
           <label>
-            UserID:
+            {this.isPraxis_hide()}
             <input
               type="text"
               name="user"

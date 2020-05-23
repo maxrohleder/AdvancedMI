@@ -92,7 +92,9 @@ class PatientApp extends React.Component {
           <div>
             Digitaler <span>Warteraum</span>
           </div>
-          <div>Home</div>
+          <div>
+            <a href="http://localhost:3000">Home</a>
+          </div>
         </div>
 
         <div className="place-info">

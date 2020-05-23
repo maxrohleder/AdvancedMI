@@ -27,7 +27,7 @@ class LoginForAdmin extends Component {
     var newPageUrl = "http://localhost:3000/admin/" + praxisID;
     if (praxisID != null && password != null) {
       alert("CHK if PW is correct ...: " + password);
-      window.open(newPageUrl, "_blank");
+      window.open(newPageUrl, "_self");
       event.preventDefault();
     } else if (praxisID == null) {
       alert("Gueltige Praxis ID eingeben ...: " + praxisID);

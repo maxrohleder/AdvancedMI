@@ -8,7 +8,7 @@ class LoginAdmin extends Component {
   state = {};
   render() {
     return (
-      <div className="app">
+      <div className="app1">
         <div className="container-admin">
           <div className="name-admin">
             Digitaler <span>Warteraum</span>
@@ -19,7 +19,6 @@ class LoginAdmin extends Component {
           <LoginForAdmin />
         </div>
         <div className="container-bottom">
-          {" "}
           <a href="http://localhost:3000">Patient</a>
           <a href="https://www.google.de">About</a>
           <a href="https://www.google.de">AGB</a>
