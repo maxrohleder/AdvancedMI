@@ -18,12 +18,10 @@ const getDetails = (placeID) => {
 const updateWaitingNumber = () => {
   return {
     list: [
-      { id: 5, pos: 5 },
-      { id: 6, pos: 8 },
-      { id: 7, pos: 6 },
-      { id: 8, pos: 9 },
-      { id: 9, pos: 1 },
-      { id: 10, pos: 2 },
+      { id: "jj98", pos: 2 },
+      { id: "mr98", pos: 3 },
+      { id: "fh98", pos: 4 },
+      { id: "cp97", pos: 1 },
     ],
   };
 };
