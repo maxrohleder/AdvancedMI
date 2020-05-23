@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import LoginForUser from "./components/loginForUser.js";
-import openSocket from "socket.io-client";
 
 import "./styles/LoginUser.css";
 import "./styles/LoginAdmin.css";
@@ -8,7 +7,6 @@ import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
-const socket = openSocket(APIendpoint + ":" + port);
 
 class LoginUser extends Component {
   constructor(props) {

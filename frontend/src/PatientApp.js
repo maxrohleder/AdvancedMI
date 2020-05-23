@@ -2,13 +2,15 @@ import React from "react";
 import "./styles/PatientApp.css";
 import { Redirect } from "react-router-dom";
 
-import openSocket from "socket.io-client";
+import io from "socket.io-client";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
-
-const socket = openSocket(APIendpoint + ":" + port);
+const socket = io.connect(APIendpoint + ":" + port, { autoConnect: false });
+// const socket = io({
+//   autoConnect: false,
+// });
 
 function setCalledCb(cb) {
   socket.on("called", (patId) => {
@@ -44,14 +46,21 @@ class PatientApp extends React.Component {
       isCalled: null,
       redirect: null, // set by update callback when patientID is not found
     };
+  }
 
-    // subscribe to called
+  componentDidMount() {
+    // connect to real-time server on backend
+    if (socket.disconnected) {
+      socket.open();
+    }
+
+    // subscribe to called channel
     setCalledCb((err, num) => {
       var c = num === this.state.patientID;
       this.setState({ isCalled: c });
     });
 
-    // subscribe to update
+    // subscribe to update channel
     setUpdateCb((err, lst) => {
       var entry = lst.find((x) => x.id == this.state.patientID);
       if (typeof entry === "undefined") {
@@ -62,11 +71,10 @@ class PatientApp extends React.Component {
       }
     });
 
-    // subscribe to timing
+    // subscribe to timing channel
     setTimingCb((err, dt) => this.setState({ minPerPerson: dt }));
-  }
 
-  componentDidMount() {
+    // fetch place information from placeID
     var apicall = APIendpoint + ":" + port + "/" + this.state.placeID;
     fetch(apicall)
       .then((response) => response.json())
@@ -78,6 +86,10 @@ class PatientApp extends React.Component {
         });
       })
       .catch(console.log);
+  }
+
+  componentWillUnmount() {
+    socket.close();
   }
 
   render() {

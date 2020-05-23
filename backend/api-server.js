@@ -39,9 +39,12 @@ app.io = io;
 // --------------------------------------------------------
 // ---------------------all api routes---------------------
 app.get("/", (req, res) => {
-  res.send({ response: "I am alive" }).status(200);
+  res
+    .send({ response: "This is the Digitales Wartezimmer Backend" })
+    .status(200);
 });
 
+// will not need this method in the future as changes to the db will be emmited directly
 app.get("/update", (req, res) => {
   req.app.io.emit("update", updateWaitingNumber());
   console.log("updated ", updateWaitingNumber());
@@ -83,4 +86,4 @@ io.on("connection", (socket) => {
 // -------------------all socket cbs-----------------------
 // --------------------------------------------------------
 
-server.listen(port, () => console.log(`listening on http://127.0.0.1:8000`));
+server.listen(port, () => console.log(`listening on http://127.0.0.1:` + port));
