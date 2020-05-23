@@ -15,15 +15,17 @@ const getDetails = (placeID) => {
   };
 };
 
+const queue = {
+  list: [
+    { id: "jj98", pos: 2 },
+    { id: "mr98", pos: 3 },
+    { id: "fh98", pos: 4 },
+    { id: "cp97", pos: 1 },
+  ],
+};
+
 const updateWaitingNumber = () => {
-  return {
-    list: [
-      { id: "jj98", pos: 2 },
-      { id: "mr98", pos: 3 },
-      { id: "fh98", pos: 4 },
-      { id: "cp97", pos: 1 },
-    ],
-  };
+  return queue;
 };
 
 // creating the http and socket server
@@ -64,6 +66,20 @@ app.get("/call/:number", (req, res) => {
   req.app.io.emit("called", number);
   console.log("emitted patient number ", number);
   res.send({ response: "called " + number }).status(200);
+});
+
+app.get("/exists/:placeid/:patid", (req, res) => {
+  var number = req.params.patid;
+  console.log(number);
+  var entry = queue.list.find((x) => x.id == number);
+  if (typeof entry === "undefined") {
+    // the patientID is not registered (anymore)
+    console.log("patient not confirmed " + number);
+    res.send({ userConfirmed: false }).status(200);
+  } else {
+    console.log("patient confirmed");
+    res.send({ userConfirmed: true }).status(200);
+  }
 });
 
 // ---------------------all api routes---------------------

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link, Redirect } from "react-router-dom";
 import LoginForUser from "./components/loginForUser.js";
 
 import "./styles/LoginUser.css";
@@ -41,7 +42,7 @@ class LoginUser extends Component {
             Digitaler <span>Warteraum</span>
           </div>
           <div>
-            <a href="http://localhost:3000">Home</a>
+            <Link to="/">Home</Link>
           </div>
         </div>
 
