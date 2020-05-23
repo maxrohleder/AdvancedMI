@@ -1,5 +1,7 @@
 import React from "react";
 import "./styles/PatientApp.css";
+import { Redirect } from "react-router-dom";
+
 import openSocket from "socket.io-client";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
@@ -40,6 +42,7 @@ class PatientApp extends React.Component {
       waitingPosition: null, // calculated on update
       minPerPerson: null, // used to calculate time estimate
       isCalled: null,
+      redirect: null, // set by update callback when patientID is not found
     };
 
     // subscribe to called
@@ -50,8 +53,13 @@ class PatientApp extends React.Component {
 
     // subscribe to update
     setUpdateCb((err, lst) => {
-      var pos = lst.find((x) => x.id == this.state.patientID).pos;
-      this.setState({ waitingPosition: pos });
+      var entry = lst.find((x) => x.id == this.state.patientID);
+      if (typeof entry === "undefined") {
+        // the patientID is not registered (anymore)
+        this.setState({ redirect: "/" + this.state.placeID });
+      } else {
+        this.setState({ waitingPosition: entry.pos });
+      }
     });
 
     // subscribe to timing
@@ -73,6 +81,11 @@ class PatientApp extends React.Component {
   }
 
   render() {
+    // Redirect to login screen if the patientID was not found
+    if (this.state.redirect) {
+      return <Redirect to={this.state.redirect} />;
+    }
+
     let status;
     if (this.state.isCalled) {
       status = <div>Bitte in die Praxis kommen.</div>;
@@ -93,7 +106,7 @@ class PatientApp extends React.Component {
             Digitaler <span>Warteraum</span>
           </div>
           <div>
-            <a href="http://localhost:3000">Home</a>
+            <a href="/">Home</a>
           </div>
         </div>
 
