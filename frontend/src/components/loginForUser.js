@@ -39,6 +39,9 @@ class LoginForUser extends Component {
     var praxisID = this.state.praxisID;
     var userID = this.state.userID == null ? "null" : this.state.userID;
 
+    console.log("praxisID: " + praxisID);
+    console.log("userID: " + userID);
+
     if (praxisID == null) {
       alert("Gultige PraxisID eingeben ...: " + praxisID);
     } else {
@@ -58,8 +61,14 @@ class LoginForUser extends Component {
               this.setState({ redirect: newPageUrl });
             } else {
               if (userID == "null") {
-                console.log("praxis confirmed and userId null -> /ort/praxis");
-                this.setState({ redirect: newPageUrl });
+                if (this.state.isPraxis && userID == "null") {
+                  alert("Bitte UserId eingeben");
+                } else {
+                  console.log(
+                    "praxis confirmed and userId null -> /ort/praxis"
+                  );
+                  this.setState({ redirect: newPageUrl });
+                }
               } else {
                 console.log("praxis confirmed and userId NOT confirmed");
                 alert("UserID " + userID + " ist ungültig. Bitte überprüfen.");
