@@ -1,8 +1,8 @@
 import React, { Component } from "react";
+import { Link, Redirect } from "react-router-dom";
 import LoginForUser from "./components/loginForUser.js";
 
 import "./styles/LoginUser.css";
-import "./styles/LoginAdmin.css";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";
@@ -41,7 +41,7 @@ class LoginUser extends Component {
             Digitaler <span>Warteraum</span>
           </div>
           <div>
-            <a href="http://localhost:3000">Home</a>
+            <Link to="/">Home</Link>
           </div>
         </div>
 

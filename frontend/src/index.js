@@ -7,19 +7,21 @@ import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 import AdminApp from "./AdminApp";
 import PatientApp from "./PatientApp";
+import Error from "./error";
 
 import Login from "./login";
-import LoginUser from "./loginuser";
-import LoginAdmin from "./loginadmin";
+import LoginUser from "./LoginUser";
+import LoginAdmin from "./LoginAdmin";
 
 ReactDOM.render(
   <Router>
     <Switch>
       <Route path="/admin/:placeID" component={AdminApp} />
       <Route path="/admin" component={LoginAdmin} />
-      <Route path="/:placeID/:waitingID" component={PatientApp} />
-      <Route path="/:placeID" component={LoginUser} />
-      <Route path="/" component={Login} />
+      <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
+      <Route path="/ort/:placeID" component={LoginUser} />
+      <Route exact path="/" component={Login} />
+      <Route path="/error" component={Error} />
     </Switch>
   </Router>,
   document.getElementById("root")

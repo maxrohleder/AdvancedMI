@@ -1,9 +1,13 @@
 import React, { Component } from "react";
+import { Redirect, Link } from "react-router-dom";
+//import Jumbotron from "../react-bootstrap/Jumbotron";
+import "../styles/LoginAdmin.css";
 
+const APIendpoint = "http://localhost:8000/";
 class LoginForAdmin extends Component {
   constructor(props) {
     super(props);
-    this.state = { praxisID: null, password: null };
+    this.state = { praxisID: null, password: null, redirect: null };
   }
 
   handleChange = (event) => {
@@ -24,21 +28,41 @@ class LoginForAdmin extends Component {
     console.log("PASWORD: " + this.state.password);
     var praxisID = this.state.praxisID;
     var password = this.state.password;
-    var newPageUrl = "http://localhost:3000/admin/" + praxisID;
-    if (praxisID != null && password != null) {
-      alert("CHK if PW is correct ...: " + password);
-      window.open(newPageUrl, "_self");
-      event.preventDefault();
-    } else if (praxisID == null) {
-      alert("Gueltige Praxis ID eingeben ...: " + praxisID);
+    var newPageUrl = "/admin/" + praxisID;
+
+    if (praxisID == null) {
+      alert("Enter a PraxisID");
       event.preventDefault();
     } else {
-      alert("Gueltiges Passwort eingeben ...: " + password);
-      event.preventDefault();
+      if (password == null) {
+        alert("Enter a Password");
+        event.preventDefault();
+      } else {
+        console.log("fetching admin info");
+        fetch(APIendpoint + "exists/admin/" + praxisID + "/" + password)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.praxisConfirmed) {
+              this.setState({ redirect: newPageUrl });
+            } else {
+              alert("praxis oder password falsch, please try again");
+            }
+          })
+          .catch(() => {
+            console.log();
+            this.setState({ redirect: "/error" });
+          });
+
+        event.preventDefault();
+      }
     }
   };
 
   render() {
+    if (this.state.redirect) {
+      console.log("redirecting to: " + this.state.redirect);
+      return <Redirect to={this.state.redirect} />;
+    }
     return (
       <div className={"form-admin"}>
         <form onSubmit={this.handleSubmit}>

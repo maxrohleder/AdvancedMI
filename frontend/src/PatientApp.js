@@ -1,6 +1,6 @@
 import React from "react";
 import "./styles/PatientApp.css";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 
 import io from "socket.io-client";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
@@ -20,7 +20,7 @@ function setCalledCb(cb) {
 
 function setUpdateCb(cb) {
   socket.on("update", (data) => {
-    cb(null, data.list);
+    cb(null, data.ukerlangen);
   });
 }
 
@@ -35,7 +35,7 @@ class PatientApp extends React.Component {
     super(props);
     this.state = {
       placeID: props.match.params.placeID,
-      patientID: props.match.params.waitingID,
+      patientID: props.match.params.patientID,
 
       name: null,
       address: null,
@@ -76,6 +76,7 @@ class PatientApp extends React.Component {
 
     // fetch place information from placeID
     var apicall = APIendpoint + ":" + port + "/" + this.state.placeID;
+    console.log("fetching placedetails");
     fetch(apicall)
       .then((response) => response.json())
       .then((data) => {
@@ -85,7 +86,10 @@ class PatientApp extends React.Component {
           field: data.field,
         });
       })
-      .catch(console.log);
+      .catch(() => {
+        console.log("could not fetch data. Backend inactive??");
+        this.setState({ redirect: "/error" });
+      });
   }
 
   componentWillUnmount() {
@@ -118,7 +122,7 @@ class PatientApp extends React.Component {
             Digitaler <span>Warteraum</span>
           </div>
           <div>
-            <a href="/">Home</a>
+            <Link to="/">Home</Link>
           </div>
         </div>
 

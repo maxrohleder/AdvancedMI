@@ -1,6 +1,9 @@
 import React, { Component } from "react";
+import { Redirect, Link } from "react-router-dom";
 //import Jumbotron from "../react-bootstrap/Jumbotron";
 import "../styles/LoginUser.css";
+
+const APIendpoint = "http://localhost:8000/";
 
 class LoginForUser extends Component {
   constructor(props) {
@@ -9,6 +12,7 @@ class LoginForUser extends Component {
       praxisID: props.praxisID,
       userID: null,
       isPraxis: props.isPraxis,
+      redirect: null,
 
       name: null,
       address: null,
@@ -21,38 +25,54 @@ class LoginForUser extends Component {
     console.log(target.id);
     if (target.id === "praxis") {
       this.setState({ praxisID: event.target.value });
-      console.log("updated : " + target.id + " : " + event.target.value);
+      // console.log("updated : " + target.id + " : " + event.target.value);
     } else {
       this.setState({ userID: event.target.value });
-      console.log("updated : " + target.id + " : " + event.target.value);
+      // console.log("updated : " + target.id + " : " + event.target.value);
     }
   };
 
   handleSubmit = (event) => {
     //alert("A name was submitted: " + this.state.value);
-    console.log("Praxis:ID : " + this.state.praxisID);
-    console.log("User:ID: " + this.state.userID);
+    // console.log("Praxis:ID : " + this.state.praxisID);
+    // console.log("User:ID: " + this.state.userID);
     var praxisID = this.state.praxisID;
-    var userID = this.state.userID == null ? "" : this.state.userID;
-    var newPageUrl = "http://localhost:3000/" + praxisID + "/" + userID;
+    var userID = this.state.userID == null ? "null" : this.state.userID;
+
     if (praxisID == null) {
       alert("Gultige PraxisID eingeben ...: " + praxisID);
     } else {
-      if (this.state.isPraxis && userID === "") {
-        alert("Gultige User ID eingeben ...: " + userID);
-        //return;
+      var newPageUrl = "/ort/" + praxisID;
+      if (userID != "null") {
+        newPageUrl += "/id/" + userID;
       }
-      if (this.state.isPraxis && userID !== "") {
-        alert(
-          "CHK if  User ID is valid for praxisID  ...: " +
-            userID +
-            " --> " +
-            praxisID
-        );
-        window.open(newPageUrl, "_self");
-      } else if (!this.state.isPraxis) {
-        window.open(newPageUrl, "_self");
-      }
+      console.log("newPageUrl: " + newPageUrl);
+      console.log("fetching user info");
+
+      fetch(APIendpoint + "exists/user/" + praxisID + "/" + userID)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.praxisConfirmed) {
+            if (data.userConfirmed) {
+              console.log("praxis confirmed and userId confirmed");
+              this.setState({ redirect: newPageUrl });
+            } else {
+              if (userID == "null") {
+                console.log("praxis confirmed and userId null -> /ort/praxis");
+                this.setState({ redirect: newPageUrl });
+              } else {
+                console.log("praxis confirmed and userId NOT confirmed");
+                alert("UserID " + userID + " ist ungültig. Bitte überprüfen.");
+              }
+            }
+          } else {
+            alert("PraxisID " + praxisID + " ist ungültig. Bitte überprüfen.");
+          }
+        })
+        .catch(() => {
+          console.log();
+          this.setState({ redirect: "/error" });
+        });
     }
     event.preventDefault();
   };
@@ -86,6 +106,7 @@ class LoginForUser extends Component {
       );
     }
   };
+
   isPraxis_hide = () => {
     var x = "";
     x = this.props.isPraxis === true ? "" : "UserID";
@@ -93,6 +114,11 @@ class LoginForUser extends Component {
   };
 
   render() {
+    if (this.state.redirect) {
+      console.log("redirecting to: " + this.state.redirect);
+      return <Redirect to={this.state.redirect} />;
+    }
+
     return (
       <div className="form-user">
         <form onSubmit={this.handleSubmit}>

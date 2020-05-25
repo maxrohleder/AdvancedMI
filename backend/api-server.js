@@ -15,15 +15,27 @@ const getDetails = (placeID) => {
   };
 };
 
+const queue = {
+  ukerlangen: [
+    { id: "jj97", pos: 1337 },
+    { id: "mr98", pos: 3 },
+    { id: "fh98", pos: 4 },
+    { id: "cp97", pos: 1 },
+  ],
+  drcovid: [{ id: "bat1", pos: 1 }],
+};
+
+const praxen = {
+  praxisToPassword: [
+    { praxisID: "ukerlangen", password: "123" },
+    { praxisID: "covidTestLabor", password: "666" },
+    { praxisID: "waschmaschienenPortal", password: "333" },
+    { praxisID: "a", password: "a" },
+  ],
+};
+
 const updateWaitingNumber = () => {
-  return {
-    list: [
-      { id: "jj98", pos: 2 },
-      { id: "mr98", pos: 3 },
-      { id: "fh98", pos: 4 },
-      { id: "cp97", pos: 1 },
-    ],
-  };
+  return queue;
 };
 
 // creating the http and socket server
@@ -64,6 +76,59 @@ app.get("/call/:number", (req, res) => {
   req.app.io.emit("called", number);
   console.log("emitted patient number ", number);
   res.send({ response: "called " + number }).status(200);
+});
+
+app.get("/exists/admin/:praxisID/:password", (req, res) => {
+  var praxisID = req.params.praxisID;
+  var password = req.params.password;
+  var entry = praxen.praxisToPassword.find((x) => x.praxisID == praxisID);
+
+  console.log("placeID: " + praxisID);
+  console.log("password: " + password);
+  console.log("entry: " + entry);
+
+  if (typeof entry === "undefined") {
+    // the praxis does not exist
+    console.log("praxis does not exist " + praxisID);
+    res.send({ praxisConfirmed: false }).status(200);
+  } else {
+    console.log("check passwort for praxis: " + praxisID);
+    if (entry.password == password) {
+      console.log("password correct");
+      res.send({ praxisConfirmed: true }).status(200);
+    } else {
+      console.log("password false");
+      res.send({ praxisConfirmed: false }).status(200);
+    }
+  }
+});
+app.get("/exists/user/:praxisID/:patID", (req, res) => {
+  var praxisID = req.params.praxisID;
+  var number = req.params.patID;
+  var entry = praxen.praxisToPassword.find((x) => x.praxisID == praxisID);
+
+  console.log("praxisID: " + praxisID);
+  console.log("number: " + number);
+  console.log("entry: " + entry);
+
+  if (typeof entry === "undefined") {
+    // the praxis does not exist
+    console.log("praxis does not exist " + praxisID);
+    res.send({ praxisConfirmed: false }).status(200);
+  } else {
+    console.log("praxis does exist " + praxisID);
+    //res.send({ praxisConfirmed: true}).status(200);
+
+    entry = queue.ukerlangen.find((x) => x.id == number);
+    if (typeof entry === "undefined") {
+      // the patientID is not registered (anymore)
+      console.log("patient not confirmed " + number);
+      res.send({ praxisConfirmed: true, userConfirmed: false }).status(200);
+    } else {
+      console.log("patient confirmed");
+      res.send({ praxisConfirmed: true, userConfirmed: true }).status(200);
+    }
+  }
 });
 
 // ---------------------all api routes---------------------

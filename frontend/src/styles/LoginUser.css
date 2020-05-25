@@ -2,12 +2,12 @@
   --primary-highlight-color: rgba(20, 170, 228, 1);
   --secondary-highlight-color: rgba(20, 138, 228, 0.54);
   --shadow-color: #3f3f3f2a;
-  caret-color: transparent;
   color: #67758d;
 }
 .app1 {
   background-color: white;
 }
+
 .container-user {
   width: 50%;
   margin-top: 7%;
@@ -74,6 +74,7 @@
   border-radius: 6px;
   margin-top: 3px;
   margin-bottom: 3px;
+  caret-color: black;
 }
 .form-user input[type="password"] {
   width: 100%;
@@ -82,6 +83,7 @@
   border-radius: 6px;
   margin-top: 3px;
   margin-bottom: 3px;
+  caret-color: black;
 }
 .container-button {
   display: flex;

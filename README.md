@@ -112,6 +112,7 @@ One waiting queue per doctors office. The welcome page can be accessed with the 
 - Estimate waiting time based on moving average
 - Enable a primitive form of patient-receptionist communication (confirm proximity button @ patient front-end)
 - Integrate with scheduling tool and appointment tool
+- Digitally Edit and Send the 'preexisting conditions' form
 
 ## Open Questions
 
