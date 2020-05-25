@@ -72,7 +72,6 @@ class LoginForAdmin extends Component {
               type="text"
               name="praxis"
               id="praxis"
-              value1={this.state.praxisID}
               onChange={this.handleChange}
             />
           </label>
@@ -84,7 +83,6 @@ class LoginForAdmin extends Component {
               type="password"
               name="password"
               id="password"
-              value2={this.state.password}
               onChange={this.handleChange}
             />
           </label>

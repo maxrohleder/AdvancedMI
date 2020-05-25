@@ -30,13 +30,32 @@ class AdminApp extends React.Component {
     console.log("mount " + this.state.queueData);
   }
 
+  handleChange = (e) => {
+    console.log(e);
+    var dummy = {
+      patientID: e.patientID,
+      first_name: e.first_name,
+      surname: e.surname,
+      appointment_date: e.appointment_date,
+      short_diagnosis: e.short_diagnosis,
+      mobile: e.mobile,
+      email: e.email,
+    };
+    var newData = [...this.state.queueData, { ...dummy, pos: e.pos }];
+    console.log("NEW DATA: " + newData);
+    this.setState({ queueData: newData });
+    alert(
+      "handleChange aufgreufen und neue Daten aus irgendEinemGrund nicht anthis.state.queueData  angehängt"
+    );
+  };
+
   render() {
     return (
       <div>
         <h1>Welcome to the front desk of {this.state.praxisID}!</h1>
         <a href="http://localhost:3000">Home</a>
         <div>
-          <PatientManagement data={this.state.queueData} />
+          <PatientManagement doChange={this.handleChange} />
           <Queue data={this.state.queueData} />
           <InfoBox />
         </div>

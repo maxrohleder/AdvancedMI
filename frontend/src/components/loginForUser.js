@@ -106,7 +106,6 @@ class LoginForUser extends Component {
               type="text"
               name="praxis"
               id="praxis"
-              value1={this.state.praxisID}
               onChange={this.handleChange}
             />
           </label>
@@ -138,7 +137,6 @@ class LoginForUser extends Component {
               type="text"
               name="user"
               id="user"
-              value2={this.state.userID}
               onChange={this.handleChange}
             />
           </label>
