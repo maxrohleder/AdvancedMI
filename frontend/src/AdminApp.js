@@ -8,7 +8,7 @@ class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      praxisID: null, // TODO
+      praxisID: props.match.params.placeID, // TODO
 
       name: null,
       address: null,
@@ -33,7 +33,7 @@ class AdminApp extends React.Component {
   render() {
     return (
       <div>
-        <h1>Welcome to the front desk of {this.props.match.params.placeId}!</h1>
+        <h1>Welcome to the front desk of {this.state.praxisID}!</h1>
         <a href="http://localhost:3000">Home</a>
         <div>
           <PatientManagement data={this.state.queueData} />
