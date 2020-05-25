@@ -10,8 +10,8 @@ import PatientApp from "./PatientApp";
 import Error from "./error";
 
 import Login from "./login";
-import LoginUser from "./loginuser";
-import LoginAdmin from "./loginadmin";
+import LoginUser from "./LoginUser";
+import LoginAdmin from "./LoginAdmin";
 
 ReactDOM.render(
   <Router>

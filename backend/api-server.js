@@ -16,12 +16,13 @@ const getDetails = (placeID) => {
 };
 
 const queue = {
-  list: [
+  ukerlangen: [
     { id: "jj98", pos: 2 },
     { id: "mr98", pos: 3 },
     { id: "fh98", pos: 4 },
     { id: "cp97", pos: 1 },
   ],
+  drcovid: [{ id: "bat1", pos: 1 }],
 };
 
 const updateWaitingNumber = () => {
