@@ -1,5 +1,9 @@
-import React from "react";
-import "../styles/PatMan.css";
+import React, { Component } from "react";
+import { Redirect, Link } from "react-router-dom";
+//import Jumbotron from "../react-bootstrap/Jumbotron";
+import "../styles/LoginAdmin.css";
+
+const APIendpoint = "http://localhost:8000/";
 
 /*
 
@@ -70,18 +74,48 @@ class PatientManagement extends React.Component {
   };
 
   handleSubmit = (event) => {
-    var data = {
-      patientID: 5,
+    var patientenData = {
+      patientID: null,
       first_name: this.state.first_name,
       surname: this.state.surname,
       appointment_date: this.state.appointment_date,
       short_diagnosis: this.state.short_diagnosis,
       mobile: this.state.mobile,
       email: this.state.email,
-      pos: 55,
+      pos: null,
     };
-    console.log("data from patman: " + data);
-    this.props.doChange(data);
+    var praxisID = this.props.praxisID;
+    var url =
+      APIendpoint +
+      "admin/register/" +
+      praxisID +
+      "/" +
+      patientenData.first_name +
+      "/" +
+      patientenData.surname +
+      "/" +
+      patientenData.appointment_date +
+      "/" +
+      patientenData.short_diagnosis +
+      "/" +
+      patientenData.mobile +
+      "/" +
+      patientenData.email;
+    console.log("fetching admin info");
+    console.log("CHECK URL: " + url);
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        patientenData.patientID = data.id;
+        patientenData.pos = data.pos;
+        console.log("data from patman: " + patientenData);
+        //ab zum admin
+        this.props.doChange(patientenData);
+      })
+      .catch(() => {
+        console.log();
+        this.setState({ redirect: "/error" });
+      });
     event.preventDefault();
   };
 

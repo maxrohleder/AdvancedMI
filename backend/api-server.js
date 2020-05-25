@@ -33,6 +33,9 @@ const praxen = {
     { praxisID: "a", password: "a" },
   ],
 };
+var patientenDaten = {
+  ukerlangen: [],
+};
 
 const updateWaitingNumber = () => {
   return queue;
@@ -130,6 +133,46 @@ app.get("/exists/user/:praxisID/:patID", (req, res) => {
     }
   }
 });
+app.get(
+  "/admin/register/:praxisID/:first_name/:surname/:appointment_date/:short_diagnosis/:mobile/:email",
+  (req, res) => {
+    var first_name = req.params.first_name;
+    var surname = req.params.surname;
+    var appointment_date = req.params.appointment_date;
+    var short_diagnosis = req.params.short_diagnosis;
+    var mobile = req.params.mobile;
+    var email = req.params.email;
+
+    console.log("first_name: " + first_name);
+    console.log("surname: " + surname);
+    console.log("appointment_date: " + appointment_date);
+    console.log("short_diagnosis: " + short_diagnosis);
+    console.log("mobile: " + mobile);
+    console.log("email: " + email);
+
+    var praxisID = req.params.praxisID; //to add to praxisID
+
+    //HIER DATABASE
+    patientenDaten.ukerlangen.push({
+      first_name: first_name,
+      surname: surname,
+      appointment_date: appointment_date,
+      short_diagnosis: short_diagnosis,
+      mobile: mobile,
+      email: email,
+    });
+
+    console.log(patientenDaten);
+
+    //position und patientenID von Database
+    var patID = patientenDaten.ukerlangen.length;
+    var pos = patientenDaten.ukerlangen.length;
+
+    res
+      .send({ response: "patient eingefuegt", id: patID, pos: pos })
+      .status(200);
+  }
+);
 
 // ---------------------all api routes---------------------
 // --------------------------------------------------------

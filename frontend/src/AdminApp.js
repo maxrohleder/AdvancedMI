@@ -44,9 +44,6 @@ class AdminApp extends React.Component {
     var newData = [...this.state.queueData, { ...dummy, pos: e.pos }];
     console.log("NEW DATA: " + newData);
     this.setState({ queueData: newData });
-    alert(
-      "handleChange aufgreufen und neue Daten aus irgendEinemGrund nicht anthis.state.queueData  angehängt"
-    );
   };
 
   render() {
@@ -55,7 +52,10 @@ class AdminApp extends React.Component {
         <h1>Welcome to the front desk of {this.state.praxisID}!</h1>
         <a href="http://localhost:3000">Home</a>
         <div>
-          <PatientManagement doChange={this.handleChange} />
+          <PatientManagement
+            praxisID={this.state.praxisID}
+            doChange={this.handleChange}
+          />
           <Queue data={this.state.queueData} />
           <InfoBox />
         </div>
