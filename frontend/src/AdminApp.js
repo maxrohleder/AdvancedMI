@@ -30,7 +30,8 @@ class AdminApp extends React.Component {
     console.log("mount " + this.state.queueData);
   }
 
-  handleChange = (e) => {
+  // used to add to queue state from PatMan
+  appendToQueue = (e) => {
     console.log(e);
     var dummy = {
       patientID: e.patientID,
@@ -42,21 +43,30 @@ class AdminApp extends React.Component {
       email: e.email,
     };
     var newData = [...this.state.queueData, { ...dummy, pos: e.pos }];
-    console.log("NEW DATA: " + newData);
+    console.log("updated AdminApp State: " + newData);
     this.setState({ queueData: newData });
+  };
+
+  // used to remove from queue state from Queue
+  deleteFromQueue = (entry) => {
+    var tmp = this.state.queueData;
+    const index = tmp.indexOf(entry);
+    if (index > -1) {
+      tmp.splice(index, 1);
+      this.setState({ queueData: tmp });
+    }
   };
 
   render() {
     return (
       <div>
-        <h1>Welcome to the front desk of {this.state.praxisID}!</h1>
-        <a href="http://localhost:3000">Home</a>
+        <h1>Welcome to the front desk of {this.state.name}!</h1>
         <div>
           <PatientManagement
             praxisID={this.state.praxisID}
-            doChange={this.handleChange}
+            doChange={this.appendToQueue}
           />
-          <Queue data={this.state.queueData} />
+          <Queue data={this.state.queueData} remove={this.deleteFromQueue} />
           <InfoBox />
         </div>
       </div>

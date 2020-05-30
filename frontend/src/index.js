@@ -3,8 +3,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import "./index.css";
 import * as serviceWorker from "./serviceWorker";
+
 import AdminApp from "./AdminApp";
 import PatientApp from "./PatientApp";
 import Error from "./error";
@@ -12,6 +12,8 @@ import Error from "./error";
 import Login from "./login";
 import LoginUser from "./LoginUser";
 import LoginAdmin from "./LoginAdmin";
+
+import "./index.css";
 
 ReactDOM.render(
   <Router>
@@ -30,4 +32,4 @@ ReactDOM.render(
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register();
+serviceWorker.unregister();

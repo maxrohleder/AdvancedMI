@@ -23,6 +23,7 @@ patientinfo {
 
 */
 
+// fully controlled component
 class PatientManagement extends React.Component {
   constructor(props) {
     super(props);
@@ -73,6 +74,7 @@ class PatientManagement extends React.Component {
     }
   };
 
+  // use a post request https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
   handleSubmit = (event) => {
     var patientenData = {
       patientID: null,
