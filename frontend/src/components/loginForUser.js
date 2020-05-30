@@ -37,26 +37,52 @@ class LoginForUser extends Component {
     // console.log("Praxis:ID : " + this.state.praxisID);
     // console.log("User:ID: " + this.state.userID);
     var praxisID = this.state.praxisID;
-    var userID = this.state.userID == null ? "" : this.state.userID;
-    var newPageUrl = "/ort/" + praxisID + "/id/" + userID;
+    var userID = this.state.userID == null ? "null" : this.state.userID;
+
+    console.log("praxisID: " + praxisID);
+    console.log("userID: " + userID);
 
     if (praxisID == null) {
       alert("Gultige PraxisID eingeben ...: " + praxisID);
+    } else {
+      var newPageUrl = "/ort/" + praxisID;
+      if (userID != "null") {
+        newPageUrl += "/id/" + userID;
+      }
+      console.log("newPageUrl: " + newPageUrl);
+      console.log("fetching user info");
+
+      fetch(APIendpoint + "exists/user/" + praxisID + "/" + userID)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.praxisConfirmed) {
+            if (data.userConfirmed) {
+              console.log("praxis confirmed and userId confirmed");
+              this.setState({ redirect: newPageUrl });
+            } else {
+              if (userID == "null") {
+                if (this.state.isPraxis && userID == "null") {
+                  alert("Bitte UserId eingeben");
+                } else {
+                  console.log(
+                    "praxis confirmed and userId null -> /ort/praxis"
+                  );
+                  this.setState({ redirect: newPageUrl });
+                }
+              } else {
+                console.log("praxis confirmed and userId NOT confirmed");
+                alert("UserID " + userID + " ist ungültig. Bitte überprüfen.");
+              }
+            }
+          } else {
+            alert("PraxisID " + praxisID + " ist ungültig. Bitte überprüfen.");
+          }
+        })
+        .catch(() => {
+          console.log();
+          this.setState({ redirect: "/error" });
+        });
     }
-    console.log("fetching user info");
-    fetch(APIendpoint + "exists/" + praxisID + "/" + userID)
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.userConfirmed) {
-          this.setState({ redirect: newPageUrl });
-        } else {
-          alert("UserID " + userID + " ist ungültig. Bitte überprüfen.");
-        }
-      })
-      .catch(() => {
-        console.log();
-        this.setState({ redirect: "/error" });
-      });
     event.preventDefault();
   };
 
@@ -80,7 +106,6 @@ class LoginForUser extends Component {
               type="text"
               name="praxis"
               id="praxis"
-              value1={this.state.praxisID}
               onChange={this.handleChange}
             />
           </label>
@@ -112,7 +137,6 @@ class LoginForUser extends Component {
               type="text"
               name="user"
               id="user"
-              value2={this.state.userID}
               onChange={this.handleChange}
             />
           </label>

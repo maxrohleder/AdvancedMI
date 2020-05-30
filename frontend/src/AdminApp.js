@@ -8,7 +8,7 @@ class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      praxisID: null, // TODO
+      praxisID: props.match.params.placeID, // TODO
 
       name: null,
       address: null,
@@ -30,12 +30,32 @@ class AdminApp extends React.Component {
     console.log("mount " + this.state.queueData);
   }
 
+  handleChange = (e) => {
+    console.log(e);
+    var dummy = {
+      patientID: e.patientID,
+      first_name: e.first_name,
+      surname: e.surname,
+      appointment_date: e.appointment_date,
+      short_diagnosis: e.short_diagnosis,
+      mobile: e.mobile,
+      email: e.email,
+    };
+    var newData = [...this.state.queueData, { ...dummy, pos: e.pos }];
+    console.log("NEW DATA: " + newData);
+    this.setState({ queueData: newData });
+  };
+
   render() {
     return (
       <div>
-        <h1>Welcome to the front desk of {this.props.match.params.placeId}!</h1>
+        <h1>Welcome to the front desk of {this.state.praxisID}!</h1>
+        <a href="http://localhost:3000">Home</a>
         <div>
-          <PatientManagement data={this.state.queueData} />
+          <PatientManagement
+            praxisID={this.state.praxisID}
+            doChange={this.handleChange}
+          />
           <Queue data={this.state.queueData} />
           <InfoBox />
         </div>

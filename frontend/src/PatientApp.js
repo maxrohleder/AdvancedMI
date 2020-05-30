@@ -20,7 +20,7 @@ function setCalledCb(cb) {
 
 function setUpdateCb(cb) {
   socket.on("update", (data) => {
-    cb(null, data.list);
+    cb(null, data.ukerlangen);
   });
 }
 

@@ -3,7 +3,6 @@ import { Link, Redirect } from "react-router-dom";
 import LoginForUser from "./components/loginForUser.js";
 
 import "./styles/LoginUser.css";
-import "./styles/LoginAdmin.css";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";

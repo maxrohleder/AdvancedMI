@@ -15,13 +15,11 @@ future:
 class Queue extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      data: props.data,
-    };
+    this.state = {};
   }
   render() {
-    console.log(this.state.data);
-    return <div>{JSON.stringify(this.state.data)}</div>;
+    console.log(this.props.data);
+    return <div>{JSON.stringify(this.props.data)}</div>;
   }
 }
 

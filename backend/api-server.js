@@ -17,12 +17,24 @@ const getDetails = (placeID) => {
 
 const queue = {
   ukerlangen: [
-    { id: "jj98", pos: 2 },
+    { id: "jj97", pos: 1337 },
     { id: "mr98", pos: 3 },
     { id: "fh98", pos: 4 },
     { id: "cp97", pos: 1 },
   ],
   drcovid: [{ id: "bat1", pos: 1 }],
+};
+
+const praxen = {
+  praxisToPassword: [
+    { praxisID: "ukerlangen", password: "123" },
+    { praxisID: "covidTestLabor", password: "666" },
+    { praxisID: "waschmaschienenPortal", password: "333" },
+    { praxisID: "a", password: "a" },
+  ],
+};
+var patientenDaten = {
+  ukerlangen: [],
 };
 
 const updateWaitingNumber = () => {
@@ -69,19 +81,98 @@ app.get("/call/:number", (req, res) => {
   res.send({ response: "called " + number }).status(200);
 });
 
-app.get("/exists/:placeid/:patid", (req, res) => {
-  var number = req.params.patid;
-  console.log(number);
-  var entry = queue.list.find((x) => x.id == number);
+app.get("/exists/admin/:praxisID/:password", (req, res) => {
+  var praxisID = req.params.praxisID;
+  var password = req.params.password;
+  var entry = praxen.praxisToPassword.find((x) => x.praxisID == praxisID);
+
+  console.log("placeID: " + praxisID);
+  console.log("password: " + password);
+  console.log("entry: " + entry);
+
   if (typeof entry === "undefined") {
-    // the patientID is not registered (anymore)
-    console.log("patient not confirmed " + number);
-    res.send({ userConfirmed: false }).status(200);
+    // the praxis does not exist
+    console.log("praxis does not exist " + praxisID);
+    res.send({ praxisConfirmed: false }).status(200);
   } else {
-    console.log("patient confirmed");
-    res.send({ userConfirmed: true }).status(200);
+    console.log("check passwort for praxis: " + praxisID);
+    if (entry.password == password) {
+      console.log("password correct");
+      res.send({ praxisConfirmed: true }).status(200);
+    } else {
+      console.log("password false");
+      res.send({ praxisConfirmed: false }).status(200);
+    }
   }
 });
+app.get("/exists/user/:praxisID/:patID", (req, res) => {
+  var praxisID = req.params.praxisID;
+  var number = req.params.patID;
+  var entry = praxen.praxisToPassword.find((x) => x.praxisID == praxisID);
+
+  console.log("praxisID: " + praxisID);
+  console.log("number: " + number);
+  console.log("entry: " + entry);
+
+  if (typeof entry === "undefined") {
+    // the praxis does not exist
+    console.log("praxis does not exist " + praxisID);
+    res.send({ praxisConfirmed: false }).status(200);
+  } else {
+    console.log("praxis does exist " + praxisID);
+    //res.send({ praxisConfirmed: true}).status(200);
+
+    entry = queue.ukerlangen.find((x) => x.id == number);
+    if (typeof entry === "undefined") {
+      // the patientID is not registered (anymore)
+      console.log("patient not confirmed " + number);
+      res.send({ praxisConfirmed: true, userConfirmed: false }).status(200);
+    } else {
+      console.log("patient confirmed");
+      res.send({ praxisConfirmed: true, userConfirmed: true }).status(200);
+    }
+  }
+});
+app.get(
+  "/admin/register/:praxisID/:first_name/:surname/:appointment_date/:short_diagnosis/:mobile/:email",
+  (req, res) => {
+    var first_name = req.params.first_name;
+    var surname = req.params.surname;
+    var appointment_date = req.params.appointment_date;
+    var short_diagnosis = req.params.short_diagnosis;
+    var mobile = req.params.mobile;
+    var email = req.params.email;
+
+    console.log("first_name: " + first_name);
+    console.log("surname: " + surname);
+    console.log("appointment_date: " + appointment_date);
+    console.log("short_diagnosis: " + short_diagnosis);
+    console.log("mobile: " + mobile);
+    console.log("email: " + email);
+
+    var praxisID = req.params.praxisID; //to add to praxisID
+
+    //HIER DATABASE
+    patientenDaten.ukerlangen.push({
+      first_name: first_name,
+      surname: surname,
+      appointment_date: appointment_date,
+      short_diagnosis: short_diagnosis,
+      mobile: mobile,
+      email: email,
+    });
+
+    console.log(patientenDaten);
+
+    //position und patientenID von Database
+    var patID = patientenDaten.ukerlangen.length;
+    var pos = patientenDaten.ukerlangen.length;
+
+    res
+      .send({ response: "patient eingefuegt", id: patID, pos: pos })
+      .status(200);
+  }
+);
 
 // ---------------------all api routes---------------------
 // --------------------------------------------------------
