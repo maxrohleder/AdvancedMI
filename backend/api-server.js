@@ -4,8 +4,12 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
-
 const port = 8000;
+
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
 
 const getDetails = (placeID) => {
   return {
@@ -41,9 +45,15 @@ const updateWaitingNumber = () => {
   return queue;
 };
 
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////
+
 // creating the http and socket server
 const app = express();
 app.use(cors());
+app.use(express.json());
 const server = http.createServer(app);
 const io = socketIo(server);
 io.origins("*:*");
@@ -133,6 +143,8 @@ app.get("/exists/user/:praxisID/:patID", (req, res) => {
     }
   }
 });
+
+// Ändern auf POST request https://jasonwatmore.com/post/2020/02/01/react-fetch-http-post-request-examples
 app.get(
   "/admin/register/:praxisID/:first_name/:surname/:appointment_date/:short_diagnosis/:mobile/:email",
   (req, res) => {
@@ -174,6 +186,12 @@ app.get(
   }
 );
 
+app.post("/call", (req, res) => {
+  console.log(
+    "patient " + req.body.patientID + " called: " + req.body.isCalled
+  );
+  res.send().status(200);
+});
 // ---------------------all api routes---------------------
 // --------------------------------------------------------
 
