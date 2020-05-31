@@ -144,47 +144,43 @@ app.get("/exists/user/:praxisID/:patID", (req, res) => {
   }
 });
 
-// Ändern auf POST request https://jasonwatmore.com/post/2020/02/01/react-fetch-http-post-request-examples
-app.get(
-  "/admin/register/:praxisID/:first_name/:surname/:appointment_date/:short_diagnosis/:mobile/:email",
-  (req, res) => {
-    var first_name = req.params.first_name;
-    var surname = req.params.surname;
-    var appointment_date = req.params.appointment_date;
-    var short_diagnosis = req.params.short_diagnosis;
-    var mobile = req.params.mobile;
-    var email = req.params.email;
+app.post("/admin/register", (req, res) => {
+  console.log(req.body.patientenData.first_name);
 
-    console.log("first_name: " + first_name);
-    console.log("surname: " + surname);
-    console.log("appointment_date: " + appointment_date);
-    console.log("short_diagnosis: " + short_diagnosis);
-    console.log("mobile: " + mobile);
-    console.log("email: " + email);
+  var first_name = req.body.patientenData.first_name;
+  var surname = req.body.patientenData.surname;
+  var appointment_date = req.body.patientenData.appointment_date;
+  var short_diagnosis = req.body.patientenData.short_diagnosis;
+  var mobile = req.body.patientenData.mobile;
+  var email = req.body.patientenData.email;
 
-    var praxisID = req.params.praxisID; //to add to praxisID
+  console.log("first_name: " + first_name);
+  console.log("surname: " + surname);
+  console.log("appointment_date: " + appointment_date);
+  console.log("short_diagnosis: " + short_diagnosis);
+  console.log("mobile: " + mobile);
+  console.log("email: " + email);
 
-    //HIER DATABASE
-    patientenDaten.ukerlangen.push({
-      first_name: first_name,
-      surname: surname,
-      appointment_date: appointment_date,
-      short_diagnosis: short_diagnosis,
-      mobile: mobile,
-      email: email,
-    });
+  var praxisID = req.params.praxisID; //to add to praxisID
 
-    console.log(patientenDaten);
+  //HIER DATABASE
+  patientenDaten.ukerlangen.push({
+    first_name: first_name,
+    surname: surname,
+    appointment_date: appointment_date,
+    short_diagnosis: short_diagnosis,
+    mobile: mobile,
+    email: email,
+  });
 
-    //position und patientenID von Database
-    var patID = patientenDaten.ukerlangen.length;
-    var pos = patientenDaten.ukerlangen.length;
+  console.log(patientenDaten);
 
-    res
-      .send({ response: "patient eingefuegt", id: patID, pos: pos })
-      .status(200);
-  }
-);
+  //position und patientenID von Database
+  var patID = patientenDaten.ukerlangen.length;
+  var pos = patientenDaten.ukerlangen.length;
+
+  res.send({ response: "patient eingefuegt", id: patID, pos: pos }).status(200);
+});
 
 app.post("/call", (req, res) => {
   console.log(
@@ -192,6 +188,7 @@ app.post("/call", (req, res) => {
   );
   res.send().status(200);
 });
+
 // ---------------------all api routes---------------------
 // --------------------------------------------------------
 

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Redirect, Link } from "react-router-dom";
-//import Jumbotron from "../react-bootstrap/Jumbotron";
 import "../styles/LoginAdmin.css";
 
 const APIendpoint = "http://localhost:8000/";
@@ -69,7 +68,7 @@ class PatientManagement extends React.Component {
       console.log("updated : " + target.id + " : " + event.target.value);
     }
     if (target.id === "email") {
-      this.setState({ praxisID: event.target.value });
+      this.setState({ email: event.target.value });
       console.log("email : " + target.id + " : " + event.target.value);
     }
   };
@@ -86,26 +85,23 @@ class PatientManagement extends React.Component {
       email: this.state.email,
       pos: null,
     };
+
     var praxisID = this.props.praxisID;
-    var url =
-      APIendpoint +
-      "admin/register/" +
-      praxisID +
-      "/" +
-      patientenData.first_name +
-      "/" +
-      patientenData.surname +
-      "/" +
-      patientenData.appointment_date +
-      "/" +
-      patientenData.short_diagnosis +
-      "/" +
-      patientenData.mobile +
-      "/" +
-      patientenData.email;
+    var url = APIendpoint + "admin/register";
     console.log("fetching admin info");
     console.log("CHECK URL: " + url);
-    fetch(url)
+
+    var payload = JSON.stringify({
+      patientenData: patientenData,
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         patientenData.patientID = data.id;
@@ -118,6 +114,7 @@ class PatientManagement extends React.Component {
         console.log();
         this.setState({ redirect: "/error" });
       });
+
     event.preventDefault();
   };
 
