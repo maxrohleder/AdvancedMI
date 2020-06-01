@@ -34,7 +34,7 @@ var db = {
         email: "corona@covid19.de",
       },
       {
-        patientID: "jj98",
+        patientID: "jj97",
         first_name: "Jule",
         surname: "Verne",
         appointment_date: new Date(),
@@ -148,6 +148,19 @@ app.get("/", (req, res) => {
 app.get("/:placeID", (req, res) => {
   console.log("place details requested");
   res.send(getDetails(req.params.placeID)).status(200);
+});
+
+app.get("/queue/:placeID", (req, res) => {
+  var placeID = req.params.placeID;
+  var queueData = [];
+  for (let i = 0; i < db[placeID].queue.length; i++) {
+    var entry = db[placeID].queue[i];
+    var patInfo = db[placeID].patientData.find((x) => {
+      return x.patientID == entry.id;
+    });
+    queueData.push({ pos: entry.pos, ...patInfo });
+  }
+  res.send({ queueData: queueData }).status(200);
 });
 
 app.get("/exists/admin/:placeID/:password", (req, res) => {
