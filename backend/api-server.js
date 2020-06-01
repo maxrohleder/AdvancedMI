@@ -95,8 +95,8 @@ const removeFromQueue = (placeID, patientID) => {
   db[placeID].queue = newQueue;
 };
 
-const updateWaitingNumber = (placeID) => {
-  return db[placeID].queue;
+const updateWaitingNumber = () => {
+  return db.ukerlangen.queue;
 };
 
 const createUID = (placeID, first, sur) => {
@@ -236,10 +236,8 @@ io.on("connection", (socket) => {
   console.log("New client connected");
 
   // send inital information
-  socket.on("update", (placeID) => {
-    socket.emit("update", updateWaitingNumber(placeID));
-    socket.emit("timing", 10);
-  });
+  socket.emit("update", updateWaitingNumber());
+  socket.emit("timing", 10);
 
   // end timer on disconnect
   socket.on("disconnect", () => {
