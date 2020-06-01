@@ -1,5 +1,4 @@
-import React, { Component } from "react";
-import { Redirect, Link } from "react-router-dom";
+import React from "react";
 //import Jumbotron from "../react-bootstrap/Jumbotron";
 import "../styles/LoginAdmin.css";
 
@@ -87,25 +86,15 @@ class PatientManagement extends React.Component {
       pos: null,
     };
     var praxisID = this.props.praxisID;
-    var url =
-      APIendpoint +
-      "admin/register/" +
-      praxisID +
-      "/" +
-      patientenData.first_name +
-      "/" +
-      patientenData.surname +
-      "/" +
-      patientenData.appointment_date +
-      "/" +
-      patientenData.short_diagnosis +
-      "/" +
-      patientenData.mobile +
-      "/" +
-      patientenData.email;
-    console.log("fetching admin info");
-    console.log("CHECK URL: " + url);
-    fetch(url)
+    var url = APIendpoint + "admin/registerpatient/";
+    var payload = JSON.stringify({ placeID: praxisID, ...patientenData });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+    console.log("fetching admin info from " + url);
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         patientenData.patientID = data.id;

@@ -11,6 +11,7 @@
     - [Additional Features](#additional-features)
   - [Open Questions](#open-questions)
   - [Project Architecture](#project-architecture)
+  - [TODOs](#todos)
 
 ## Motivation|Idea
 Develop the digital waiting room!
@@ -131,3 +132,8 @@ This project is (as outlined before) structured into backend and front end. The 
 There is one flask-based webserver, which exposes the administrative functionality of the project via a REST-Api. The sources for these backend functions can be found in the folder `./backend`.
 
 The client side of the application was written using React. The code can be seen in the folder called `./frontend`.
+
+## TODOs
+
+- remove data from admin-frontend and pull from backend
+- css for admin frontend

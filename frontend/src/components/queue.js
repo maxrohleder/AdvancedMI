@@ -27,6 +27,7 @@ queuedata: [{..patientinfo, pos}, {..patientinfo, pos}]
 
 const APIendpoint = "http://localhost:8000/";
 const callRoute = "call";
+const delRoute = "del";
 
 // stateless component
 class QueueEntry extends React.Component {
@@ -53,7 +54,24 @@ class QueueEntry extends React.Component {
     fetch(url, requestOptions);
   }
 
-  removePatient() {}
+  removePatient() {
+    console.log("removing patient");
+    var url = APIendpoint + delRoute;
+    var payload = JSON.stringify({
+      placeID: this.props.placeID,
+      patientID: this.props.entrydata.patientID,
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+    console.log(url);
+    console.log(payload);
+    console.log(this.props.placeID);
+    fetch(url, requestOptions);
+    this.props.cb(this.props.entrydata);
+  }
 
   render() {
     var status = "";
@@ -61,14 +79,12 @@ class QueueEntry extends React.Component {
       status = "called";
     }
     return (
-      <div>
+      <li key={this.props.entrydata.patientID}>
         Patient {this.props.entrydata.patientID}
         {status}
         <button onClick={this.callPatient.bind(this)}>call</button>
-        <button onClick={this.props.cb.bind(this, this.props.entrydata)}>
-          remove
-        </button>
-      </div>
+        <button onClick={this.removePatient.bind(this)}>remove</button>
+      </li>
     );
   }
 }
@@ -80,13 +96,18 @@ class Queue extends React.Component {
     this.renderEntries = this.renderEntries.bind(this);
   }
   renderEntries = (entry) => (
-    <QueueEntry entrydata={entry} cb={this.props.remove} />
+    <QueueEntry
+      key={entry.patientID}
+      entrydata={entry}
+      cb={this.props.remove}
+      placeID={this.props.placeID}
+    />
   );
   render() {
     return (
       <div>
         <div>People waiting: {this.props.data.length}</div>
-        <div>{this.props.data.map(this.renderEntries)}</div>
+        <ul>{this.props.data.map(this.renderEntries)}</ul>
       </div>
     );
   }

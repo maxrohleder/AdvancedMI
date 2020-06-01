@@ -8,7 +8,7 @@ class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      praxisID: props.match.params.placeID, // TODO
+      placeID: props.match.params.placeID, // TODO
 
       name: null,
       address: null,
@@ -17,16 +17,16 @@ class AdminApp extends React.Component {
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
     };
     // insert some data to play with
-    var dummy = {
-      patientID: "mr98",
-      first_name: "Max",
-      surname: "Rohleder",
-      appointment_date: new Date(),
-      short_diagnosis: "Corona",
-      mobile: "0123456789",
-      email: "corona@covid19.de",
-    };
-    this.state.queueData = [...this.state.queueData, { ...dummy, pos: 1 }];
+    // var dummy = {
+    //   patientID: "mr98",
+    //   first_name: "Max",
+    //   surname: "Rohleder",
+    //   appointment_date: new Date(),
+    //   short_diagnosis: "Corona",
+    //   mobile: "0123456789",
+    //   email: "corona@covid19.de",
+    // };
+    // this.state.queueData = [...this.state.queueData, { ...dummy, pos: 1 }];
     console.log("mount " + this.state.queueData);
   }
 
@@ -43,7 +43,6 @@ class AdminApp extends React.Component {
       email: e.email,
     };
     var newData = [...this.state.queueData, { ...dummy, pos: e.pos }];
-    console.log("updated AdminApp State: " + newData);
     this.setState({ queueData: newData });
   };
 
@@ -63,10 +62,14 @@ class AdminApp extends React.Component {
         <h1>Welcome to the front desk of {this.state.name}!</h1>
         <div>
           <PatientManagement
-            praxisID={this.state.praxisID}
+            praxisID={this.state.placeID}
             doChange={this.appendToQueue}
           />
-          <Queue data={this.state.queueData} remove={this.deleteFromQueue} />
+          <Queue
+            placeID={this.state.placeID}
+            data={this.state.queueData}
+            remove={this.deleteFromQueue}
+          />
           <InfoBox />
         </div>
       </div>

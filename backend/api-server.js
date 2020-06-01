@@ -7,53 +7,129 @@ const cors = require("cors");
 const port = 8000;
 
 ////////////////////////////////////////////////////////////
+/////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+
+var db = {
+  ukerlangen: {
+    password: "123",
+    details: {
+      name: "Universitätsklinikum Erlangen",
+      address: "Östliche Stadtmauerstraße 4, 91052 Erlangen",
+      field: "Virologie",
+    },
+    queue: [
+      { id: "jj97", pos: 1 },
+      { id: "mr98", pos: 2 },
+    ],
+    patientData: [
+      {
+        patientID: "mr98",
+        first_name: "Max",
+        surname: "Rohleder",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+      {
+        patientID: "jj98",
+        first_name: "Jule",
+        surname: "Verne",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+    ],
+  },
+  drcovid: {
+    password: "666",
+    details: {
+      name: "Praxis Dr. Covidweg",
+      address: "Fledermausweg 19, 12020 Wuhan",
+      field: "Allgemeinarzt",
+    },
+    queue: [],
+    patientData: [],
+  },
+};
 
 const getDetails = (placeID) => {
-  return {
-    name: "Praxis Dr. Covidweg",
-    address: "Fledermausweg 19, 12020 Wuhan",
-    field: "Allgemeinarzt",
-  };
+  return db[placeID].details;
 };
 
-const queue = {
-  ukerlangen: [
-    { id: "jj97", pos: 1337 },
-    { id: "mr98", pos: 3 },
-    { id: "fh98", pos: 4 },
-    { id: "cp97", pos: 1 },
-  ],
-  drcovid: [{ id: "bat1", pos: 1 }],
+const registerPatient = (placeID, pd) => {
+  var match = db[placeID].patientData.find((entry) => {
+    pd.first_name === entry.first_name &&
+      pd.surname === entry.surname &&
+      pd.appointment_date === entry.appointment_date &&
+      pd.short_diagnosis === entry.short_diagnosis &&
+      pd.mobile === entry.mobile &&
+      pd.email === entry.email;
+  });
+
+  if (typeof match !== "undefined") {
+    return match.patientID;
+  } else {
+    var patId = createUID(placeID, pd.first_name, pd.surname);
+    db[placeID].patientData.push({
+      patientID: patId,
+      first_name: pd.first_name,
+      surname: pd.surname,
+      appointment_date: pd.appointment_date,
+      short_diagnosis: pd.short_diagnosis,
+      mobile: pd.mobile,
+      email: pd.email,
+    });
+    return patId;
+  }
 };
 
-const praxen = {
-  praxisToPassword: [
-    { praxisID: "ukerlangen", password: "123" },
-    { praxisID: "covidTestLabor", password: "666" },
-    { praxisID: "waschmaschienenPortal", password: "333" },
-    { praxisID: "a", password: "a" },
-  ],
-};
-var patientenDaten = {
-  ukerlangen: [],
+const removeFromQueue = (placeID, patientID) => {
+  console.log("[deletePatient]: deleting " + patientID);
+  var newQueue = db[placeID].queue.filter((entry) => {
+    return entry.id !== patientID;
+  });
+  db[placeID].queue = newQueue;
 };
 
-const updateWaitingNumber = () => {
-  return queue;
+const updateWaitingNumber = (placeID) => {
+  return db[placeID].queue;
+};
+
+const createUID = (placeID, first, sur) => {
+  // create an place-unique patientID from first and surname
+  var id = first.substring(0, 2) + sur.substring(0, 2);
+  while (db[placeID].queue.some((entry) => entry.id === id)) {
+    id += "I";
+  }
+  return id;
+};
+
+const queuePatient = (placeID, patientID) => {
+  // place patientID in queue and return position
+  var lastPosition = 1;
+  for (let i = 0; i < db[placeID].queue.length; i++) {
+    var tmp = db[placeID].queue[i].pos;
+    lastPosition = lastPosition > tmp ? lastPosition : tmp;
+  }
+  lastPosition += 1; // next free last position
+  db[placeID].queue.push({ id: patientID, pos: lastPosition });
+  console.log(db[placeID].queue);
+  return lastPosition;
 };
 
 ////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////
+/////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
 // creating the http and socket server
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // for post calls in json format
 const server = http.createServer(app);
 const io = socketIo(server);
 io.origins("*:*");
@@ -69,129 +145,75 @@ app.get("/", (req, res) => {
     .status(200);
 });
 
-// will not need this method in the future as changes to the db will be emmited directly
-app.get("/update", (req, res) => {
-  req.app.io.emit("update", updateWaitingNumber());
-  console.log("updated ", updateWaitingNumber());
-  res
-    .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
-    .status(200);
-});
-
 app.get("/:placeID", (req, res) => {
-  var number = req.params.number;
   console.log("place details requested");
   res.send(getDetails(req.params.placeID)).status(200);
 });
 
-app.get("/call/:number", (req, res) => {
-  var number = req.params.number;
-  req.app.io.emit("called", number);
-  console.log("emitted patient number ", number);
-  res.send({ response: "called " + number }).status(200);
-});
-
-app.get("/exists/admin/:praxisID/:password", (req, res) => {
-  var praxisID = req.params.praxisID;
+app.get("/exists/admin/:placeID/:password", (req, res) => {
+  var placeID = req.params.placeID;
   var password = req.params.password;
-  var entry = praxen.praxisToPassword.find((x) => x.praxisID == praxisID);
-
-  console.log("placeID: " + praxisID);
-  console.log("password: " + password);
-  console.log("entry: " + entry);
-
-  if (typeof entry === "undefined") {
-    // the praxis does not exist
-    console.log("praxis does not exist " + praxisID);
-    res.send({ praxisConfirmed: false }).status(200);
-  } else {
-    console.log("check passwort for praxis: " + praxisID);
-    if (entry.password == password) {
-      console.log("password correct");
-      res.send({ praxisConfirmed: true }).status(200);
-    } else {
-      console.log("password false");
-      res.send({ praxisConfirmed: false }).status(200);
-    }
-  }
-});
-app.get("/exists/user/:praxisID/:patID", (req, res) => {
-  var praxisID = req.params.praxisID;
-  var number = req.params.patID;
-  var entry = praxen.praxisToPassword.find((x) => x.praxisID == praxisID);
-
-  console.log("praxisID: " + praxisID);
-  console.log("number: " + number);
-  console.log("entry: " + entry);
-
-  if (typeof entry === "undefined") {
-    // the praxis does not exist
-    console.log("praxis does not exist " + praxisID);
-    res.send({ praxisConfirmed: false }).status(200);
-  } else {
-    console.log("praxis does exist " + praxisID);
-    //res.send({ praxisConfirmed: true}).status(200);
-
-    entry = queue.ukerlangen.find((x) => x.id == number);
-    if (typeof entry === "undefined") {
-      // the patientID is not registered (anymore)
-      console.log("patient not confirmed " + number);
-      res.send({ praxisConfirmed: true, userConfirmed: false }).status(200);
-    } else {
-      console.log("patient confirmed");
-      res.send({ praxisConfirmed: true, userConfirmed: true }).status(200);
-    }
-  }
+  var placeExists = db.hasOwnProperty(placeID);
+  var existsAndConfirmed = placeExists && db[placeID].password == password;
+  res.send({ praxisConfirmed: existsAndConfirmed }).status(200);
 });
 
-// Ändern auf POST request https://jasonwatmore.com/post/2020/02/01/react-fetch-http-post-request-examples
-app.get(
-  "/admin/register/:praxisID/:first_name/:surname/:appointment_date/:short_diagnosis/:mobile/:email",
-  (req, res) => {
-    var first_name = req.params.first_name;
-    var surname = req.params.surname;
-    var appointment_date = req.params.appointment_date;
-    var short_diagnosis = req.params.short_diagnosis;
-    var mobile = req.params.mobile;
-    var email = req.params.email;
+app.get("/exists/user/:placeID/:patID", (req, res) => {
+  var placeID = req.params.placeID;
+  var patientID = req.params.patID;
 
-    console.log("first_name: " + first_name);
-    console.log("surname: " + surname);
-    console.log("appointment_date: " + appointment_date);
-    console.log("short_diagnosis: " + short_diagnosis);
-    console.log("mobile: " + mobile);
-    console.log("email: " + email);
+  // check if place exists
+  var placeExists = db.hasOwnProperty(placeID);
 
-    var praxisID = req.params.praxisID; //to add to praxisID
+  entry = db[placeID].queue.find((x) => x.id == patientID);
+  res
+    .send({
+      praxisConfirmed: placeExists,
+      userConfirmed: placeExists && typeof entry !== "undefined",
+    })
+    .status(200);
+});
 
-    //HIER DATABASE
-    patientenDaten.ukerlangen.push({
-      first_name: first_name,
-      surname: surname,
-      appointment_date: appointment_date,
-      short_diagnosis: short_diagnosis,
-      mobile: mobile,
-      email: email,
-    });
+// register a new patient and return its patientID and position
+app.post("/admin/registerpatient/", (req, res) => {
+  // create a patientID
+  var placeID = req.body.placeID;
 
-    console.log(patientenDaten);
+  // register patient details if not existant and return a unique id
+  var patientID = registerPatient(placeID, {
+    first_name: req.body.first_name,
+    surname: req.body.surname,
+    appointment_date: req.body.appointment_date,
+    short_diagnosis: req.body.short_diagnosis,
+    mobile: req.body.mobile,
+    email: req.body.email,
+  });
 
-    //position und patientenID von Database
-    var patID = patientenDaten.ukerlangen.length;
-    var pos = patientenDaten.ukerlangen.length;
+  // place patient into queue
+  var pos = queuePatient(placeID, patientID);
 
-    res
-      .send({ response: "patient eingefuegt", id: patID, pos: pos })
-      .status(200);
-  }
-);
+  // inform admin interface about patientID and position
+  res
+    .send({ response: "registered patient", id: patientID, pos: pos })
+    .status(200);
+});
 
 app.post("/call", (req, res) => {
-  console.log(
-    "patient " + req.body.patientID + " called: " + req.body.isCalled
-  );
-  res.send().status(200);
+  var channel = req.body.isCalled ? "called" : "uncalled";
+  req.app.io.emit(channel, req.body.patientID);
+  console.log(channel + " " + req.body.patientID);
+  res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
+
+app.post("/del", (req, res) => {
+  // res
+  //   .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
+  //   .status(200);
+  removeFromQueue(req.body.placeID, req.body.patientID);
+  req.app.io.emit("update", updateWaitingNumber(req.body.placeID));
+  res.send({ response: "deleted patientID" + req.body.patientID }).status(200);
+});
+
 // ---------------------all api routes---------------------
 // --------------------------------------------------------
 
@@ -201,8 +223,10 @@ io.on("connection", (socket) => {
   console.log("New client connected");
 
   // send inital information
-  socket.emit("update", updateWaitingNumber());
-  socket.emit("timing", 10);
+  socket.on("update", (placeID) => {
+    socket.emit("update", updateWaitingNumber(placeID));
+    socket.emit("timing", 10);
+  });
 
   // end timer on disconnect
   socket.on("disconnect", () => {
