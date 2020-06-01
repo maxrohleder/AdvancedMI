@@ -51,8 +51,30 @@ var db = {
       address: "Fledermausweg 19, 12020 Wuhan",
       field: "Allgemeinarzt",
     },
-    queue: [],
-    patientData: [],
+    queue: [
+      { id: "jj97", pos: 1 },
+      { id: "mr98", pos: 2 },
+    ],
+    patientData: [
+      {
+        patientID: "mr98",
+        first_name: "Max",
+        surname: "Rohleder",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+      {
+        patientID: "jj97",
+        first_name: "Jule",
+        surname: "Verne",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+    ],
   },
 };
 
