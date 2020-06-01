@@ -4,6 +4,9 @@ import InfoBox from "./components/InfoBox";
 import PatientManagement from "./components/PatMan";
 import "./styles/AdminApp.css";
 
+const APIendpoint = "http://localhost:8000/";
+const updateRoute = "queue/";
+
 class AdminApp extends React.Component {
   constructor(props) {
     super(props);
@@ -16,18 +19,24 @@ class AdminApp extends React.Component {
 
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
     };
-    // insert some data to play with
-    // var dummy = {
-    //   patientID: "mr98",
-    //   first_name: "Max",
-    //   surname: "Rohleder",
-    //   appointment_date: new Date(),
-    //   short_diagnosis: "Corona",
-    //   mobile: "0123456789",
-    //   email: "corona@covid19.de",
-    // };
-    // this.state.queueData = [...this.state.queueData, { ...dummy, pos: 1 }];
-    console.log("mount " + this.state.queueData);
+  }
+
+  componentDidMount() {
+    // fetch initial queue status
+    var url = APIendpoint + updateRoute + this.state.placeID;
+
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        this.setState({
+          queueData: data.queueData,
+        });
+      })
+      .catch(() => {
+        console.log("could not fetch data. Backend inactive??");
+        this.setState({ redirect: "/error" });
+      });
   }
 
   // used to add to queue state from PatMan
@@ -59,7 +68,7 @@ class AdminApp extends React.Component {
   render() {
     return (
       <div>
-        <h1>Welcome to the front desk of {this.state.name}!</h1>
+        <h1>Welcome to the front desk of {this.state.placeID}!</h1>
         <div>
           <PatientManagement
             praxisID={this.state.placeID}

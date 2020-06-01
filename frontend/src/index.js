@@ -12,6 +12,7 @@ import Error from "./error";
 import Login from "./login";
 import LoginUser from "./LoginUser";
 import LoginAdmin from "./LoginAdmin";
+import Impressum from "./components/impressum";
 
 import "./index.css";
 
@@ -22,8 +23,9 @@ ReactDOM.render(
       <Route path="/admin" component={LoginAdmin} />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />
-      <Route exact path="/" component={Login} />
+      <Route path="/impressum" component={Impressum} />
       <Route path="/error" component={Error} />
+      <Route exact path="/" component={Login} />
     </Switch>
   </Router>,
   document.getElementById("root")

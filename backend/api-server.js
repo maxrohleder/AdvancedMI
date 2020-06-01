@@ -34,7 +34,7 @@ var db = {
         email: "corona@covid19.de",
       },
       {
-        patientID: "jj98",
+        patientID: "jj97",
         first_name: "Jule",
         surname: "Verne",
         appointment_date: new Date(),
@@ -95,8 +95,8 @@ const removeFromQueue = (placeID, patientID) => {
   db[placeID].queue = newQueue;
 };
 
-const updateWaitingNumber = (placeID) => {
-  return db[placeID].queue;
+const updateWaitingNumber = () => {
+  return db.ukerlangen.queue;
 };
 
 const createUID = (placeID, first, sur) => {
@@ -150,11 +150,26 @@ app.get("/:placeID", (req, res) => {
   res.send(getDetails(req.params.placeID)).status(200);
 });
 
+app.get("/queue/:placeID", (req, res) => {
+  var placeID = req.params.placeID;
+  var queueData = [];
+  for (let i = 0; i < db[placeID].queue.length; i++) {
+    var entry = db[placeID].queue[i];
+    var patInfo = db[placeID].patientData.find((x) => {
+      return x.patientID == entry.id;
+    });
+    queueData.push({ pos: entry.pos, ...patInfo });
+  }
+  res.send({ queueData: queueData }).status(200);
+});
+
 app.get("/exists/admin/:placeID/:password", (req, res) => {
   var placeID = req.params.placeID;
   var password = req.params.password;
+
   var placeExists = db.hasOwnProperty(placeID);
   var existsAndConfirmed = placeExists && db[placeID].password == password;
+
   res.send({ praxisConfirmed: existsAndConfirmed }).status(200);
 });
 
@@ -222,11 +237,10 @@ app.post("/del", (req, res) => {
 io.on("connection", (socket) => {
   console.log("New client connected");
 
+  //MUST BE FIXED // woher placeID
   // send inital information
-  socket.on("update", (placeID) => {
-    socket.emit("update", updateWaitingNumber(placeID));
-    socket.emit("timing", 10);
-  });
+  socket.emit("update", updateWaitingNumber());
+  socket.emit("timing", 10);
 
   // end timer on disconnect
   socket.on("disconnect", () => {

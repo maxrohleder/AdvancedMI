@@ -20,7 +20,7 @@ class LoginAdmin extends Component {
         </div>
         <div className="container-bottom">
           <a href="http://localhost:3000">Patient</a>
-          <a href="https://www.google.de">About</a>
+          <a href="http://localhost:3000/impressum">Impressum</a>
           <a href="https://www.google.de">AGB</a>
         </div>
       </div>

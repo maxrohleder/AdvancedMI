@@ -20,7 +20,7 @@ function setCalledCb(cb) {
 
 function setUpdateCb(cb) {
   socket.on("update", (data) => {
-    cb(null, data.ukerlangen);
+    cb(null, data);
   });
 }
 
@@ -62,7 +62,9 @@ class PatientApp extends React.Component {
 
     // subscribe to update channel
     setUpdateCb((err, lst) => {
-      var entry = lst.find((x) => x.id == this.state.patientID);
+      var entry = lst.find((x) => {
+        return x.id == this.state.patientID;
+      });
       if (typeof entry === "undefined") {
         // the patientID is not registered (anymore)
         this.setState({ redirect: "/" + this.state.placeID });

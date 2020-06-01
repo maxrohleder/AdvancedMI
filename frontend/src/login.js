@@ -21,7 +21,7 @@ class Login extends Component {
         <div className="container-bottom">
           {" "}
           <a href="http://localhost:3000/admin">Admin</a>
-          <a href="https://www.google.de">About</a>
+          <a href="http://localhost:3000/impressum">Impressum</a>
           <a href="https://www.google.de">AGB</a>
         </div>
       </div>
