@@ -7,28 +7,6 @@ import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
-const socket = io.connect(APIendpoint + ":" + port, { autoConnect: false });
-// const socket = io({
-//   autoConnect: false,
-// });
-
-function setCalledCb(cb) {
-  socket.on("called", (patId) => {
-    cb(null, patId);
-  });
-}
-
-function setUpdateCb(cb) {
-  socket.on("update", (data) => {
-    cb(null, data);
-  });
-}
-
-function setTimingCb(cb) {
-  socket.on("timing", (dt) => {
-    cb(null, dt);
-  });
-}
 
 class PatientApp extends React.Component {
   constructor(props) {
@@ -48,20 +26,43 @@ class PatientApp extends React.Component {
     };
   }
 
+  socket = io.connect(APIendpoint + ":" + port, {
+    autoConnect: false,
+    query: "praxisID=" + this.props.match.params.placeID,
+  });
+
+  setCalledCb = (cb) => {
+    this.socket.on("called", (patId) => {
+      cb(null, patId);
+    });
+  };
+
+  setUpdateCb = (cb) => {
+    this.socket.on("update", (data) => {
+      cb(null, data);
+    });
+  };
+
+  setTimingCb = (cb) => {
+    this.socket.on("timing", (dt) => {
+      cb(null, dt);
+    });
+  };
+
   componentDidMount() {
     // connect to real-time server on backend
-    if (socket.disconnected) {
-      socket.open();
+    if (this.socket.disconnected) {
+      this.socket.open();
     }
 
     // subscribe to called channel
-    setCalledCb((err, num) => {
+    this.setCalledCb((err, num) => {
       var c = num === this.state.patientID;
       this.setState({ isCalled: c });
     });
 
     // subscribe to update channel
-    setUpdateCb((err, lst) => {
+    this.setUpdateCb((err, lst) => {
       var entry = lst.find((x) => {
         return x.id == this.state.patientID;
       });
@@ -74,7 +75,7 @@ class PatientApp extends React.Component {
     });
 
     // subscribe to timing channel
-    setTimingCb((err, dt) => this.setState({ minPerPerson: dt }));
+    this.setTimingCb((err, dt) => this.setState({ minPerPerson: dt }));
 
     // fetch place information from placeID
     var apicall = APIendpoint + ":" + port + "/" + this.state.placeID;
@@ -95,7 +96,7 @@ class PatientApp extends React.Component {
   }
 
   componentWillUnmount() {
-    socket.close();
+    this.socket.close();
   }
 
   render() {

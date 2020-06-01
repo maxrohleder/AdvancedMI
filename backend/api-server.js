@@ -95,8 +95,8 @@ const removeFromQueue = (placeID, patientID) => {
   db[placeID].queue = newQueue;
 };
 
-const updateWaitingNumber = () => {
-  return db.ukerlangen.queue;
+const updateWaitingNumber = (praxis) => {
+  return db[praxis].queue;
 };
 
 const createUID = (placeID, first, sur) => {
@@ -236,10 +236,9 @@ app.post("/del", (req, res) => {
 // -------------------all socket cbs-----------------------
 io.on("connection", (socket) => {
   console.log("New client connected");
-
   //MUST BE FIXED // woher placeID
   // send inital information
-  socket.emit("update", updateWaitingNumber());
+  socket.emit("update", updateWaitingNumber(socket.handshake.query.praxisID));
   socket.emit("timing", 10);
 
   // end timer on disconnect
