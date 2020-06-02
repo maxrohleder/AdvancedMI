@@ -271,7 +271,9 @@ io.on("connection", (socket) => {
 
   // send inital information
   var patDaten = socket.handshake.query.patDaten;
-  patDaten = patDaten.split(" ");
+  patDaten = patDaten.split(" x+x "); //allow " " in prakisID
+
+  console.log(patDaten[0] + " : " + patDaten[1]);
 
   socket.emit("update", updateWaitingNumber(patDaten[0], patDaten[1]));
   socket.emit("timing", 10);

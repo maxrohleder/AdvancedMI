@@ -31,7 +31,7 @@ class PatientApp extends React.Component {
     query:
       "patDaten=" +
       this.props.match.params.placeID +
-      " " +
+      " x+x " + //allow " " in praxisID
       this.props.match.params.patientID,
   });
 
