@@ -18,6 +18,7 @@ import Login from "./login";
 import LoginUser from "./LoginUser";
 import LoginAdmin from "./LoginAdmin";
 import Impressum from "./components/impressum";
+import chatWindow from "./components/chatWindow";
 
 import "./index.css";
 
@@ -51,6 +52,7 @@ ReactDOM.render(
         path="/admin"
         component={() => <LoginAdmin onAdminLoggedIn={setAdminLoggedIn} />}
       />
+      <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />
       <Route path="/impressum" component={Impressum} />
