@@ -28,7 +28,11 @@ class PatientApp extends React.Component {
 
   socket = io.connect(APIendpoint + ":" + port, {
     autoConnect: false,
-    query: "praxisID=" + this.props.match.params.placeID,
+    query:
+      "patDaten=" +
+      this.props.match.params.placeID +
+      " " +
+      this.props.match.params.patientID,
   });
 
   setCalledCb = (cb) => {
@@ -62,15 +66,12 @@ class PatientApp extends React.Component {
     });
 
     // subscribe to update channel
-    this.setUpdateCb((err, lst) => {
-      var entry = lst.find((x) => {
-        return x.id == this.state.patientID;
-      });
-      if (typeof entry === "undefined") {
+    this.setUpdateCb((err, pos) => {
+      if (pos == null) {
         // the patientID is not registered (anymore)
         this.setState({ redirect: "/" + this.state.placeID });
       } else {
-        this.setState({ waitingPosition: entry.pos });
+        this.setState({ waitingPosition: pos });
       }
     });
 

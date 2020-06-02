@@ -52,8 +52,8 @@ var db = {
       field: "Allgemeinarzt",
     },
     queue: [
-      { id: "jj97", pos: 1 },
-      { id: "mr98", pos: 2 },
+      { id: "jj97", pos: 2 },
+      { id: "mr98", pos: 1 },
     ],
     patientData: [
       {
@@ -117,8 +117,18 @@ const removeFromQueue = (placeID, patientID) => {
   db[placeID].queue = newQueue;
 };
 
-const updateWaitingNumber = (praxis) => {
-  return db[praxis].queue;
+const updateWaitingNumber = (praxisID, patientID) => {
+  var lst = db[praxisID].queue;
+  var entry = lst.find((x) => {
+    return x.id == patientID;
+  });
+  if (typeof entry === "undefined") {
+    // the patientID is not registered (anymore)//TODO
+    return null;
+  } else {
+    //console.log(entry.pos);
+    return entry.pos;
+  }
 };
 
 const createUID = (placeID, first, sur) => {
@@ -258,9 +268,12 @@ app.post("/del", (req, res) => {
 // -------------------all socket cbs-----------------------
 io.on("connection", (socket) => {
   console.log("New client connected");
-  //MUST BE FIXED // woher placeID
+
   // send inital information
-  socket.emit("update", updateWaitingNumber(socket.handshake.query.praxisID));
+  var patDaten = socket.handshake.query.patDaten;
+  patDaten = patDaten.split(" ");
+
+  socket.emit("update", updateWaitingNumber(patDaten[0], patDaten[1]));
   socket.emit("timing", 10);
 
   // end timer on disconnect
