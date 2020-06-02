@@ -2,7 +2,12 @@
 
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 import * as serviceWorker from "./serviceWorker";
 
 import AdminApp from "./AdminApp";
@@ -16,11 +21,36 @@ import Impressum from "./components/impressum";
 
 import "./index.css";
 
+//loggin for admin only if password was correct
+var adminLoggedIn = false;
+function setAdminLoggedIn(entry) {
+  adminLoggedIn = entry;
+}
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route
+    {...rest}
+    render={(props) =>
+      adminLoggedIn === true ? (
+        <Component {...props} />
+      ) : (
+        <Redirect
+          to={{
+            pathname: "/",
+          }}
+        />
+      )
+    }
+  />
+);
+
 ReactDOM.render(
   <Router>
     <Switch>
-      <Route path="/admin/:placeID" component={AdminApp} />
-      <Route path="/admin" component={LoginAdmin} />
+      <PrivateRoute path="/admin/:placeID" component={AdminApp} />
+      <Route
+        path="/admin"
+        component={() => <LoginAdmin onAdminLoggedIn={setAdminLoggedIn} />}
+      />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />
       <Route path="/impressum" component={Impressum} />

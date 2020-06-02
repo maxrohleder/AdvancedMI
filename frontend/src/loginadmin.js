@@ -16,7 +16,8 @@ class LoginAdmin extends Component {
           <div className="container-bild">
             <Logo id="img" />
           </div>
-          <LoginForAdmin />
+          {console.log("inLoginAdmin: " + this.props.onAdminLoggedIn)}
+          <LoginForAdmin onAdminLoggedIn={this.props.onAdminLoggedIn} />
         </div>
         <div className="container-bottom">
           <a href="http://localhost:3000">Patient</a>

@@ -43,6 +43,8 @@ class LoginForAdmin extends Component {
           .then((response) => response.json())
           .then((data) => {
             if (data.praxisConfirmed) {
+              console.log(this.props.onAdminLoggedIn);
+              this.props.onAdminLoggedIn(true);
               this.setState({ redirect: newPageUrl });
             } else {
               alert("praxis oder password falsch, please try again");
