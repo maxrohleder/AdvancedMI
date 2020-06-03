@@ -2,13 +2,18 @@ import React, { Component } from "react";
 class ChatWindow extends Component {
   constructor(props) {
     super(props);
-    this.state = { chatData: [], chat: null, speaker: "props.speaker" };
+    this.state = {
+      chatData: [],
+      chat: null,
+      speaker: props.speaker,
+      praxisID: props.praxisID,
+    };
   }
 
   handleChange = (event) => {
     var target = event.target;
-    console.log(target.id);
-    if (target.id === "user") {
+    //console.log(target.id);
+    if (target.id === this.state.speaker) {
       this.setState({
         chat: {
           text: event.target.value,
@@ -20,16 +25,29 @@ class ChatWindow extends Component {
   };
 
   handleSubmit = (event) => {
+    var dummy = this.state.chat;
     if (this.state.chat !== null) {
-      var dummy = this.state.chat;
-      var newData = [...this.state.chatData, { ...dummy }];
-      this.setState({ chatData: newData });
-      event.preventDefault();
+      var i = this.state.chatData.length - 1;
+      if (i >= 0) {
+        //publish same txt at different time//prevent duplicate
+        var prevText = this.state.chatData[i].text;
+        if (prevText === dummy.text) {
+          dummy = {
+            text: dummy.text,
+            time: new Date(),
+            speaker: dummy.speaker,
+          };
+        }
+      }
+      var chatData = this.state.chatData;
+      chatData.push(dummy);
+      this.setState({ chatData: chatData });
     }
+    event.preventDefault();
   };
 
   writeMessage = (e) => {
-    var date =
+    var d =
       e.time.getDate() +
       "." +
       (e.time.getMonth() + 1) +
@@ -44,9 +62,9 @@ class ChatWindow extends Component {
       ":" +
       e.time.getMilliseconds();
 
-    var txt = e.speaker + " | " + e.text + " | " + date;
+    var txt = e.speaker + " | " + e.text + " | " + d;
     return (
-      <div>
+      <div key={d}>
         <p>{txt}</p>
       </div>
     );
@@ -55,7 +73,10 @@ class ChatWindow extends Component {
     return (
       <div>
         <div>
-          hey <br />
+          <p>
+            Hey ich bin dein ChatWindow mit der Praxis {this.state.praxisID}
+          </p>{" "}
+          <br />
           <div>{this.state.chatData.map((x) => this.writeMessage(x))}</div>
         </div>
 
@@ -63,8 +84,8 @@ class ChatWindow extends Component {
           <label>
             <input
               type="text"
-              name="user"
-              id="user"
+              name={this.state.speaker}
+              id={this.state.speaker}
               onChange={this.handleChange}
             />
           </label>

@@ -1,4 +1,5 @@
 import React from "react";
+import PopUp from "./PopUp";
 const bcrypt = require("bcryptjs");
 
 //impressum blueprint und hashing test :D
@@ -8,7 +9,6 @@ class Impressum extends React.Component {
     super(props);
     this.state = { password: null };
   }
-
   test1 = () => {
     var salt = 10;
     var pw = "hello_PW!";
@@ -89,6 +89,7 @@ class Impressum extends React.Component {
           <br />
           {this.test1()}
         </p>
+        <PopUp txt={"hey"} speaker={"impressum"} praxisID={"impressum"} />
       </div>
     );
   }

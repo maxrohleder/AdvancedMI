@@ -18,6 +18,7 @@ import Login from "./login";
 import LoginUser from "./LoginUser";
 import LoginAdmin from "./LoginAdmin";
 import chatWindow from "./components/chatWindow";
+import Impresum from "./components/impressum";
 
 import "./index.css";
 
@@ -55,6 +56,7 @@ ReactDOM.render(
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />
       <Route path="/error" component={Error} />
+      <Route path="/impressum" component={Impresum} />
       <Route exact path="/" component={Login} />
     </Switch>
   </Router>,

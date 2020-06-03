@@ -5,6 +5,8 @@ import { Redirect, Link } from "react-router-dom";
 import io from "socket.io-client";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
 
+import PopUp from "./components/PopUp";
+
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
 
@@ -145,6 +147,12 @@ class PatientApp extends React.Component {
           <div className="circle">{this.state.waitingPosition}</div>
           {status}
         </div>
+
+        <PopUp
+          txt={"Open Chat Window"}
+          speaker={this.state.patientID}
+          praxisID={this.state.placeID}
+        />
       </div>
     );
   }
