@@ -4,9 +4,11 @@ import { Redirect, Link } from "react-router-dom";
 
 import io from "socket.io-client";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
+import PopUp from "./components/PopUp";
 
 const APIendpoint = "http://127.0.0.1:8000/";
 const detailsRoute = "details/";
+
 class PatientApp extends React.Component {
   constructor(props) {
     super(props);
@@ -22,6 +24,14 @@ class PatientApp extends React.Component {
       minPerPerson: null, // used to calculate time estimate
       isCalled: null,
       redirect: null, // set by update callback when patientID is not found
+
+      chatData: [
+        {
+          text: "Schreib mir...",
+          time: new Date(),
+          speaker: props.match.params.placeID,
+        },
+      ],
     };
   }
 
@@ -98,6 +108,11 @@ class PatientApp extends React.Component {
   componentWillUnmount() {
     this.socket.close();
   }
+  handleChatData = (data) => {
+    var chatData = this.state.chatData;
+    chatData.push(data);
+    this.setState({ chatData: chatData });
+  };
 
   render() {
     // Redirect to login screen if the patientID was not found
@@ -144,6 +159,14 @@ class PatientApp extends React.Component {
           <div className="circle">{this.state.waitingPosition}</div>
           {status}
         </div>
+
+        <PopUp
+          txt={"Open Chat Window"}
+          speaker={this.state.patientID}
+          praxisID={this.state.placeID}
+          chatData={this.state.chatData}
+          handleChatData={this.handleChatData}
+        />
       </div>
     );
   }
