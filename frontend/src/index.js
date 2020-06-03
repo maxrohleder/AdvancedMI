@@ -17,7 +17,6 @@ import Error from "./error";
 import Login from "./login";
 import LoginUser from "./LoginUser";
 import LoginAdmin from "./LoginAdmin";
-import Impressum from "./components/impressum";
 import chatWindow from "./components/chatWindow";
 
 import "./index.css";
@@ -55,7 +54,6 @@ ReactDOM.render(
       <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />
-      <Route path="/impressum" component={Impressum} />
       <Route path="/error" component={Error} />
       <Route exact path="/" component={Login} />
     </Switch>

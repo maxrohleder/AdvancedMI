@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import LoginForUser from "./components/loginForUser.js";
+import { Link } from "react-router-dom";
 
 import "./styles/LoginUser.css";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
@@ -20,9 +21,9 @@ class Login extends Component {
         </div>
         <div className="container-bottom">
           {" "}
-          <a href="http://localhost:3000/admin">Admin</a>
-          <a href="http://localhost:3000/impressum">Impressum</a>
-          <a href="https://www.google.de">AGB</a>
+          <Link to="/admin">Admin</Link>
+          <Link to="/impressum">Impressum</Link>
+          <Link to="/agb">AGB</Link>
         </div>
       </div>
     );

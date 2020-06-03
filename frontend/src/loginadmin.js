@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import LoginForAdmin from "./components/loginForAdmin.js";
+import { Link } from "react-router-dom";
 
 import "./styles/LoginAdmin.css";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
@@ -20,9 +21,9 @@ class LoginAdmin extends Component {
           <LoginForAdmin onAdminLoggedIn={this.props.onAdminLoggedIn} />
         </div>
         <div className="container-bottom">
-          <a href="http://localhost:3000">Patient</a>
-          <a href="http://localhost:3000/impressum">Impressum</a>
-          <a href="https://www.google.de">AGB</a>
+          <Link to="/">Patient</Link>
+          <Link to="/impressum">Impressum</Link>
+          <Link to="/agb">AGB</Link>
         </div>
       </div>
     );
