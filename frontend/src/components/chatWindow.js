@@ -75,7 +75,8 @@ class ChatWindow extends Component {
       <div className="chat-card">
         <div>
           <p>
-            Hey ich bin dein ChatWindow mit der Praxis {this.state.praxisID}
+            Hey <span>{this.state.speaker}</span> ich bin dein ChatWindow mit
+            der Praxis <span>{this.state.praxisID}</span>
           </p>{" "}
           <br />
           <div>{this.state.chatData.map((x) => this.writeMessage(x))}</div>

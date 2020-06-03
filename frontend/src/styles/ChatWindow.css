@@ -24,3 +24,8 @@
   box-shadow: 5px 5px 5px var(--shadow-color);
   border-radius: 6px;
 }
+
+.chat-card span {
+  font-style: italic;
+  font-weight: bold;
+}
