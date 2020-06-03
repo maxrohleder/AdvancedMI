@@ -1,4 +1,5 @@
 import React from "react";
+import "../styles/AdminApp.css";
 
 /*
 
@@ -105,9 +106,8 @@ class Queue extends React.Component {
   );
   render() {
     return (
-      <div>
-        <div>People waiting: {this.props.data.length}</div>
-        <ul>{this.props.data.map(this.renderEntries)}</ul>
+      <div className="overview">
+        <ol>{this.props.data.map(this.renderEntries)}</ol>
       </div>
     );
   }

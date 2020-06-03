@@ -1,38 +1,89 @@
-.App {
-  text-align: center;
+:root {
+  --primary-highlight-color: rgba(20, 170, 228, 1);
+  --secondary-highlight-color: rgba(20, 138, 228, 0.54);
+  --patient-active-color: #21f51d;
+  --shadow-color: #3f3f3f2a;
+  color: black;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.app {
+  height: 100vh;
+  width: 100vw;
+  border-radius: 0.5em;
+  border: 2px solid #eaf0f7;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  background-color: whitesmoke;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.banner {
+  width: 100%;
+  background-color: var(--primary-highlight-color);
+  text-align: center;
+  color: black;
+  padding: 5vh;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.main {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100vw;
+  justify-content: space-between;
+}
+
+.patman {
+  display: flex;
+  flex-direction: column;
+}
+
+.patman label {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-content: center;
+}
+
+input[type="text"] {
+  width: 15vw;
+  height: 1.5vw;
+  min-width: 300px;
+  min-height: 30px;
+  box-shadow: 2px 2px 2px var(--shadow-color);
+  padding: 1em;
+  border-radius: 0.5em;
+  border: 0.1em solid black;
+  margin: 0.5em 0;
+}
+
+input[type="text"]:hover {
+  box-shadow: 2px 2px 2px var(--primary-highlight-color);
+  transition: 0.3s box-shadow;
+}
+
+input[type="submit"] {
+  width: 30%;
+  margin-left: 70%;
+
+  height: 1.5vw;
+  min-width: 100px;
+  min-height: 30px;
+
+  border-radius: 0.5em;
+  border: 0.1em solid black;
+}
+
+.overview ul {
+  height: 10px;
+  overflow: hidden;
+  overflow-y: scroll;
 }

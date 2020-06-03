@@ -22,7 +22,7 @@ import chatWindow from "./components/chatWindow";
 import "./index.css";
 
 //loggin for admin only if password was correct
-var adminLoggedIn = false;
+var adminLoggedIn = true;
 function setAdminLoggedIn(entry) {
   adminLoggedIn = entry;
 }

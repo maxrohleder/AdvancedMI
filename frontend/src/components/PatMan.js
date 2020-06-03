@@ -1,5 +1,5 @@
 import React from "react";
-import "../styles/LoginAdmin.css";
+import "../styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
 
@@ -113,14 +113,15 @@ class PatientManagement extends React.Component {
 
   render() {
     return (
-      <div className={"container-patman"}>
+      <div className={"patman"}>
         <form onSubmit={this.handleSubmit}>
           <label>
-            PatientenDaten:
+            Neuer Wartezimmer Gast:
             <input
               type="text"
               name="first_name"
               id="first_name"
+              placeholder="First Name"
               value={this.state.first_name}
               onChange={this.handleChange}
             />
@@ -160,13 +161,10 @@ class PatientManagement extends React.Component {
               onChange={this.handleChange}
             />
           </label>
-          <br />
-          <div className="container-button-todo">
+          <div>
             <input type="submit" value="Eintragen" />
           </div>
         </form>
-        <br />
-        <br />
       </div>
     );
   }

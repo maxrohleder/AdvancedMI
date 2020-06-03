@@ -177,7 +177,7 @@ app.get("/", (req, res) => {
     .status(200);
 });
 
-app.get("/:placeID", (req, res) => {
+app.get("/details/:placeID", (req, res) => {
   console.log("place details requested");
   res.send(getDetails(req.params.placeID)).status(200);
 });

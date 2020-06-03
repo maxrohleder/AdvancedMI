@@ -6,12 +6,13 @@ import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
 const updateRoute = "queue/";
+const detailsRoute = "details/";
 
 class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      placeID: props.match.params.placeID, // TODO
+      placeID: props.match.params.placeID,
 
       name: null,
       address: null,
@@ -31,6 +32,22 @@ class AdminApp extends React.Component {
         console.log(data);
         this.setState({
           queueData: data.queueData,
+        });
+      })
+      .catch(() => {
+        console.log("could not fetch data. Backend inactive??");
+        this.setState({ redirect: "/error" });
+      });
+
+    // fetch place information from placeID
+    var url = APIendpoint + detailsRoute + this.state.placeID;
+    fetch(url)
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({
+          name: data.name,
+          address: data.address,
+          field: data.field,
         });
       })
       .catch(() => {
@@ -67,20 +84,23 @@ class AdminApp extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Welcome to the front desk of {this.state.placeID}!</h1>
-        <div>
+      <div className="app">
+        <div className="banner">
+          <h1>Wartezimmer {this.state.name}!</h1>
+        </div>
+        <div className="main">
           <PatientManagement
             praxisID={this.state.placeID}
             doChange={this.appendToQueue}
+            className="patman"
           />
           <Queue
             placeID={this.state.placeID}
             data={this.state.queueData}
             remove={this.deleteFromQueue}
           />
-          <InfoBox />
         </div>
+        <InfoBox />
       </div>
     );
   }
