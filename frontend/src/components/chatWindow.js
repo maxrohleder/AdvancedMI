@@ -1,9 +1,11 @@
 import React, { Component } from "react";
+import "../styles/ChatWindow.css";
+
 class ChatWindow extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      chatData: [],
+      chatData: this.props.chatData,
       chat: null,
       speaker: props.speaker,
       praxisID: props.praxisID,
@@ -39,9 +41,7 @@ class ChatWindow extends Component {
           };
         }
       }
-      var chatData = this.state.chatData;
-      chatData.push(dummy);
-      this.setState({ chatData: chatData });
+      this.props.handleChatData(dummy);
     }
     event.preventDefault();
   };
@@ -62,16 +62,17 @@ class ChatWindow extends Component {
       ":" +
       e.time.getMilliseconds();
 
-    var txt = e.speaker + " | " + e.text + " | " + d;
+    var side = e.speaker === this.state.speaker ? "left" : "right";
+    var txt = e.speaker + " | " + e.text + " | " + d + " | " + side;
     return (
-      <div key={d}>
+      <div className={side} key={d}>
         <p>{txt}</p>
       </div>
     );
   };
   render() {
     return (
-      <div>
+      <div className="chat-card">
         <div>
           <p>
             Hey ich bin dein ChatWindow mit der Praxis {this.state.praxisID}

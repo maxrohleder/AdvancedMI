@@ -1,0 +1,26 @@
+.left {
+  color: red;
+}
+.right {
+  text-align: center;
+  color: blue;
+}
+
+.chat-card {
+  /* use flexbox https://css-tricks.com/snippets/css/a-guide-to-flexbox/*/
+  display: flex;
+  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
+
+  /* dimensions of card */
+  width: 80vw;
+  height: 59vh;
+  margin: 5vh 10vw 5vh 10vw; /*top right bottom left*/
+
+  background: #ffffff;
+  border: 2px solid #eaf0f7;
+  box-sizing: border-box;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  border-radius: 6px;
+}

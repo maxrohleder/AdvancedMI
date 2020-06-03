@@ -7,8 +7,13 @@ const bcrypt = require("bcryptjs");
 class Impressum extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { password: null };
+    this.state = { password: null, chatData: [] };
   }
+  handleChatData = (data) => {
+    var chatData = this.state.chatData;
+    chatData.push(data);
+    this.setState({ chatData: chatData });
+  };
   test1 = () => {
     var salt = 10;
     var pw = "hello_PW!";
@@ -89,7 +94,13 @@ class Impressum extends React.Component {
           <br />
           {this.test1()}
         </p>
-        <PopUp txt={"hey"} speaker={"impressum"} praxisID={"impressum"} />
+        <PopUp
+          txt={"chat"}
+          speaker={"impressum"}
+          praxisID={"impressumID"}
+          chatData={this.state.chatData}
+          handleChatData={this.handleChatData}
+        />
       </div>
     );
   }

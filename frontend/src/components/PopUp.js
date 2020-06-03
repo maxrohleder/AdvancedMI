@@ -18,6 +18,8 @@ class PopUpManager extends Component {
         <ChatWindow
           speaker={this.props.speaker}
           praxisID={this.props.praxisID}
+          chatData={this.props.chatData}
+          handleChatData={this.props.handleChatData}
         />
       </div>
     );
@@ -45,6 +47,8 @@ class PopUp extends Component {
             toggle={this.togglePop}
             speaker={this.props.speaker}
             praxisID={this.props.praxisID}
+            chatData={this.props.chatData}
+            handleChatData={this.props.handleChatData}
           />
         ) : null}
       </div>
