@@ -1,10 +1,3 @@
-:root {
-  --primary-highlight-color: rgba(20, 170, 228, 1);
-  --secondary-highlight-color: rgba(20, 138, 228, 0.54);
-  --shadow-color: #3f3f3f2a;
-  caret-color: transparent;
-  color: #67758d;
-}
 .container-admin {
   width: 50%;
   margin-top: 7%;

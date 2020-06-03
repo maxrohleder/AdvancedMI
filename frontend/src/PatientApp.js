@@ -134,7 +134,7 @@ class PatientApp extends React.Component {
     }
 
     return (
-      <div className="app">
+      <div>
         <div className="header">
           <div>
             Digitaler <span>Warteraum</span>

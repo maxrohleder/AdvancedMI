@@ -1,9 +1,5 @@
 :root {
-  --primary-highlight-color: rgba(20, 170, 228, 1);
-  --secondary-highlight-color: rgba(20, 138, 228, 0.54);
   --patient-active-color: #21f51d;
-  --shadow-color: #3f3f3f2a;
-  color: black;
 }
 
 *,
@@ -53,7 +49,7 @@
   align-content: center;
 }
 
-input[type="text"] {
+.patman input[type="text"] {
   width: 15vw;
   height: 1.5vw;
   min-width: 300px;
@@ -65,7 +61,7 @@ input[type="text"] {
   margin: 0.5em 0;
 }
 
-input[type="text"]:hover {
+.patman input[type="text"]:hover {
   box-shadow: 2px 2px 2px var(--primary-highlight-color);
   transition: 0.3s box-shadow;
 }
