@@ -9,6 +9,7 @@ class Impressum extends React.Component {
     super(props);
     this.state = { password: null, chatData: [] };
   }
+
   handleChatData = (data) => {
     var chatData = this.state.chatData;
     chatData.push(data);
@@ -26,6 +27,11 @@ class Impressum extends React.Component {
     } else {
       console.log("flase");
     }
+
+    var tet = { x: "stirng", b: "llslls" };
+    console.log(tet);
+    test["x"] = "string";
+    console.log(tet);
   };
   test2 = () => {
     /* 

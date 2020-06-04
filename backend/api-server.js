@@ -43,22 +43,28 @@ var db = {
         email: "corona@covid19.de",
       },
     ],
-    chatData: {
-      jj97: [
-        {
-          text: "Schreib mir...",
-          time: new Date().toLocaleTimeString(),
-          speaker: "ukerlangen",
-        },
-      ],
-      mr98: [
-        {
-          text: "MaxRohChat.",
-          time: new Date().toLocaleTimeString(),
-          speaker: "ukerlangen",
-        },
-      ],
-    },
+    chatData: [
+      {
+        id: "jj97",
+        chat: [
+          {
+            text: "Schreib mir...jj97",
+            time: new Date().toLocaleTimeString(),
+            speaker: "drcovid",
+          },
+        ],
+      },
+      {
+        id: "mr98",
+        chat: [
+          {
+            text: "Schreib mir...98",
+            time: new Date().toLocaleTimeString(),
+            speaker: "drcovid",
+          },
+        ],
+      },
+    ],
   },
   drcovid: {
     password: "666",
@@ -91,15 +97,18 @@ var db = {
         email: "corona@covid19.de",
       },
     ],
-    chatData: {
-      jj97: [
-        {
-          text: "Schreib mir...",
-          time: new Date().toLocaleTimeString(),
-          speaker: "drcovid",
-        },
-      ],
-    },
+    chatData: [
+      {
+        id: "jj97",
+        chat: [
+          {
+            text: "Schreib mir...",
+            time: new Date().toLocaleTimeString(),
+            speaker: "drcovid",
+          },
+        ],
+      },
+    ],
   },
 };
 
@@ -157,16 +166,19 @@ const updateWaitingNumber = (praxisID, patientID) => {
 };
 //-------------------------CHAT------------------------------------------------
 const updateChat = (praxisID, patientID) => {
-  var lst = db[praxisID].chatData;
-  var patientChat = lst[patientID];
-  console.log(patientChat);
+  var match = db[praxisID].chatData.find((entry) => {
+    return entry.id == patientID;
+  });
+  console.log(praxisID);
+  console.log(patientID);
+  console.log(match.chat);
 
-  if (typeof patientChat === "undefined") {
+  if (typeof match === "undefined") {
     // the patientID is not registered (anymore)//TODO
     return null;
   } else {
     //console.log(entry.pos);
-    return patientChat;
+    return match.chat;
   }
 };
 //-------------------------CHAT------------------------------------------------
@@ -294,18 +306,22 @@ app.post("/chat/", (req, res) => {
   var praxisID = req.body.praxisID;
 
   //log
-  //console.log(chatData);
-  //console.log(patientID);
-  //console.log(praxisID);
+  console.log(chatData);
+  console.log(patientID);
+  console.log(praxisID);
 
-  db[praxisID].chatData[patientID].push(chatData);
-  console.log(db[praxisID].chatData[patientID]);
-
+  var index = db[praxisID].chatData.findIndex((entry) => {
+    return entry.id == patientID;
+  });
+  console.log(index);
+  console.log(db[praxisID].chatData[index]);
+  db[praxisID].chatData[index].chat.push(chatData);
+  console.log(db[praxisID].chatData[index]);
   // inform
   res
     .send({
       response: "registered patient",
-      chatData: db[praxisID].chatData[patientID],
+      chatData: db[praxisID].chatData[index].chat,
     })
     .status(200);
 });
