@@ -4,6 +4,9 @@ import InfoBox from "./components/InfoBox";
 import PatientManagement from "./components/PatMan";
 import "./styles/AdminApp.css";
 
+import PopUp from "./components/PopUp";
+import io from "socket.io-client";
+
 const APIendpoint = "http://localhost:8000/";
 const updateRoute = "queue/";
 const detailsRoute = "details/";
@@ -19,10 +22,38 @@ class AdminApp extends React.Component {
       field: null, // facharzt
 
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
+
+      chatData: [],
     };
   }
 
+  socket = io.connect(APIendpoint, {
+    autoConnect: false,
+    query:
+      "patDaten=" +
+      this.props.match.params.placeID +
+      " x+x " + //allow " " in praxisID
+      "jj97", //hmmm dunno wie man des fixen kann
+  });
+
+  setChatCb = (cb) => {
+    this.socket.on("chat", (dt) => {
+      cb(null, dt);
+    });
+  };
+
   componentDidMount() {
+    if (this.socket.disconnected) {
+      this.socket.open();
+    }
+
+    // subscribe to chat channel
+    this.setChatCb((err, chat) => {
+      console.log(chat);
+      this.setState({ chatData: chat });
+      console.log(this.state.chatData);
+    });
+
     // fetch initial queue status
     var url = APIendpoint + updateRoute + this.state.placeID;
 
@@ -82,6 +113,36 @@ class AdminApp extends React.Component {
     }
   };
 
+  handleChatData = (data) => {
+    /* var chatData = this.state.chatData;
+    chatData.push(data);
+    this.setState({ chatData: chatData }); */
+
+    var url = APIendpoint + "chat/";
+    var payload = JSON.stringify({
+      chatData: data,
+      patientID: "jj97", //tochange
+      praxisID: this.state.placeID,
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+
+    console.log("fetching admin info from " + url);
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        //
+        this.setState({ chatData: data.chatData });
+      })
+      .catch(() => {
+        console.log();
+        this.setState({ redirect: "/error" });
+      });
+  };
+
   render() {
     return (
       <div className="app">
@@ -101,6 +162,14 @@ class AdminApp extends React.Component {
           />
         </div>
         <InfoBox />
+
+        <PopUp
+          txt={"Open Chat Window"}
+          speaker={this.state.placeID}
+          praxisID={"jj97"} //tochange
+          chatData={this.state.chatData}
+          handleChatData={this.handleChatData}
+        />
       </div>
     );
   }

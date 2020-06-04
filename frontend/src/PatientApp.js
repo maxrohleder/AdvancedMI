@@ -115,6 +115,7 @@ class PatientApp extends React.Component {
   componentWillUnmount() {
     this.socket.close();
   }
+
   handleChatData = (data) => {
     /* var chatData = this.state.chatData;
     chatData.push(data);

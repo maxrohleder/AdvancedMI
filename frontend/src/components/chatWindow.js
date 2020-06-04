@@ -68,7 +68,9 @@ class ChatWindow extends Component {
             der Praxis <span>{this.state.praxisID}</span>
           </p>{" "}
           <br />
-          {JSON.stringify(this.props.chatData)}
+          {
+            //JSON.stringify(this.props.chatData)
+          }
           <div>{this.props.chatData.map((x) => this.writeMessage(x))}</div>
         </div>
 
