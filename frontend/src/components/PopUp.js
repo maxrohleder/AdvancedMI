@@ -20,6 +20,7 @@ class PopUpManager extends Component {
           praxisID={this.props.praxisID}
           chatData={this.props.chatData}
           handleChatData={this.props.handleChatData}
+          chatRefresh={this.props.chatRefresh}
         />
       </div>
     );
@@ -49,6 +50,7 @@ class PopUp extends Component {
             praxisID={this.props.praxisID}
             chatData={this.props.chatData}
             handleChatData={this.props.handleChatData}
+            chatRefresh={this.props.chatRefresh}
           />
         ) : null}
       </div>

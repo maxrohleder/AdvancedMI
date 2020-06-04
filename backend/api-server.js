@@ -324,6 +324,15 @@ app.post("/admin/registerpatient/", (req, res) => {
 app.post("/chat/", (req, res) => {
   // create a patientID
   var chatData = req.body.chatData;
+  if (chatData == null) {
+    res
+      .send({
+        response: "registered patient",
+        chatData: db[praxisID].chatData[index].chat,
+      })
+      .status(200);
+    return;
+  }
   var patientID = req.body.patientID;
   var praxisID = req.body.praxisID;
 

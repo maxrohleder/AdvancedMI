@@ -59,6 +59,10 @@ class ChatWindow extends Component {
       </div>
     );
   };
+
+  componentDidMount() {
+    //this.props.chatrefresh();
+  }
   render() {
     return (
       <div className="chat-card">

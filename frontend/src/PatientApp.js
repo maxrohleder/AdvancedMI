@@ -198,6 +198,7 @@ class PatientApp extends React.Component {
           praxisID={this.state.placeID}
           chatData={this.state.chatData}
           handleChatData={this.handleChatData}
+          chatRefresh={this.handleChatData}
         />
       </div>
     );
