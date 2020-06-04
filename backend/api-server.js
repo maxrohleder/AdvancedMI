@@ -48,9 +48,9 @@ var db = {
         id: "jj97",
         chat: [
           {
-            text: "Schreib mir...jj97",
+            text: "Heyy jj97 Schreib mir...hier im ukerlangen",
             time: new Date().toLocaleTimeString(),
-            speaker: "drcovid",
+            speaker: "ukerlangen",
           },
         ],
       },
@@ -58,9 +58,9 @@ var db = {
         id: "mr98",
         chat: [
           {
-            text: "Schreib mir...98",
+            text: "Heyy mr98 Schreib mir...hier im ukerlangen",
             time: new Date().toLocaleTimeString(),
-            speaker: "drcovid",
+            speaker: "ukerlangen",
           },
         ],
       },
@@ -102,7 +102,17 @@ var db = {
         id: "jj97",
         chat: [
           {
-            text: "Schreib mir...",
+            text: "Heyy jj97 Schreib mir...hier im drcovid",
+            time: new Date().toLocaleTimeString(),
+            speaker: "drcovid",
+          },
+        ],
+      },
+      {
+        id: "mr98",
+        chat: [
+          {
+            text: "Heyy mr98 Schreib mir...hier im drcovid",
             time: new Date().toLocaleTimeString(),
             speaker: "drcovid",
           },
@@ -290,6 +300,18 @@ app.post("/admin/registerpatient/", (req, res) => {
 
   // place patient into queue
   var pos = queuePatient(placeID, patientID);
+
+  //add empty chat for user
+  db[placeID].chatData.push({
+    id: patientID,
+    chat: [
+      {
+        text: "Hey " + patientID + "Schreib mir... hier im " + placeID,
+        time: new Date().toLocaleTimeString(),
+        speaker: placeID,
+      },
+    ],
+  });
 
   // inform admin interface about patientID and position
   res
