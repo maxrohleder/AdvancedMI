@@ -25,13 +25,7 @@ class PatientApp extends React.Component {
       isCalled: null,
       redirect: null, // set by update callback when patientID is not found
 
-      chatData: [
-        {
-          text: "Schreib mir...",
-          time: new Date(),
-          speaker: props.match.params.placeID,
-        },
-      ],
+      chatData: [],
     };
   }
 
@@ -62,6 +56,12 @@ class PatientApp extends React.Component {
     });
   };
 
+  setChatCb = (cb) => {
+    this.socket.on("chat", (dt) => {
+      cb(null, dt);
+    });
+  };
+
   componentDidMount() {
     // connect to real-time server on backend
     if (this.socket.disconnected) {
@@ -87,6 +87,13 @@ class PatientApp extends React.Component {
     // subscribe to timing channel
     this.setTimingCb((err, dt) => this.setState({ minPerPerson: dt }));
 
+    // subscribe to chat channel
+    this.setChatCb((err, chat) => {
+      console.log(chat);
+      this.setState({ chatData: chat });
+      console.log(this.state.chatData);
+    });
+
     // fetch place information from placeID
     var apicall = APIendpoint + detailsRoute + this.state.placeID;
     console.log("fetching placedetails");
@@ -109,9 +116,33 @@ class PatientApp extends React.Component {
     this.socket.close();
   }
   handleChatData = (data) => {
-    var chatData = this.state.chatData;
+    /* var chatData = this.state.chatData;
     chatData.push(data);
-    this.setState({ chatData: chatData });
+    this.setState({ chatData: chatData }); */
+
+    var url = APIendpoint + "chat/";
+    var payload = JSON.stringify({
+      chatData: data,
+      patientID: this.state.patientID,
+      praxisID: this.state.placeID,
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+
+    console.log("fetching admin info from " + url);
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        //
+        this.setState({ chatData: data.chatData });
+      })
+      .catch(() => {
+        console.log();
+        this.setState({ redirect: "/error" });
+      });
   };
 
   render() {

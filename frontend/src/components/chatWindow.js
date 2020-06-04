@@ -19,7 +19,7 @@ class ChatWindow extends Component {
       this.setState({
         chat: {
           text: event.target.value,
-          time: new Date(),
+          time: new Date().toLocaleTimeString(),
           speaker: this.state.speaker,
         },
       });
@@ -28,15 +28,17 @@ class ChatWindow extends Component {
 
   handleSubmit = (event) => {
     var dummy = this.state.chat;
-    if (this.state.chat !== null) {
-      var i = this.state.chatData.length - 1;
+    if (dummy !== null) {
+      var i = this.props.chatData.length - 1;
       if (i >= 0) {
         //publish same txt at different time//prevent duplicate
-        var prevText = this.state.chatData[i].text;
+        var prevText = this.props.chatData[i].text;
+        console.log("prevText: " + prevText);
+        console.log("dummy: " + dummy.text);
         if (prevText === dummy.text) {
           dummy = {
             text: dummy.text,
-            time: new Date(),
+            time: new Date().toLocaleTimeString(),
             speaker: dummy.speaker,
           };
         }
@@ -47,20 +49,7 @@ class ChatWindow extends Component {
   };
 
   writeMessage = (e) => {
-    var d =
-      e.time.getDate() +
-      "." +
-      (e.time.getMonth() + 1) +
-      "." +
-      e.time.getFullYear() +
-      "  " +
-      e.time.getHours() +
-      ":" +
-      e.time.getMinutes() +
-      ":" +
-      e.time.getSeconds() +
-      ":" +
-      e.time.getMilliseconds();
+    var d = e.time;
 
     var side = e.speaker === this.state.speaker ? "left" : "right";
     var txt = e.speaker + " | " + e.text + " | " + d + " | " + side;
@@ -79,7 +68,8 @@ class ChatWindow extends Component {
             der Praxis <span>{this.state.praxisID}</span>
           </p>{" "}
           <br />
-          <div>{this.state.chatData.map((x) => this.writeMessage(x))}</div>
+          {JSON.stringify(this.props.chatData)}
+          <div>{this.props.chatData.map((x) => this.writeMessage(x))}</div>
         </div>
 
         <form onSubmit={this.handleSubmit}>

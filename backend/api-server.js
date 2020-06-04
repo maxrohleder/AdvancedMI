@@ -43,6 +43,22 @@ var db = {
         email: "corona@covid19.de",
       },
     ],
+    chatData: {
+      jj97: [
+        {
+          text: "Schreib mir...",
+          time: new Date().toLocaleTimeString(),
+          speaker: "ukerlangen",
+        },
+      ],
+      mr98: [
+        {
+          text: "MaxRohChat.",
+          time: new Date().toLocaleTimeString(),
+          speaker: "ukerlangen",
+        },
+      ],
+    },
   },
   drcovid: {
     password: "666",
@@ -75,6 +91,15 @@ var db = {
         email: "corona@covid19.de",
       },
     ],
+    chatData: {
+      jj97: [
+        {
+          text: "Schreib mir...",
+          time: new Date().toLocaleTimeString(),
+          speaker: "drcovid",
+        },
+      ],
+    },
   },
 };
 
@@ -130,6 +155,21 @@ const updateWaitingNumber = (praxisID, patientID) => {
     return entry.pos;
   }
 };
+//-------------------------CHAT------------------------------------------------
+const updateChat = (praxisID, patientID) => {
+  var lst = db[praxisID].chatData;
+  var patientChat = lst[patientID];
+  console.log(patientChat);
+
+  if (typeof patientChat === "undefined") {
+    // the patientID is not registered (anymore)//TODO
+    return null;
+  } else {
+    //console.log(entry.pos);
+    return patientChat;
+  }
+};
+//-------------------------CHAT------------------------------------------------
 
 const createUID = (placeID, first, sur) => {
   // create an place-unique patientID from first and surname
@@ -245,6 +285,32 @@ app.post("/admin/registerpatient/", (req, res) => {
     .status(200);
 });
 
+//-------------------------CHAT------------------------------------------------
+// handle chat
+app.post("/chat/", (req, res) => {
+  // create a patientID
+  var chatData = req.body.chatData;
+  var patientID = req.body.patientID;
+  var praxisID = req.body.praxisID;
+
+  //log
+  //console.log(chatData);
+  //console.log(patientID);
+  //console.log(praxisID);
+
+  db[praxisID].chatData[patientID].push(chatData);
+  console.log(db[praxisID].chatData[patientID]);
+
+  // inform
+  res
+    .send({
+      response: "registered patient",
+      chatData: db[praxisID].chatData[patientID],
+    })
+    .status(200);
+});
+//-------------------------CHAT------------------------------------------------
+
 app.post("/call", (req, res) => {
   var channel = req.body.isCalled ? "called" : "uncalled";
   req.app.io.emit(channel, req.body.patientID);
@@ -276,6 +342,7 @@ io.on("connection", (socket) => {
   console.log(patDaten[0] + " : " + patDaten[1]);
 
   socket.emit("update", updateWaitingNumber(patDaten[0], patDaten[1]));
+  socket.emit("chat", updateChat(patDaten[0], patDaten[1]));
   socket.emit("timing", 10);
 
   // end timer on disconnect
