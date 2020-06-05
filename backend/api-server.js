@@ -176,19 +176,23 @@ const updateWaitingNumber = (praxisID, patientID) => {
 };
 //-------------------------CHAT------------------------------------------------
 const updateChat = (praxisID, patientID) => {
-  var match = db[praxisID].chatData.find((entry) => {
-    return entry.id == patientID;
-  });
-  console.log(praxisID);
-  console.log(patientID);
-  console.log(match.chat);
-
-  if (typeof match === "undefined") {
-    // the patientID is not registered (anymore)//TODO
-    return null;
+  if (praxisID === patientID) {
+    return db[praxisID].chatData; //praxis bekommt IHREN gesamten Chat
   } else {
-    //console.log(entry.pos);
-    return match.chat;
+    var match = db[praxisID].chatData.find((entry) => {
+      return entry.id == patientID;
+    });
+    console.log(praxisID);
+    console.log(patientID);
+    console.log(match.chat);
+
+    if (typeof match === "undefined") {
+      // the patientID is not registered (anymore)//TODO
+      return null;
+    } else {
+      //console.log(entry.pos);
+      return match.chat;
+    }
   }
 };
 //-------------------------CHAT------------------------------------------------
@@ -322,8 +326,16 @@ app.post("/admin/registerpatient/", (req, res) => {
 //-------------------------CHAT------------------------------------------------
 // handle chat
 app.post("/chat/", (req, res) => {
-  // create a patientID
+  // create a chat
+
   var chatData = req.body.chatData;
+  var patientID = req.body.patientID;
+  var praxisID = req.body.praxisID;
+
+  var index = db[praxisID].chatData.findIndex((entry) => {
+    return entry.id == patientID;
+  });
+
   if (chatData == null) {
     res
       .send({
@@ -333,20 +345,16 @@ app.post("/chat/", (req, res) => {
       .status(200);
     return;
   }
-  var patientID = req.body.patientID;
-  var praxisID = req.body.praxisID;
-
   //log
   console.log(chatData);
   console.log(patientID);
   console.log(praxisID);
-
-  var index = db[praxisID].chatData.findIndex((entry) => {
-    return entry.id == patientID;
-  });
   console.log(index);
   console.log(db[praxisID].chatData[index]);
+
+  //push
   db[praxisID].chatData[index].chat.push(chatData);
+
   console.log(db[praxisID].chatData[index]);
   // inform
   res
@@ -385,13 +393,18 @@ io.on("connection", (socket) => {
   // send inital information
   var patDaten = socket.handshake.query.patDaten;
   patDaten = patDaten.split(" x+x "); //allow " " in prakisID
-
-  console.log(patDaten[0] + " : " + patDaten[1]);
-
-  socket.emit("update", updateWaitingNumber(patDaten[0], patDaten[1]));
-  socket.emit("chat", updateChat(patDaten[0], patDaten[1]));
-  socket.emit("timing", 10);
-
+  var praxisID = patDaten[0];
+  var patientID = patDaten[1];
+  console.log(praxisID + " : " + patientID);
+  if (praxisID === patientID) {
+    console.log("bin in ner praxis");
+    socket.emit("chat", updateChat(praxisID, patientID));
+  } else {
+    console.log("ich bin patient");
+    socket.emit("update", updateWaitingNumber(praxisID, patientID));
+    socket.emit("chat", updateChat(praxisID, patientID));
+    socket.emit("timing", 10);
+  }
   // end timer on disconnect
   socket.on("disconnect", () => {
     console.log("Client disconnected");

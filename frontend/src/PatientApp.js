@@ -117,10 +117,6 @@ class PatientApp extends React.Component {
   }
 
   handleChatData = (data) => {
-    /* var chatData = this.state.chatData;
-    chatData.push(data);
-    this.setState({ chatData: chatData }); */
-
     var url = APIendpoint + "chat/";
     var payload = JSON.stringify({
       chatData: data,
@@ -138,6 +134,7 @@ class PatientApp extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         //
+        //this.state.chatData = data.chatData;
         this.setState({ chatData: data.chatData });
       })
       .catch(() => {
