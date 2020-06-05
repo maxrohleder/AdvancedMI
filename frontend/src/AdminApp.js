@@ -74,10 +74,12 @@ class AdminApp extends React.Component {
     this.setChatCb((err, chat) => {
       console.log(chat);
 
-      if (chat[0].chat == null) {
+      if (chat.db[0].chat == null) {
         return;
       } else {
-        this.setState({ chatData: chat });
+        if (chat.praxisID == this.state.placeID) {
+          this.setState({ chatData: chat.db });
+        }
       }
     });
 

@@ -178,7 +178,11 @@ const updateWaitingNumber = (praxisID, patientID) => {
 //-------------------------CHAT------------------------------------------------
 const updateChat = (praxisID, patientID) => {
   if (praxisID === patientID) {
-    return db[praxisID].chatData; //praxis bekommt IHREN gesamten Chat
+    return {
+      db: db[praxisID].chatData,
+      praxisID: praxisID,
+      patientID: patientID,
+    }; //praxis bekommt IHREN gesamten Chat
   } else {
     var match = db[praxisID].chatData.find((entry) => {
       return entry.id == patientID;
@@ -192,7 +196,7 @@ const updateChat = (praxisID, patientID) => {
       return null;
     } else {
       //console.log(entry.pos);
-      return match.chat;
+      return { db: match.chat, praxisID: praxisID, patientID: patientID };
     }
   }
 };

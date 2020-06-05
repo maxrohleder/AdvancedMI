@@ -90,8 +90,13 @@ class PatientApp extends React.Component {
     this.setChatCb((err, chat) => {
       console.log("chat update.........");
       console.log(chat);
-      if (chat[0].chat == null) {
-        this.setState({ chatData: chat });
+      if (chat.db[0].chat == null) {
+        if (
+          chat.praxisID == this.state.placeID &&
+          chat.patientID == this.state.patientID
+        ) {
+          this.setState({ chatData: chat.db });
+        }
       } else {
         //nothing
         return;
