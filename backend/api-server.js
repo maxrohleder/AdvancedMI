@@ -6,6 +6,7 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 const port = 8000;
 
+const APIendpoint = "http://localhost:8000/";
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
@@ -354,9 +355,12 @@ app.post("/chat/", (req, res) => {
 
   //push
   db[praxisID].chatData[index].chat.push(chatData);
-
   console.log(db[praxisID].chatData[index]);
-  // inform
+  //update
+  app.io.emit("chat", updateChat(praxisID, patientID)); //to fix for individual talk //same prob as call
+  app.io.emit("chat", updateChat(praxisID, praxisID)); //to fix for individual talk //same porb as call
+
+  //info
   res
     .send({
       response: "registered patient",

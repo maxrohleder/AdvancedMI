@@ -74,8 +74,11 @@ class AdminApp extends React.Component {
     this.setChatCb((err, chat) => {
       console.log(chat);
 
-      this.setState({ chatData: chat });
-      console.log(this.state.chatData);
+      if (chat[0].chat == null) {
+        return;
+      } else {
+        this.setState({ chatData: chat });
+      }
     });
 
     // fetch initial queue status
@@ -109,6 +112,9 @@ class AdminApp extends React.Component {
         console.log("could not fetch data. Backend inactive??");
         this.setState({ redirect: "/error" });
       });
+  }
+  componentWillUnmount() {
+    this.socket.close();
   }
 
   // used to add to queue state from PatMan

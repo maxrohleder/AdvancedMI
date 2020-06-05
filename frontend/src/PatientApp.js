@@ -61,7 +61,6 @@ class PatientApp extends React.Component {
       cb(null, dt);
     });
   };
-
   componentDidMount() {
     // connect to real-time server on backend
     if (this.socket.disconnected) {
@@ -89,9 +88,14 @@ class PatientApp extends React.Component {
 
     // subscribe to chat channel
     this.setChatCb((err, chat) => {
+      console.log("chat update.........");
       console.log(chat);
-      this.setState({ chatData: chat });
-      console.log(this.state.chatData);
+      if (chat[0].chat == null) {
+        this.setState({ chatData: chat });
+      } else {
+        //nothing
+        return;
+      }
     });
 
     // fetch place information from placeID
