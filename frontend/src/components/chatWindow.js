@@ -52,7 +52,7 @@ class ChatWindow extends Component {
     var d = e.time;
 
     var side = e.speaker === this.state.speaker ? "left" : "right";
-    var txt = e.speaker + " | " + e.text + " | " + d + " | " + side;
+    var txt = e.speaker + " | " + e.text + " | " + d;
     return (
       <div className={side} key={d}>
         <p>{txt}</p>

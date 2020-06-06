@@ -361,16 +361,8 @@ app.post("/chat/", (req, res) => {
   db[praxisID].chatData[index].chat.push(chatData);
   console.log(db[praxisID].chatData[index]);
   //update
-  app.io.emit("chat", updateChat(praxisID, patientID)); //to fix for individual talk //same prob as call
-  app.io.emit("chat", updateChat(praxisID, praxisID)); //to fix for individual talk //same porb as call
-
-  //info
-  res
-    .send({
-      response: "registered patient",
-      chatData: db[praxisID].chatData[index].chat,
-    })
-    .status(200);
+  app.io.emit("chat" + praxisID + patientID, updateChat(praxisID, patientID)); //to fix for individual talk //same prob as call
+  app.io.emit("chat" + praxisID, updateChat(praxisID, praxisID)); //to fix for individual talk //same porb as call
 });
 //-------------------------CHAT------------------------------------------------
 
@@ -406,11 +398,11 @@ io.on("connection", (socket) => {
   console.log(praxisID + " : " + patientID);
   if (praxisID === patientID) {
     console.log("bin in ner praxis");
-    socket.emit("chat", updateChat(praxisID, patientID));
+    socket.emit("chat" + praxisID, updateChat(praxisID, patientID));
   } else {
     console.log("ich bin patient");
     socket.emit("update", updateWaitingNumber(praxisID, patientID));
-    socket.emit("chat", updateChat(praxisID, patientID));
+    socket.emit("chat" + praxisID + patientID, updateChat(praxisID, patientID));
     socket.emit("timing", 10);
   }
   // end timer on disconnect

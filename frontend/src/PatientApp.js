@@ -57,9 +57,14 @@ class PatientApp extends React.Component {
   };
 
   setChatCb = (cb) => {
-    this.socket.on("chat", (dt) => {
-      cb(null, dt);
-    });
+    this.socket.on(
+      "chat" +
+        this.props.match.params.placeID +
+        this.props.match.params.patientID,
+      (dt) => {
+        cb(null, dt);
+      }
+    );
   };
   componentDidMount() {
     // connect to real-time server on backend
@@ -90,17 +95,7 @@ class PatientApp extends React.Component {
     this.setChatCb((err, chat) => {
       console.log("chat update.........");
       console.log(chat);
-      if (chat.db[0].chat == null) {
-        if (
-          chat.praxisID == this.state.placeID &&
-          chat.patientID == this.state.patientID
-        ) {
-          this.setState({ chatData: chat.db });
-        }
-      } else {
-        //nothing
-        return;
-      }
+      this.setState({ chatData: chat.db });
     });
 
     // fetch place information from placeID
@@ -138,18 +133,11 @@ class PatientApp extends React.Component {
       body: payload,
     };
 
-    console.log("fetching admin info from " + url);
-    fetch(url, requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        //
-        //this.state.chatData = data.chatData;
-        this.setState({ chatData: data.chatData });
-      })
-      .catch(() => {
-        console.log();
-        this.setState({ redirect: "/error" });
-      });
+    console.log("sending chat data to " + url);
+    fetch(url, requestOptions).catch(() => {
+      console.log();
+      this.setState({ redirect: "/error" });
+    });
   };
 
   render() {
@@ -204,7 +192,6 @@ class PatientApp extends React.Component {
           praxisID={this.state.placeID}
           chatData={this.state.chatData}
           handleChatData={this.handleChatData}
-          chatRefresh={this.handleChatData}
         />
       </div>
     );

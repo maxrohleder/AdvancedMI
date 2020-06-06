@@ -61,7 +61,7 @@ class AdminApp extends React.Component {
   });
 
   setChatCb = (cb) => {
-    this.socket.on("chat", (dt) => {
+    this.socket.on("chat" + this.props.match.params.placeID, (dt) => {
       cb(null, dt);
     });
   };
@@ -73,14 +73,7 @@ class AdminApp extends React.Component {
     // subscribe to chat channel and get praxis chat
     this.setChatCb((err, chat) => {
       console.log(chat);
-
-      if (chat.db[0].chat == null) {
-        return;
-      } else {
-        if (chat.praxisID == this.state.placeID) {
-          this.setState({ chatData: chat.db });
-        }
-      }
+      this.setState({ chatData: chat.db });
     });
 
     // fetch initial queue status
@@ -158,20 +151,10 @@ class AdminApp extends React.Component {
       body: payload,
     };
 
-    console.log("fetching admin info from " + url);
-    fetch(url, requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        var chat = this.state.chatData;
-        chat[this.state.chatIndex].chat = data.chatData;
-        this.setState({ chatData: chat });
-        console.log(this.state.chatData[this.state.chatIndex].chat);
-      })
-      .catch(() => {
-        console.log();
-        this.setState({ redirect: "/error" });
-      });
+    console.log("sending chat data to " + url);
+    fetch(url, requestOptions).catch(() => {
+      this.setState({ redirect: "/error" });
+    });
   };
 
   handleChange = (event) => {
