@@ -142,7 +142,7 @@ class LoginForUser extends Component {
           </label>
           <br />
           <div className="container-button">
-            <input type="submit" value="Betreten" />
+            <input type="submit" value="⮕" />
           </div>
         </form>
       </div>

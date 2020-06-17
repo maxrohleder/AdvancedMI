@@ -50,58 +50,38 @@
 }
 .form-user {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 1%;
-  border-radius: 5%, 5%;
-  margin-left: 5%;
-  margin-right: 5%;
+  width: 70vw;
+  max-width: 400px;
+  margin-bottom: 20vh;
 }
+
 .form-user label {
   color: white;
-  display: block;
-}
-.form-user input[type="text"] {
-  width: 100%;
-  padding: 5px 20px;
-  box-sizing: border-box;
-  border-radius: 6px;
-  margin-top: 3px;
-  margin-bottom: 3px;
-  caret-color: black;
-}
-.form-user input[type="password"] {
-  width: 100%;
-  padding: 5px 20px;
-  box-sizing: border-box;
-  border-radius: 6px;
-  margin-top: 3px;
-  margin-bottom: 3px;
-  caret-color: black;
-}
-.container-button {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 30px;
-  margin-bottom: 50px;
+  flex-direction: column;
 }
-.form-user input[type="submit"] {
-  width: 70%;
-  background-color: white;
-  color: rgb(109, 109, 109);
-  padding: 10px 5%;
-  margin: 0 auto;
+.form-user input {
+  padding: 0.5em 1em 0.5em 1em;
+  border-radius: 0.6em;
+  caret-color: black;
   border: none;
-  border-radius: 10%;
-  cursor: pointer;
-  border: 2px solid(--primary-highlight-color);
   box-shadow: 5px 5px 5px var(--shadow-color);
-  border-radius: 20px;
 }
-.form-user input[type="submit"]:hover {
-  background-color: lightgreen;
+
+.form-user input[type="submit"] {
+  margin-left: 55vw;
+  width: 15vw;
+  height: 15vw;
+  border-radius: 50%;
+  background-color: rgb(196, 185, 93);
+  background-color: var(--primary-highlight-color);
+  color: white;
+  font-size: x-large;
 }
+
 .isPraxis {
   margin-top: 13%;
   margin-bottom: 7%;
