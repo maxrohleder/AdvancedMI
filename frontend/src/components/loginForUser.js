@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-//import Jumbotron from "../react-bootstrap/Jumbotron";
-import "../styles/LoginUser.css";
 
 const APIendpoint = "http://localhost:8000/";
 
@@ -87,21 +85,11 @@ class LoginForUser extends Component {
   };
 
   isPraxis = () => {
-    if (this.props.isPraxis === true) {
-      return (
-        <div className="isPraxis">
-          <span>
-            Wilkommen
-            <br />
-          </span>
-          Bitte geben sie ihre <span>UserID</span> ein
-        </div>
-      );
-    } else {
+    if (!(this.props.isPraxis === true)) {
       return (
         <React.Fragment>
           <label>
-            Praxis:
+            Praxis ID:
             <input
               type="text"
               name="praxis"
@@ -115,12 +103,6 @@ class LoginForUser extends Component {
     }
   };
 
-  isPraxis_hide = () => {
-    var x = "";
-    x = this.props.isPraxis === true ? "" : "UserID";
-    return x;
-  };
-
   render() {
     if (this.state.redirect) {
       console.log("redirecting to: " + this.state.redirect);
@@ -132,7 +114,7 @@ class LoginForUser extends Component {
         <form onSubmit={this.handleSubmit}>
           {this.isPraxis()}
           <label>
-            {this.isPraxis_hide()}
+            User ID:
             <input
               type="text"
               name="user"

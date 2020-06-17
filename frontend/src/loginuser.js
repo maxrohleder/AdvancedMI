@@ -2,15 +2,13 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import LoginForUser from "./components/loginForUser.js";
 
-import "./styles/LoginUser.css";
-import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
-
 const APIendpoint = "http://127.0.0.1";
 const port = 8000;
 
 class LoginUser extends Component {
   constructor(props) {
     super(props);
+    console.log(props.match.params.placeID);
     this.state = {
       placeID: props.match.params.placeID,
 
@@ -20,7 +18,8 @@ class LoginUser extends Component {
     };
   }
   componentDidMount() {
-    var apicall = APIendpoint + ":" + port + "/" + this.state.placeID;
+    var apicall = APIendpoint + ":" + port + "/details/" + this.state.placeID;
+    console.log(apicall);
     fetch(apicall)
       .then((response) => response.json())
       .then((data) => {
@@ -35,31 +34,29 @@ class LoginUser extends Component {
 
   render() {
     return (
-      <div className="app1">
-        <div className="header">
-          <div>
+      <div className="login-img">
+        <div className="login-main">
+          <div className="login-header">
             Digitaler <span>Warteraum</span>
           </div>
-          <div>
-            <Link to="/">Home</Link>
-          </div>
-        </div>
 
-        <div className="place-info">
-          <div>
-            <h1>{this.state.name}</h1>
-            {this.state.field}
-            <br />
+          <div className="login-greeting">
+            <span>{this.state.name}</span> <br />
+            {this.state.field} <br />
             {this.state.address}
           </div>
-          <Logo id="img" />
-        </div>
 
-        <div className="card">
-          <LoginForUser
-            praxisID={this.state.placeID}
-            isPraxis={!("" === this.state.placeID)}
-          />
+          <div className="login-form">
+            <LoginForUser
+              praxisID={this.state.placeID}
+              isPraxis={!("" === this.state.placeID)}
+            />
+          </div>
+          <div className="login-footer">
+            <Link to="/admin">Admin</Link>
+            <Link to="/impressum">Impressum</Link>
+            <Link to="/agb">AGB</Link>
+          </div>
         </div>
       </div>
     );

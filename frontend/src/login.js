@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import LoginForUser from "./components/loginForUser.js";
 import { Link } from "react-router-dom";
 
-import "./styles/MainLogin.css";
+import "./styles/login.css";
 
 class Login extends Component {
   state = {};
@@ -11,7 +11,7 @@ class Login extends Component {
       <div className="login-img">
         <div className="login-main">
           <div className="login-header">
-            Digitales <span>Wartezimmer</span>
+            Digitaler <span>Warteraum</span>
           </div>
 
           <div className="login-form">

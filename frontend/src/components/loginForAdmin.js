@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 //import Jumbotron from "../react-bootstrap/Jumbotron";
-import "../styles/LoginAdmin.css";
 
 const APIendpoint = "http://localhost:8000/";
 class LoginForAdmin extends Component {
@@ -66,10 +65,10 @@ class LoginForAdmin extends Component {
       return <Redirect to={this.state.redirect} />;
     }
     return (
-      <div className={"form-admin"}>
+      <div className="form-user">
         <form onSubmit={this.handleSubmit}>
           <label>
-            Praxis: <br />
+            Praxis ID: <br />
             <input
               type="text"
               name="praxis"
@@ -89,8 +88,8 @@ class LoginForAdmin extends Component {
             />
           </label>
           <br />
-          <div className="container-button">
-            <input type="submit" value="Betreten" />
+          <div className="login-button-container">
+            <input type="submit" value="⮕" />
           </div>
         </form>
       </div>
