@@ -53,7 +53,7 @@
   align-content: center;
 }
 
-input[type="text"] {
+.patman input[type="text"] {
   width: 15vw;
   height: 1.5vw;
   min-width: 300px;
@@ -65,12 +65,12 @@ input[type="text"] {
   margin: 0.5em 0;
 }
 
-input[type="text"]:hover {
+.patman input[type="text"]:hover {
   box-shadow: 2px 2px 2px var(--primary-highlight-color);
   transition: 0.3s box-shadow;
 }
 
-input[type="submit"] {
+.patman input[type="submit"] {
   width: 30%;
   margin-left: 70%;
 

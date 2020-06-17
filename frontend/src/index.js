@@ -15,8 +15,8 @@ import PatientApp from "./PatientApp";
 import Error from "./error";
 
 import Login from "./login";
-import LoginUser from "./LoginUser";
-import LoginAdmin from "./LoginAdmin";
+import LoginUser from "./loginuser";
+import LoginAdmin from "./loginadmin";
 import chatWindow from "./components/chatWindow";
 
 import "./index.css";
