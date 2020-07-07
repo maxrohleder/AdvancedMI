@@ -22,15 +22,15 @@ import chatWindow from "./components/chatWindow";
 import "./index.css";
 
 //loggin for admin only if password was correct
-var adminLoggedIn = true;
-function setAdminLoggedIn(entry) {
-  adminLoggedIn = entry;
+var adminLogToken = 123; //null
+function setAdminToken(entry) {
+  adminLogToken = entry;
 }
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
     render={(props) =>
-      adminLoggedIn === true ? (
+      adminLogToken !== null ? (
         <Component {...props} />
       ) : (
         <Redirect
@@ -49,7 +49,7 @@ ReactDOM.render(
       <PrivateRoute path="/admin/:placeID" component={AdminApp} />
       <Route
         path="/admin"
-        component={() => <LoginAdmin onAdminLoggedIn={setAdminLoggedIn} />}
+        component={() => <LoginAdmin onAdminToken={setAdminToken} />}
       />
       <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />

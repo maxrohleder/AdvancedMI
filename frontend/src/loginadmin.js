@@ -13,7 +13,7 @@ class LoginAdmin extends Component {
             ADMIN
           </div>
           <div className="login-form">
-            <LoginForAdmin onAdminLoggedIn={this.props.onAdminLoggedIn} />
+            <LoginForAdmin onAdminToken={this.props.onAdminToken} />
           </div>
           <div className="login-footer">
             <Link to="/">Patient</Link>

@@ -37,13 +37,27 @@ class LoginForAdmin extends Component {
         alert("Enter a Password");
         event.preventDefault();
       } else {
-        console.log("fetching admin info");
-        fetch(APIendpoint + "exists/admin/" + praxisID + "/" + password)
+        //get token
+        var payload = JSON.stringify({
+          praxisID: praxisID,
+          password: password,
+        });
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+        };
+        var url = APIendpoint + "auth/admin/";
+        console.log("fetching admin info from " + url);
+        console.log(praxisID);
+        fetch(url, requestOptions)
           .then((response) => response.json())
           .then((data) => {
             if (data.praxisConfirmed) {
-              console.log(this.props.onAdminLoggedIn);
-              this.props.onAdminLoggedIn(true);
+              //hab KA ob des accedToken schon ein cookie is ka was ich damit machen soll :D
+              this.props.onAdminToken(data.accessToken);
+
+              console.log(data.accessToken);
               this.setState({ redirect: newPageUrl });
             } else {
               alert("praxis oder password falsch, please try again");
