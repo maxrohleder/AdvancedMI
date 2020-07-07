@@ -4,6 +4,14 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
+
+const {
+  isAuthenticatedMiddleware,
+  jwtAuthenticationMiddleware,
+  jwtLogin,
+} = require("./jwt-authentication");
+const bodyParser = require("body-parser");
+
 const port = 8000;
 
 ////////////////////////////////////////////////////////////
@@ -165,6 +173,10 @@ app.use(express.json()); // for post calls in json format
 const server = http.createServer(app);
 const io = socketIo(server);
 io.origins("*:*");
+
+//JWT
+app.use(bodyParser.json());
+app.use(jwtAuthenticationMiddleware);
 
 // making sockets available in rest api
 app.io = io;
