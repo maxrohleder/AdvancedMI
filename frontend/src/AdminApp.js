@@ -63,13 +63,11 @@ class AdminApp extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
+    var auth = true;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        if (!data.authConfirmed) {
-          console.log("falschesToken");
-          alert("Use Valid Token");
-        }
+        auth = data.authConfirmed;
         this.setState({
           name: data.details.name,
           address: data.details.address,
@@ -78,6 +76,10 @@ class AdminApp extends React.Component {
       })
       .catch(() => {
         console.log("could not fetch data. Backend inactive??");
+        if (!auth) {
+          console.log("falschesToken");
+          alert("Use Valid Token");
+        }
         this.setState({ redirect: "/error" });
       });
   }
