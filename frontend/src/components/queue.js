@@ -104,12 +104,13 @@ class Queue extends React.Component {
       placeID={this.props.placeID}
     />
   );
+  notEmpty = () => {
+    if (this.props.data !== null) {
+      return <ol>{this.props.data.map(this.renderEntries)}</ol>;
+    }
+  };
   render() {
-    return (
-      <div className="overview">
-        <ol>{this.props.data.map(this.renderEntries)}</ol>
-      </div>
-    );
+    return <div className="overview">{this.notEmpty()}</div>;
   }
 }
 

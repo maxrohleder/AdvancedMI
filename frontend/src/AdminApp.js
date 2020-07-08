@@ -5,13 +5,14 @@ import PatientManagement from "./components/PatMan";
 import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
-const updateRoute = "queue/";
+const updateRoute = "admin_queue/";
 const detailsRoute = "admin_details/";
 
 class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isAuth: true,
       placeID: props.match.params.placeID,
 
       name: null,
@@ -36,24 +37,9 @@ class AdminApp extends React.Component {
     var placeID = this.state.placeID;
 
     // fetch initial queue status
-    var url = APIendpoint + updateRoute + this.state.placeID;
+    var url = APIendpoint + updateRoute;
     console.log(url);
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        this.setState({
-          queueData: data.queueData,
-        });
-      })
-      .catch(() => {
-        console.log("could not fetch data. Backend inactive??");
-        this.setState({ redirect: "/error" });
-      });
-
-    // fetch place information from placeID
-    url = APIendpoint + detailsRoute;
     var payload = JSON.stringify({
       placeID: placeID,
       token: token,
@@ -64,6 +50,26 @@ class AdminApp extends React.Component {
       body: payload,
     };
     var auth = true;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        this.setState({
+          queueData: data.queueData,
+        });
+      })
+      .catch(() => {
+        console.log("could not fetch data. Backend inactive??");
+        if (!auth) {
+          console.log("falschesToken");
+          alert("Use Valid Token");
+        }
+        this.setState({ redirect: "/error" });
+      });
+
+    // fetch place information from placeID
+    url = APIendpoint + detailsRoute;
+    auth = true;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
@@ -78,7 +84,7 @@ class AdminApp extends React.Component {
         console.log("could not fetch data. Backend inactive??");
         if (!auth) {
           console.log("falschesToken");
-          alert("Use Valid Token");
+          //alert("Use Valid Token");
         }
         this.setState({ redirect: "/error" });
       });

@@ -245,17 +245,21 @@ app.get("/details/:placeID", (req, res) => {
   res.send(getDetails(req.params.placeID)).status(200);
 });
 
-app.get("/queue/:placeID", (req, res) => {
-  var placeID = req.params.placeID;
-  var queueData = [];
-  for (let i = 0; i < db[placeID].queue.length; i++) {
-    var entry = db[placeID].queue[i];
-    var patInfo = db[placeID].patientData.find((x) => {
-      return x.patientID == entry.id;
-    });
-    queueData.push({ pos: entry.pos, ...patInfo });
+app.post("/admin_queue/", (req, res) => {
+  var placeID = isAuthenticationMiddleware(req, res);
+  if (placeID == null) {
+    res.send({ authConfirmed: false, queueData: null }).status(200);
+  } else {
+    var queueData = [];
+    for (let i = 0; i < db[placeID].queue.length; i++) {
+      var entry = db[placeID].queue[i];
+      var patInfo = db[placeID].patientData.find((x) => {
+        return x.patientID == entry.id;
+      });
+      queueData.push({ pos: entry.pos, ...patInfo });
+    }
+    res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
-  res.send({ queueData: queueData }).status(200);
 });
 
 app.post("/auth/admin/", (req, res) => {
