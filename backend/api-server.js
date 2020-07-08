@@ -20,7 +20,7 @@ const production = false;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
-  keyFilename: "backend-db-access-key.json",
+  keyFilename: "../../gcloud/backend-db-access-key.json",
 });
 
 // firestore convention: large collections with small documents
