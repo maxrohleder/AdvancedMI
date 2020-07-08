@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "wartezimmer-a2415",
+  "private_key_id": "3f51bbffc6b81e20717e0c878d273b7e53075a35",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDSr1xMdWr5jLe4\nDTnROBe0N/PKe0cNV5Nl9kmY9lBhdLo1RYa4+aDW+/W+Ko3889NCVhsHjabWyzUR\nqjqAu5XI++TFUQer2/WYUXhImCRB3Pu0M1cHLbmzb+/S8q5DT3ne8JpudusxqOyV\n7j8e1bDhIGYkN+cF+mteDGCikXmde4eVHlb5EmsnWu4h2LBKEi7dnT7z4LnY70ih\nFrHBbRwwxlyG//gs+2sDcq15tkc5DSAVmfvcOsOtbN8mcwNaIRv9ioCbZ2Xtfmym\n1A3XDj97h01fiftYY0HlNKePLwU4xXRHzfGEhqhdVN0ZgrUhRaaJaLk00jLrjYHT\nQi2W1MKZAgMBAAECggEACcNglpZ2X5waw2exfzWHO63AGWj/EOo3BWmVXYZEkU+U\ndXWEWbwPrQa+C5LzQ36VEqTk2cPBsIB4NBpcXazTsx2hK1em8FrgFa/o0Axk2byA\n2Yfrh4Sh72PHjFH8q1fagO9LaMUP/xwh4ozI1gf3C2ex9Am3JfrF0PTn4YC2Twrd\n5Yj0F199fpXbm42HN7JIsckwm6Jzw+7VPnzghiwwkAsPkXnhwWbAwafHXkThbo7y\nGztjlcgX3PW26xTxBAXQRxqohRFGbrD3WNbXjKpSJw/Ocn9nTGAGKU5mHAx9yHP+\nFGaPZHTxg3mlj124nmThTGKBQj/FHNEPRghTVajgAQKBgQDsOZcI2qXfSamM9BAO\n39GI3LcphrtmplAmk0UrcwdzbNlIJYkid0K2bTpONYptd9/1TYxdgtl0tQYLQPN0\nn6BW+FTUkiMOwgzqusWHJ6x37O0bEXeqn52UYMUBqx9XNg1l0iFfapolr7GXvSrt\nFPxVf+7xN54kd+tEKMJDL57+mQKBgQDkUm/8v3XUb76DXhKTUa5IGCxvjRaKNYV+\nKPNo4jAnsSkLkaRrDe8lVl1gBVn8Bm8c8TsnDyT778FI/2NlLLxBcd6g2ScMZ21K\nItTrteIsl8s2aOO31OYrgjKAAVhFUpBkvkgGl/+7X2ZS2LyZFjDltXOS0grkAKSC\nW4zdrRJkAQKBgQC6LG1HkiM2hrS1HUlmn6lhZyqH9OLPdPYoYNsb8k2F/9yDSun4\nmuueIRnZt8LAocCFcTfWHyFJJL59shPt7zyMLq2U1xQANpm9ibPR4EfCQJ1iPvME\nK0YjQd0ign5x2mzWubSJodeZKg4aXAFv1qFEtU5ZGA9wCH8IOeNY1jhFyQKBgEOx\n6YAvqBjnVL4QW0OQmTLI8AvW8hLiUYUZUSoMvihWj4vdj7kp9XjFhYPdslNV+QXE\nxDwNcnK8IDurdOXfgKWKxG4+VCSKWc38S9LjJ37/NoIYUUQE/IVz4dMwEuLi2urz\nu9kwoeMFIwp3NlvRR4gj53NlkVMOmbgIuthS4zwBAoGBAKCBe/phn5UAfDhPMQ5B\nnxzmOdjn0OiSMLfPSPsG6Ujnp7ORM3vdKNSrWydJ/CPCifOFh0ZZgcw3intPej+X\nBJqZt5K8WCf0EojcSlwCSDOOrBrXM6Cu5Pq2NCGH7hHtRjYqW49cE9KyNiKTKvMH\nGb8oRDZXLZZg8jDKUz3zK+TB\n-----END PRIVATE KEY-----\n",
+  "client_email": "backend-db-access@wartezimmer-a2415.iam.gserviceaccount.com",
+  "client_id": "104440933736699544111",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/backend-db-access%40wartezimmer-a2415.iam.gserviceaccount.com"
+}
