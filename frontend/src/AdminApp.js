@@ -38,7 +38,7 @@ class AdminApp extends React.Component {
 
     // fetch initial queue status
     var url = APIendpoint + updateRoute;
-    console.log(url);
+    //console.log(url);
 
     var payload = JSON.stringify({
       placeID: placeID,
@@ -53,7 +53,7 @@ class AdminApp extends React.Component {
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        //console.log(data);
         this.setState({
           queueData: data.queueData,
         });

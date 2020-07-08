@@ -190,16 +190,12 @@ function decodeToken(token) {
 const isAuthenticationMiddleware = (req, res, next) => {
   var placeID = req.body.placeID;
   var token = req.body.token;
-  console.log("ich bin im JWT AUTH");
-  //const token = req.header("Access-Token");
-  console.log(placeID);
-  console.log(token);
   try {
     const decoded = decodeToken(token);
     const { userId } = decoded;
 
-    console.log("decoded", decoded);
-    console.log("userId", userId);
+    //console.log("decoded", decoded);
+    //console.log("userId", userId);
 
     if (placeID === userId) {
       console.log("Token and PlaceID match!");
