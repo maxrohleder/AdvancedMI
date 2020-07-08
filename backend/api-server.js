@@ -4,6 +4,7 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
+const Firestore = require("@google-cloud/firestore");
 
 const njwt = require("njwt");
 const bodyParser = require("body-parser");
@@ -14,6 +15,19 @@ const port = 8000;
 /////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
+
+const production = false;
+
+const fdb = new Firestore({
+  projectId: "wartezimmer-a2415",
+  keyFilename: "backend-db-access-key.json",
+});
+
+// firestore convention: large collections with small documents
+let DETAILS = fdb.collection("places");
+let PATIENTS = fdb.collection("patients"); // collection of collections
+let QUEUES = fdb.collection("queues"); // collection of collections
+let PASS = fdb.collection("passwords");
 
 var db = {
   ukerlangen: {
@@ -83,10 +97,58 @@ var db = {
 };
 
 const getDetails = (placeID) => {
+  if (production) {
+    let detailsRef = DETAILS.doc(placeID);
+    let getPlace = detailsRef
+      .get()
+      .then((doc) => {
+        if (!doc.exists) {
+          return null;
+        } else {
+          return doc.data();
+        }
+      })
+      .catch((err) => {
+        console.log("Error getting document ", err);
+      });
+  }
   return db[placeID].details;
 };
 
 const registerPatient = (placeID, pd) => {
+  var patId = createUID(placeID, pd.first_name, pd.surname);
+
+  // use firestore insert a new entry if not existand and return unique patID
+  if (production) {
+    var patID;
+    var patientRef = PATIENTS.collection(placeID);
+    patientRef = patientRef.where("first_name", "==", pd.first_name);
+    patientRef = patientRef.where("surname", "==", pd.surname);
+    patientRef = patientRef.where(
+      "appointment_date",
+      "==",
+      pd.appointment_date
+    );
+    patientRef = patientRef.where("short_diagnosis", "==", pd.short_diagnosis);
+    patientRef = patientRef.where("mobile", "==", pd.mobile);
+    patientRef = patientRef.where("email", "==", pd.email);
+    patientRef
+      .get()
+      .then((doc) => {
+        if (!doc.exists) {
+          patId = createUID(placeID, pd.first_name, pd.surname);
+          PATIENTS.collection(placeID).doc(patID).set(pd);
+        } else {
+          patID = doc.data().patID;
+        }
+      })
+      .catch((err) => {
+        console.log("Error getting document", err);
+      });
+
+    return patId;
+  }
+
   var match = db[placeID].patientData.find((entry) => {
     pd.first_name === entry.first_name &&
       pd.surname === entry.surname &&
@@ -114,6 +176,13 @@ const registerPatient = (placeID, pd) => {
 };
 
 const removeFromQueue = (placeID, patientID) => {
+  if(production){
+
+    const res = await QUEUES.collection(placeID).doc(patientID).delete();
+    return res;
+  }
+
+
   console.log("[deletePatient]: deleting " + patientID);
   var newQueue = db[placeID].queue.filter((entry) => {
     return entry.id !== patientID;
@@ -122,6 +191,17 @@ const removeFromQueue = (placeID, patientID) => {
 };
 
 const updateWaitingNumber = (praxisID, patientID) => {
+  if (production){
+    var queueRef = QUEUES.collection(praxisID);
+
+    var patRef = queueRef.doc(patientID);
+    var check = patRef.get().then((doc) => {
+      return doc.data().pos;
+    }).catch(
+      console.log("error retrieving patId from queue: ", patientID, praxisID)
+    )
+  }
+
   var lst = db[praxisID].queue;
   var entry = lst.find((x) => {
     return x.id == patientID;
@@ -138,6 +218,28 @@ const updateWaitingNumber = (praxisID, patientID) => {
 const createUID = (placeID, first, sur) => {
   // create an place-unique patientID from first and surname
   var id = first.substring(0, 2) + sur.substring(0, 2);
+
+  if(production){
+    var exists = true;
+    while(true){
+      var idRef = QUEUES.collection(placeID).doc(id);
+      var docCheck = idRef.get()
+        .then((doc) => {
+          exists = doc.exists;
+        })
+        .catch((err) => {
+          console.log("Error getting document in createUID ", err);
+        });
+      if(!exists){
+        break;
+      }
+      id += "I";
+    }
+    return id;
+
+  }
+
+
   while (db[placeID].queue.some((entry) => entry.id === id)) {
     id += "I";
   }
@@ -145,6 +247,22 @@ const createUID = (placeID, first, sur) => {
 };
 
 const queuePatient = (placeID, patientID) => {
+
+  if(production){
+    var maxPos = 0;
+    var queueRef = QUEUES.collection(placeID);
+    queueRef.orderBy("pos").limit(1).get().then(querySnapshot => {
+      querySnapshot.forEach(documentSnapshot => {
+        maxPos = documentSnapshot.data().pos;
+      }).catch((err) => {
+        console.log("Error queuing patient ", err);
+      });
+    });
+
+    queueRef.doc(patientID).set(maxPos + 1);
+    return maxPos + 1;
+  }
+
   // place patientID in queue and return position
   var lastPosition = 1;
   for (let i = 0; i < db[placeID].queue.length; i++) {
