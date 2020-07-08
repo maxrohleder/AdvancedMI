@@ -297,26 +297,31 @@ app.get("/exists/user/:placeID/:patID", (req, res) => {
 
 // register a new patient and return its patientID and position
 app.post("/admin/registerpatient/", (req, res) => {
-  // create a patientID
-  var placeID = req.body.placeID;
+  var placeID = isAuthenticationMiddleware(req, res);
+  if (placeID == null) {
+    res.send({ authConfirmed: false }).status(200);
+  } else {
+    // create a patientID
+    var placeID = req.body.placeID;
 
-  // register patient details if not existant and return a unique id
-  var patientID = registerPatient(placeID, {
-    first_name: req.body.first_name,
-    surname: req.body.surname,
-    appointment_date: req.body.appointment_date,
-    short_diagnosis: req.body.short_diagnosis,
-    mobile: req.body.mobile,
-    email: req.body.email,
-  });
+    // register patient details if not existant and return a unique id
+    var patientID = registerPatient(placeID, {
+      first_name: req.body.first_name,
+      surname: req.body.surname,
+      appointment_date: req.body.appointment_date,
+      short_diagnosis: req.body.short_diagnosis,
+      mobile: req.body.mobile,
+      email: req.body.email,
+    });
 
-  // place patient into queue
-  var pos = queuePatient(placeID, patientID);
+    // place patient into queue
+    var pos = queuePatient(placeID, patientID);
 
-  // inform admin interface about patientID and position
-  res
-    .send({ response: "registered patient", id: patientID, pos: pos })
-    .status(200);
+    // inform admin interface about patientID and position
+    res
+      .send({ response: "registered patient", id: patientID, pos: pos })
+      .status(200);
+  }
 });
 
 app.post("/call", (req, res) => {
