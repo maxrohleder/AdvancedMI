@@ -187,12 +187,13 @@ function decodeToken(token) {
   return njwt.verify(token, APP_SECRET).body;
 }
 
-const jwtAuthenticationMiddleware = (req, res, next) => {
-  const token = req.header("Access-Token");
-  if (!token) {
-    return next();
-  }
-
+const isAuthenticationMiddleware = (req, res, next) => {
+  var placeID = req.body.placeID;
+  var token = req.body.token;
+  console.log("ich bin im JWT AUTH");
+  //const token = req.header("Access-Token");
+  console.log(placeID);
+  console.log(token);
   try {
     const decoded = decodeToken(token);
     const { userId } = decoded;
@@ -200,26 +201,20 @@ const jwtAuthenticationMiddleware = (req, res, next) => {
     console.log("decoded", decoded);
     console.log("userId", userId);
 
-    if (users.find((user) => user.id === userId)) {
-      console.log("found user!");
-      req.userId = userId;
+    if (placeID === userId) {
+      console.log("Token and PlaceID match!");
+      //req.userId = userId;
+      return userId;
+    } else {
+      console.log("Token and PlaceID DO NOT match!");
+      console.log("Try to log in properly");
+      return null;
     }
   } catch (e) {
-    return next();
+    console.log(e);
+    return null;
   }
-
-  next();
 };
-
-// This middleware stops the request if a user is not authenticated.
-async function isAuthenticatedMiddleware(req, res, next) {
-  if (req.userId) {
-    return next();
-  }
-
-  res.status(401);
-  res.json({ error: "User not authenticated" });
-}
 
 //JWT
 // -------------------------------------------------------------------JWT--------------------------------------
@@ -233,6 +228,16 @@ app.get("/", (req, res) => {
   res
     .send({ response: "This is the Digitales Wartezimmer Backend" })
     .status(200);
+});
+
+app.post("/admin_details/", (req, res) => {
+  var placeID = isAuthenticationMiddleware(req, res);
+  if (placeID == null) {
+    res.send({ authConfirmed: false }).status(200);
+  } else {
+    var details = getDetails(placeID);
+    res.send({ authConfirmed: false, details: details }).status(200);
+  }
 });
 
 app.get("/details/:placeID", (req, res) => {
@@ -257,6 +262,7 @@ app.post("/auth/admin/", (req, res) => {
   var placeID = req.body.praxisID;
   var password = req.body.password;
   //console.log(placeID + password);
+
   var placeExists = db.hasOwnProperty(placeID);
   var existsAndConfirmed = placeExists && db[placeID].password == password;
 
@@ -264,7 +270,6 @@ app.post("/auth/admin/", (req, res) => {
   if (existsAndConfirmed) {
     var accessToken = encodeToken({ userId: placeID });
   }
-
   res
     .send({ praxisConfirmed: existsAndConfirmed, accessToken: accessToken })
     .status(200);

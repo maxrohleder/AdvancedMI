@@ -6,7 +6,7 @@ import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
 const updateRoute = "queue/";
-const detailsRoute = "details/";
+const detailsRoute = "admin_details/";
 
 class AdminApp extends React.Component {
   constructor(props) {
@@ -21,10 +21,23 @@ class AdminApp extends React.Component {
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
     };
   }
+  getAdminCookie = () => {};
 
   componentDidMount() {
+    //getAdminCookie
+    //to change//implement react-cookie structure
+    function escape(s) {
+      return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
+    }
+    var match = document.cookie.match(
+      RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
+    );
+    var token = match ? match[1] : null;
+    var placeID = this.state.placeID;
+
     // fetch initial queue status
     var url = APIendpoint + updateRoute + this.state.placeID;
+    console.log(url);
 
     fetch(url)
       .then((response) => response.json())
@@ -40,14 +53,27 @@ class AdminApp extends React.Component {
       });
 
     // fetch place information from placeID
-    var url = APIendpoint + detailsRoute + this.state.placeID;
-    fetch(url)
+    url = APIendpoint + detailsRoute;
+    var payload = JSON.stringify({
+      placeID: placeID,
+      token: token,
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
+        if (!data.authConfirmed) {
+          console.log("falschesToken");
+          alert("Use Valid Token");
+        }
         this.setState({
-          name: data.name,
-          address: data.address,
-          field: data.field,
+          name: data.details.name,
+          address: data.details.address,
+          field: data.details.field,
         });
       })
       .catch(() => {

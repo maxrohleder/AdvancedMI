@@ -39,7 +39,7 @@ function getAdminCookie() {
 }
 function checkAdminToken() {
   var TokenValue = getAdminCookie();
-  console.log(TokenValue);
+  //console.log(TokenValue);
   return TokenValue != null;
 }
 
