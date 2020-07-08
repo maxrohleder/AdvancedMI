@@ -265,7 +265,7 @@ app.post("/auth/admin/", (req, res) => {
     var accessToken = encodeToken({ userId: placeID });
   }
 
-  res //hab KA ob des accedToken schon ein cookie is
+  res
     .send({ praxisConfirmed: existsAndConfirmed, accessToken: accessToken })
     .status(200);
 });

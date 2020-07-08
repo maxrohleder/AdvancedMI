@@ -50,6 +50,7 @@ class LoginForAdmin extends Component {
         var url = APIendpoint + "auth/admin/";
         console.log("fetching admin info from " + url);
         console.log(praxisID);
+
         fetch(url, requestOptions)
           .then((response) => response.json())
           .then((data) => {
@@ -57,6 +58,8 @@ class LoginForAdmin extends Component {
               //hab KA ob des accedToken schon ein cookie is ka was ich damit machen soll :D
               this.props.onAdminToken(data.accessToken);
 
+              console.log(data.accessToken);
+              document.cookie = "Access-Token=" + data.accessToken;
               console.log(data.accessToken);
               this.setState({ redirect: newPageUrl });
             } else {

@@ -21,16 +21,33 @@ import chatWindow from "./components/chatWindow";
 
 import "./index.css";
 
-//loggin for admin only if password was correct
+//loggin for admin only if password was correct//outdated
 var adminLogToken = 123; //null
 function setAdminToken(entry) {
   adminLogToken = entry;
 }
+
+function getAdminCookie() {
+  //to change//implement react-cookie structure
+  function escape(s) {
+    return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
+  }
+  var match = document.cookie.match(
+    RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
+  );
+  return match ? match[1] : null;
+}
+function checkAdminToken() {
+  var TokenValue = getAdminCookie();
+  console.log(TokenValue);
+  return TokenValue != null;
+}
+
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
     {...rest}
     render={(props) =>
-      adminLogToken !== null ? (
+      checkAdminToken() ? (
         <Component {...props} />
       ) : (
         <Redirect
