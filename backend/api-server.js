@@ -4,6 +4,10 @@ const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
 const cors = require("cors");
+
+const njwt = require("njwt");
+const bodyParser = require("body-parser");
+
 const port = 8000;
 
 ////////////////////////////////////////////////////////////
@@ -166,6 +170,60 @@ const server = http.createServer(app);
 const io = socketIo(server);
 io.origins("*:*");
 
+// -------------------------------------------------------------------JWT--------------------------------------
+//JWT
+
+app.use(bodyParser.json());
+const {
+  APP_SECRET = "something really random 2000",
+  APP_BASE_URL = "http://localhost:3000",
+} = process.env;
+
+function encodeToken(tokenData) {
+  return njwt.create(tokenData, APP_SECRET).compact();
+}
+
+function decodeToken(token) {
+  return njwt.verify(token, APP_SECRET).body;
+}
+
+const jwtAuthenticationMiddleware = (req, res, next) => {
+  const token = req.header("Access-Token");
+  if (!token) {
+    return next();
+  }
+
+  try {
+    const decoded = decodeToken(token);
+    const { userId } = decoded;
+
+    console.log("decoded", decoded);
+    console.log("userId", userId);
+
+    if (users.find((user) => user.id === userId)) {
+      console.log("found user!");
+      req.userId = userId;
+    }
+  } catch (e) {
+    return next();
+  }
+
+  next();
+};
+
+// This middleware stops the request if a user is not authenticated.
+async function isAuthenticatedMiddleware(req, res, next) {
+  if (req.userId) {
+    return next();
+  }
+
+  res.status(401);
+  res.json({ error: "User not authenticated" });
+}
+
+//JWT
+// -------------------------------------------------------------------JWT--------------------------------------
+
 // making sockets available in rest api
 app.io = io;
 
@@ -195,14 +253,21 @@ app.get("/queue/:placeID", (req, res) => {
   res.send({ queueData: queueData }).status(200);
 });
 
-app.get("/exists/admin/:placeID/:password", (req, res) => {
-  var placeID = req.params.placeID;
-  var password = req.params.password;
-
+app.post("/auth/admin/", (req, res) => {
+  var placeID = req.body.praxisID;
+  var password = req.body.password;
+  //console.log(placeID + password);
   var placeExists = db.hasOwnProperty(placeID);
   var existsAndConfirmed = placeExists && db[placeID].password == password;
 
-  res.send({ praxisConfirmed: existsAndConfirmed }).status(200);
+  var accessToken = null;
+  if (existsAndConfirmed) {
+    var accessToken = encodeToken({ userId: placeID });
+  }
+
+  res //hab KA ob des accedToken schon ein cookie is
+    .send({ praxisConfirmed: existsAndConfirmed, accessToken: accessToken })
+    .status(200);
 });
 
 app.get("/exists/user/:placeID/:patID", (req, res) => {
