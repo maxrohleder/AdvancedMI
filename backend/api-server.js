@@ -305,39 +305,30 @@ function decodeToken(token) {
   return njwt.verify(token, APP_SECRET).body;
 }
 
-const jwtAuthenticationMiddleware = (req, res, next) => {
-  const token = req.header("Access-Token");
-  if (!token) {
-    return next();
-  }
-
+const isAuthenticationMiddleware = (req, res, next) => {
+  var placeID = req.body.placeID;
+  var token = req.body.token;
   try {
     const decoded = decodeToken(token);
     const { userId } = decoded;
 
-    console.log("decoded", decoded);
-    console.log("userId", userId);
+    //console.log("decoded", decoded);
+    //console.log("userId", userId);
 
-    if (users.find((user) => user.id === userId)) {
-      console.log("found user!");
-      req.userId = userId;
+    if (placeID === userId) {
+      console.log("Token and PlaceID match!");
+      //req.userId = userId;
+      return userId;
+    } else {
+      console.log("Token and PlaceID DO NOT match!");
+      console.log("Try to log in properly");
+      return null;
     }
   } catch (e) {
-    return next();
+    console.log(e);
+    return null;
   }
-
-  next();
 };
-
-// This middleware stops the request if a user is not authenticated.
-async function isAuthenticatedMiddleware(req, res, next) {
-  if (req.userId) {
-    return next();
-  }
-
-  res.status(401);
-  res.json({ error: "User not authenticated" });
-}
 
 //JWT
 // -------------------------------------------------------------------JWT--------------------------------------
@@ -353,28 +344,43 @@ app.get("/", (req, res) => {
     .status(200);
 });
 
+app.post("/admin_details/", (req, res) => {
+  var placeID = isAuthenticationMiddleware(req, res);
+  if (placeID == null) {
+    res.send({ authConfirmed: false }).status(200);
+  } else {
+    var details = getDetails(placeID);
+    res.send({ authConfirmed: false, details: details }).status(200);
+  }
+});
+
 app.get("/details/:placeID", (req, res) => {
   console.log("place details requested");
   res.send(getDetails(req.params.placeID)).status(200);
 });
 
-app.get("/queue/:placeID", (req, res) => {
-  var placeID = req.params.placeID;
-  var queueData = [];
-  for (let i = 0; i < db[placeID].queue.length; i++) {
-    var entry = db[placeID].queue[i];
-    var patInfo = db[placeID].patientData.find((x) => {
-      return x.patientID == entry.id;
-    });
-    queueData.push({ pos: entry.pos, ...patInfo });
+app.post("/admin_queue/", (req, res) => {
+  var placeID = isAuthenticationMiddleware(req, res);
+  if (placeID == null) {
+    res.send({ authConfirmed: false, queueData: null }).status(200);
+  } else {
+    var queueData = [];
+    for (let i = 0; i < db[placeID].queue.length; i++) {
+      var entry = db[placeID].queue[i];
+      var patInfo = db[placeID].patientData.find((x) => {
+        return x.patientID == entry.id;
+      });
+      queueData.push({ pos: entry.pos, ...patInfo });
+    }
+    res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
-  res.send({ queueData: queueData }).status(200);
 });
 
 app.post("/auth/admin/", (req, res) => {
   var placeID = req.body.praxisID;
   var password = req.body.password;
   //console.log(placeID + password);
+
   var placeExists = db.hasOwnProperty(placeID);
   var existsAndConfirmed = placeExists && db[placeID].password == password;
 
@@ -382,8 +388,7 @@ app.post("/auth/admin/", (req, res) => {
   if (existsAndConfirmed) {
     var accessToken = encodeToken({ userId: placeID });
   }
-
-  res //hab KA ob des accedToken schon ein cookie is
+  res
     .send({ praxisConfirmed: existsAndConfirmed, accessToken: accessToken })
     .status(200);
 });
@@ -406,26 +411,31 @@ app.get("/exists/user/:placeID/:patID", (req, res) => {
 
 // register a new patient and return its patientID and position
 app.post("/admin/registerpatient/", (req, res) => {
-  // create a patientID
-  var placeID = req.body.placeID;
+  var placeID = isAuthenticationMiddleware(req, res);
+  if (placeID == null) {
+    res.send({ authConfirmed: false }).status(200);
+  } else {
+    // create a patientID
+    var placeID = req.body.placeID;
 
-  // register patient details if not existant and return a unique id
-  var patientID = registerPatient(placeID, {
-    first_name: req.body.first_name,
-    surname: req.body.surname,
-    appointment_date: req.body.appointment_date,
-    short_diagnosis: req.body.short_diagnosis,
-    mobile: req.body.mobile,
-    email: req.body.email,
-  });
+    // register patient details if not existant and return a unique id
+    var patientID = registerPatient(placeID, {
+      first_name: req.body.first_name,
+      surname: req.body.surname,
+      appointment_date: req.body.appointment_date,
+      short_diagnosis: req.body.short_diagnosis,
+      mobile: req.body.mobile,
+      email: req.body.email,
+    });
 
-  // place patient into queue
-  var pos = queuePatient(placeID, patientID);
+    // place patient into queue
+    var pos = queuePatient(placeID, patientID);
 
-  // inform admin interface about patientID and position
-  res
-    .send({ response: "registered patient", id: patientID, pos: pos })
-    .status(200);
+    // inform admin interface about patientID and position
+    res
+      .send({ response: "registered patient", id: patientID, pos: pos })
+      .status(200);
+  }
 });
 
 app.post("/call", (req, res) => {

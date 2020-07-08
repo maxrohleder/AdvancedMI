@@ -85,14 +85,31 @@ class PatientManagement extends React.Component {
       pos: null,
     };
 
+    //getAdminCookie
+    //to change//implement react-cookie structure
+    function escape(s) {
+      return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
+    }
+    var match = document.cookie.match(
+      RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
+    );
+    var token = match ? match[1] : null;
+    //getAdminCookie
+    //to change//implement react-cookie structure
+
     var praxisID = this.props.praxisID;
     var url = APIendpoint + "admin/registerpatient/";
-    var payload = JSON.stringify({ placeID: praxisID, ...patientenData });
+    var payload = JSON.stringify({
+      placeID: praxisID,
+      token: token,
+      ...patientenData,
+    });
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
+    var auth = true;
     console.log("fetching admin info from " + url);
     fetch(url, requestOptions)
       .then((response) => response.json())

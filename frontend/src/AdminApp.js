@@ -5,13 +5,14 @@ import PatientManagement from "./components/PatMan";
 import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
-const updateRoute = "queue/";
-const detailsRoute = "details/";
+const updateRoute = "admin_queue/";
+const detailsRoute = "admin_details/";
 
 class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isAuth: true,
       placeID: props.match.params.placeID,
 
       name: null,
@@ -21,37 +22,70 @@ class AdminApp extends React.Component {
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
     };
   }
+  getAdminCookie = () => {};
 
   componentDidMount() {
-    // fetch initial queue status
-    var url = APIendpoint + updateRoute + this.state.placeID;
+    //getAdminCookie
+    //to change//implement react-cookie structure
+    function escape(s) {
+      return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
+    }
+    var match = document.cookie.match(
+      RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
+    );
+    var token = match ? match[1] : null;
+    var placeID = this.state.placeID;
 
-    fetch(url)
+    // fetch initial queue status
+    var url = APIendpoint + updateRoute;
+    //console.log(url);
+
+    var payload = JSON.stringify({
+      placeID: placeID,
+      token: token,
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+    var auth = true;
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
+        //console.log(data);
         this.setState({
           queueData: data.queueData,
         });
       })
       .catch(() => {
         console.log("could not fetch data. Backend inactive??");
+        if (!auth) {
+          console.log("falschesToken");
+          alert("Use Valid Token");
+        }
         this.setState({ redirect: "/error" });
       });
 
     // fetch place information from placeID
-    var url = APIendpoint + detailsRoute + this.state.placeID;
-    fetch(url)
+    url = APIendpoint + detailsRoute;
+    auth = true;
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
+        auth = data.authConfirmed;
         this.setState({
-          name: data.name,
-          address: data.address,
-          field: data.field,
+          name: data.details.name,
+          address: data.details.address,
+          field: data.details.field,
         });
       })
       .catch(() => {
         console.log("could not fetch data. Backend inactive??");
+        if (!auth) {
+          console.log("falschesToken");
+          //alert("Use Valid Token");
+        }
         this.setState({ redirect: "/error" });
       });
   }
