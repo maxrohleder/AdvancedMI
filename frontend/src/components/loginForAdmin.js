@@ -55,12 +55,7 @@ class LoginForAdmin extends Component {
           .then((response) => response.json())
           .then((data) => {
             if (data.praxisConfirmed) {
-              //hab KA ob des accedToken schon ein cookie is ka was ich damit machen soll :D
-              this.props.onAdminToken(data.accessToken);
-
-              console.log(data.accessToken);
               document.cookie = "Access-Token=" + data.accessToken;
-              console.log(data.accessToken);
               this.setState({ redirect: newPageUrl });
             } else {
               alert("praxis oder password falsch, please try again");

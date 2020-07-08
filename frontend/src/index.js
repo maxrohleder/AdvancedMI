@@ -21,12 +21,6 @@ import chatWindow from "./components/chatWindow";
 
 import "./index.css";
 
-//loggin for admin only if password was correct//outdated
-var adminLogToken = 123; //null
-function setAdminToken(entry) {
-  adminLogToken = entry;
-}
-
 function getAdminCookie() {
   //to change//implement react-cookie structure
   function escape(s) {
@@ -64,10 +58,7 @@ ReactDOM.render(
   <Router>
     <Switch>
       <PrivateRoute path="/admin/:placeID" component={AdminApp} />
-      <Route
-        path="/admin"
-        component={() => <LoginAdmin onAdminToken={setAdminToken} />}
-      />
+      <Route path="/admin" component={() => <LoginAdmin />} />
       <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />
