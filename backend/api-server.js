@@ -33,7 +33,7 @@ let PLACES = fdb.collection("places"); // PATIENTS.doc(placeID).doc(patID).colle
  */
 let DETAILS = "details";
 let PATIENTS = "patients"; //
-let QUEUES = "queues"; // QUEUES.doc(placeID).collection("queue").doc(patID)
+let QUEUES = "queue"; // QUEUES.doc(placeID).collection("queue").doc(patID)
 let PASS = "passwords";
 
 var db = {
@@ -143,13 +143,13 @@ const getDetails = async (placeID) => {
   return db[placeID].details;
 };
 
-const registerPatient = (placeID, pd) => {
-  var patId = createUID(placeID, pd.first_name, pd.surname);
+const registerPatient = async (placeID, pd) => {
+  var patID = await createUID(placeID, pd.first_name, pd.surname);
+  console.log("---------------- ID", patID);
 
   // use firestore insert a new entry if not existand and return unique patID
   if (PRODUCTION) {
     console.log("FIREBASE: registerPatient");
-    var patID;
     var patientRef = PLACES.doc(placeID).collection(PATIENTS);
     patientRef = patientRef.where("first_name", "==", pd.first_name);
     patientRef = patientRef.where("surname", "==", pd.surname);
@@ -161,21 +161,20 @@ const registerPatient = (placeID, pd) => {
     patientRef = patientRef.where("short_diagnosis", "==", pd.short_diagnosis);
     patientRef = patientRef.where("mobile", "==", pd.mobile);
     patientRef = patientRef.where("email", "==", pd.email);
-    patientRef
-      .get()
-      .then((doc) => {
-        if (!doc.exists) {
-          patId = createUID(placeID, pd.first_name, pd.surname);
-          PLACES.doc(placeID).collection(PATIENTS).doc(patID).set(pd);
-        } else {
-          patID = doc.data().patID;
-        }
-      })
-      .catch((err) => {
-        console.log("Error getting document", err);
-      });
 
-    return patId;
+    try {
+      const patientData = await patientRef.get();
+      if (!patientData.exists) {
+        await PLACES.doc(placeID).collection(PATIENTS).doc(patID).set(pd);
+      } else {
+        console.log("I KNOW THIS PATIENT:", patID);
+        patID = doc.data().patID;
+      }
+    } catch (err) {
+      console.log("Error getting document", err);
+    }
+
+    return patID;
   }
 
   var match = db[placeID].patientData.find((entry) => {
@@ -190,7 +189,6 @@ const registerPatient = (placeID, pd) => {
   if (typeof match !== "undefined") {
     return match.patientID;
   } else {
-    var patId = createUID(placeID, pd.first_name, pd.surname);
     db[placeID].patientData.push({
       patientID: patId,
       first_name: pd.first_name,
@@ -244,11 +242,18 @@ const getPatientInfo = async (placeID, patientID) => {
   }
 };
 
-const removeFromQueue = (placeID, patientID) => {
+const removeFromQueue = async (placeID, patientID) => {
   if (PRODUCTION) {
     console.log("FIREBASE: removeFromQueue");
-    const res = PLACES.doc(placeID).collection(QUEUES).doc(patientID).delete();
-    return res;
+    try {
+      const res = await PLACES.doc(placeID)
+        .collection(QUEUES)
+        .doc(patientID)
+        .delete();
+      return res;
+    } catch (error) {
+      console.log(err);
+    }
   }
 
   console.log("[deletePatient]: deleting " + patientID);
@@ -260,7 +265,7 @@ const removeFromQueue = (placeID, patientID) => {
 
 const updateWaitingNumber = async (praxisID, patientID) => {
   if (PRODUCTION) {
-    console.log("FIREBASE: updateWaitingNumber");
+    console.log("FIREBASE: updateWaitingNumber", patientID);
 
     var patRef = PLACES.doc(praxisID).collection(QUEUES).doc(patientID);
     try {
@@ -288,16 +293,16 @@ const updateWaitingNumber = async (praxisID, patientID) => {
   }
 };
 
-const createUID = (placeID, first, sur) => {
+const createUID = async (placeID, first, sur) => {
   // create an place-unique patientID from first and surname
   var id = first.substring(0, 2) + sur.substring(0, 2);
 
   if (PRODUCTION) {
-    console.log("FIREBASE: createUID");
+    console.log("FIREBASE: createUID", id);
 
     while (true) {
-      var idRef = PLACES.doc(placeID).collection(QUEUES).doc(id);
-      var res = idRef.get();
+      var idRef = PLACES.doc(placeID).collection(PATIENTS).doc(id);
+      var res = await idRef.get();
       if (!res.exists) {
         break;
       }
@@ -313,31 +318,23 @@ const createUID = (placeID, first, sur) => {
   return id;
 };
 
-const queuePatient = (placeID, patientID) => {
+const queuePatient = async (placeID, patientID) => {
   if (PRODUCTION) {
     console.log("FIREBASE: queuePatient");
 
-    var maxPos = 0;
+    var maxPos = -1;
     var queueRef = PLACES.doc(placeID).collection(QUEUES);
-    queueRef
-      .orderBy("pos", "desc")
-      .limit(1)
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot
-          .forEach((documentSnapshot) => {
-            var lastPos = documentSnapshot.data().pos;
-            if (typeof lastPos != "undefined") {
-              maxPos = lastPos;
-            }
-          })
-          .catch((err) => {
-            console.log("Error queuing patient ", err);
-          });
-      });
-    console.log("maxpos: ", maxPos);
+    try {
+      const queueDoc = await queueRef.orderBy("pos", "desc").limit(1).get();
+      for (const doc of queueDoc.docs) {
+        maxPos = doc.data().pos;
+      }
+      console.log("maxpos: ", maxPos);
+      await queueRef.doc(patientID).set({ pos: maxPos + 1, id: patientID });
+    } catch (err) {
+      console.log("Error queuing patient ", err);
+    }
 
-    queueRef.doc(patientID).set(maxPos + 1);
     return maxPos + 1;
   }
 
@@ -547,14 +544,14 @@ app.get("/exists/user/:placeID/:patID", (req, res) => {
 });
 
 // register a new patient and return its patientID and position
-app.post("/admin/registerpatient", (req, res) => {
+app.post("/admin/registerpatient", async (req, res) => {
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false }).status(200);
   } else {
     // register patient details if not existant and return a unique id
     var placeID = req.body.placeID;
-    var patientID = registerPatient(placeID, {
+    var patientID = await registerPatient(placeID, {
       first_name: req.body.first_name,
       surname: req.body.surname,
       appointment_date: req.body.appointment_date,
@@ -564,7 +561,7 @@ app.post("/admin/registerpatient", (req, res) => {
     });
 
     // place patient into queue
-    var pos = queuePatient(placeID, patientID);
+    var pos = await queuePatient(placeID, patientID);
 
     // inform admin interface about patientID and position
     res
@@ -585,13 +582,20 @@ app.post("/call", (req, res) => {
   res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
 
-app.post("/del", (req, res) => {
+app.post("/del", async (req, res) => {
   // res
   //   .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
   //   .status(200);
-  removeFromQueue(req.body.placeID, req.body.patientID);
-  req.app.io.emit("update", updateWaitingNumber(req.body.placeID));
-  res.send({ response: "deleted patientID" + req.body.patientID }).status(200);
+  try {
+    await removeFromQueue(req.body.placeID, req.body.patientID);
+    const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
+    req.app.io.emit("update", pos);
+    res
+      .send({ response: "deleted patientID" + req.body.patientID })
+      .status(200);
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 // ---------------------all api routes---------------------
@@ -599,7 +603,7 @@ app.post("/del", (req, res) => {
 
 // --------------------------------------------------------
 // -------------------all socket cbs-----------------------
-io.on("connection", (socket) => {
+io.on("connection", async (socket) => {
   console.log("New client connected");
 
   // send inital information
@@ -608,7 +612,12 @@ io.on("connection", (socket) => {
 
   console.log(patDaten[0] + " : " + patDaten[1]);
 
-  socket.emit("update", updateWaitingNumber(patDaten[0], patDaten[1]));
+  try {
+    socket.emit("update", await updateWaitingNumber(patDaten[0], patDaten[1]));
+  } catch (err) {
+    console.log(err);
+  }
+
   socket.emit("timing", 10);
 
   // end timer on disconnect
