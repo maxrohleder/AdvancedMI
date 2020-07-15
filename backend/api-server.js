@@ -8,6 +8,8 @@ const Firestore = require("@google-cloud/firestore");
 
 const njwt = require("njwt");
 const bodyParser = require("body-parser");
+const { verify } = require("crypto");
+const e = require("express");
 
 const port = 8000;
 
@@ -16,18 +18,23 @@ const port = 8000;
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const production = false;
+const PRODUCTION = false;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
-  keyFilename: "../../gcloud/backend-db-access-key.json",
+  keyFilename: "../../gcloud/admin-key-wartezimmer.json",
 });
 
 // firestore convention: large collections with small documents
-let DETAILS = fdb.collection("places");
-let PATIENTS = fdb.collection("patients"); // collection of collections
-let QUEUES = fdb.collection("queues"); // collection of collections
-let PASS = fdb.collection("passwords");
+let PLACES = fdb.collection("places"); // PATIENTS.doc(placeID).doc(patID).collection
+/*
+ * patients:
+  PLACES.doc(placeID).doc(patID).collection
+ */
+let DETAILS = "details";
+let PATIENTS = "patients"; //
+let QUEUES = "queues"; // QUEUES.doc(placeID).collection("queue").doc(patID)
+let PASS = "passwords";
 
 var db = {
   ukerlangen: {
@@ -96,16 +103,39 @@ var db = {
   },
 };
 
+const isValidPlace = (placeID) => {
+  if (PRODUCTION) {
+    const placeRef = PLACES.doc(placeID);
+    placeRef
+      .get()
+      .then((docPreview) => {
+        if (docPreview.exists) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log("firestore error on isValidPlace", err);
+      });
+  }
+  return db.hasOwnProperty(placeID);
+};
+
 const getDetails = (placeID) => {
-  if (production) {
-    let detailsRef = DETAILS.doc(placeID);
-    let getPlace = detailsRef
+  if (PRODUCTION) {
+    console.log("FIREBASE: getDetails");
+    let placeRef = PLACES.doc(placeID);
+    placeRef
       .get()
       .then((doc) => {
         if (!doc.exists) {
+          console.log("document does not exit!");
           return null;
         } else {
-          return doc.data();
+          var details = doc.get(DETAILS);
+          console.log(details);
+          return details;
         }
       })
       .catch((err) => {
@@ -119,9 +149,10 @@ const registerPatient = (placeID, pd) => {
   var patId = createUID(placeID, pd.first_name, pd.surname);
 
   // use firestore insert a new entry if not existand and return unique patID
-  if (production) {
+  if (PRODUCTION) {
+    console.log("FIREBASE: registerPatient");
     var patID;
-    var patientRef = PATIENTS.collection(placeID);
+    var patientRef = PLACES.doc(placeID).collection(PATIENTS);
     patientRef = patientRef.where("first_name", "==", pd.first_name);
     patientRef = patientRef.where("surname", "==", pd.surname);
     patientRef = patientRef.where(
@@ -137,7 +168,7 @@ const registerPatient = (placeID, pd) => {
       .then((doc) => {
         if (!doc.exists) {
           patId = createUID(placeID, pd.first_name, pd.surname);
-          PATIENTS.collection(placeID).doc(patID).set(pd);
+          PLACES.doc(placeID).collection(PATIENTS).doc(patID).set(pd);
         } else {
           patID = doc.data().patID;
         }
@@ -175,13 +206,55 @@ const registerPatient = (placeID, pd) => {
   }
 };
 
-const removeFromQueue = (placeID, patientID) => {
-  if(production){
+const isValidPatient = (placeID, patientID) => {
+  if (PRODUCTION) {
+    const patRef = PLACES.doc(placeID).collection(PATIENTS).doc(patientID);
+    patRef
+      .get()
+      .then((docPreview) => {
+        if (docPreview.exists) {
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log("firestore error on isValidPlace", err);
+      });
+  }
+  var placeExists = isValidPlace(patientID);
+  entry = db[placeID].queue.find((x) => x.id == patientID);
+  return placeExists && typeof entry !== "undefined";
+};
 
-    const res = await QUEUES.collection(placeID).doc(patientID).delete();
+const getPatientInfo = (placeID, patientID) => {
+  if (PRODUCTION) {
+    console.log("FIRESTORE getPatient: ", patientID);
+    const patRef = PATIENTS.collection(placeID).doc(patientID);
+    patRef
+      .get()
+      .then((docPreview) => {
+        if (docPreview.exists) {
+          patRef.onSnapshot((doc) => {
+            console.log(doc.data());
+            return doc.data();
+          });
+        } else {
+          return null;
+        }
+      })
+      .catch((err) => {
+        console.log("firestore error on isValidPlace", err);
+      });
+  }
+};
+
+const removeFromQueue = (placeID, patientID) => {
+  if (PRODUCTION) {
+    console.log("FIREBASE: removeFromQueue");
+    const res = PLACES.doc(placeID).collection(QUEUES).doc(patientID).delete();
     return res;
   }
-
 
   console.log("[deletePatient]: deleting " + patientID);
   var newQueue = db[placeID].queue.filter((entry) => {
@@ -191,15 +264,18 @@ const removeFromQueue = (placeID, patientID) => {
 };
 
 const updateWaitingNumber = (praxisID, patientID) => {
-  if (production){
-    var queueRef = QUEUES.collection(praxisID);
+  if (PRODUCTION) {
+    console.log("FIREBASE: updateWaitingNumber");
 
-    var patRef = queueRef.doc(patientID);
-    var check = patRef.get().then((doc) => {
-      return doc.data().pos;
-    }).catch(
-      console.log("error retrieving patId from queue: ", patientID, praxisID)
-    )
+    var patRef = PLACES.doc(praxisID).collection(QUEUES).doc(patientID);
+    patRef
+      .get()
+      .then((doc) => {
+        return doc.data().pos;
+      })
+      .catch(
+        console.log("error retrieving patId from queue: ", patientID, praxisID)
+      );
   }
 
   var lst = db[praxisID].queue;
@@ -219,26 +295,20 @@ const createUID = (placeID, first, sur) => {
   // create an place-unique patientID from first and surname
   var id = first.substring(0, 2) + sur.substring(0, 2);
 
-  if(production){
-    var exists = true;
-    while(true){
-      var idRef = QUEUES.collection(placeID).doc(id);
-      var docCheck = idRef.get()
-        .then((doc) => {
-          exists = doc.exists;
-        })
-        .catch((err) => {
-          console.log("Error getting document in createUID ", err);
-        });
-      if(!exists){
+  if (PRODUCTION) {
+    console.log("FIREBASE: createUID");
+
+    while (true) {
+      var idRef = PLACES.doc(placeID).collection(QUEUES).doc(id);
+      var res = idRef.get();
+      if (!res.exists) {
         break;
       }
+      console.log("exists: ", id);
       id += "I";
     }
     return id;
-
   }
-
 
   while (db[placeID].queue.some((entry) => entry.id === id)) {
     id += "I";
@@ -247,17 +317,28 @@ const createUID = (placeID, first, sur) => {
 };
 
 const queuePatient = (placeID, patientID) => {
+  if (PRODUCTION) {
+    console.log("FIREBASE: queuePatient");
 
-  if(production){
     var maxPos = 0;
-    var queueRef = QUEUES.collection(placeID);
-    queueRef.orderBy("pos").limit(1).get().then(querySnapshot => {
-      querySnapshot.forEach(documentSnapshot => {
-        maxPos = documentSnapshot.data().pos;
-      }).catch((err) => {
-        console.log("Error queuing patient ", err);
+    var queueRef = PLACES.doc(placeID).collection(QUEUES);
+    queueRef
+      .orderBy("pos", "desc")
+      .limit(1)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot
+          .forEach((documentSnapshot) => {
+            var lastPos = documentSnapshot.data().pos;
+            if (typeof lastPos != "undefined") {
+              maxPos = lastPos;
+            }
+          })
+          .catch((err) => {
+            console.log("Error queuing patient ", err);
+          });
       });
-    });
+    console.log("maxpos: ", maxPos);
 
     queueRef.doc(patientID).set(maxPos + 1);
     return maxPos + 1;
@@ -275,6 +356,70 @@ const queuePatient = (placeID, patientID) => {
   return lastPosition;
 };
 
+var getQueue = (placeID) => {
+  var queueData = [];
+  if (PRODUCTION) {
+    console.log("FIRESTORE getQueue:");
+    var queueRef = PLACES.doc(placeID).collection(QUEUES);
+    var idAndPos = [];
+    queueRef
+      .get()
+      .then((queueSnap) => {
+        if (queueSnap.exists) {
+          queueRef.onSnapshot((doc) => {
+            console.log("queue: ", doc);
+            idAndPos = doc;
+          });
+        } else {
+          console.log("no queue yet. return empty");
+          idAndPos = [];
+        }
+      })
+      .catch((err) => {
+        console.log("FIRESTORE ERROR getQueue: ", err);
+      });
+
+    for (let i = 0; i < idAndPos.length; i++) {
+      var patInfo = getPatientInfo(placeID, idAndPos[i].id);
+      queueData.push({ pos: idAndPos[i].pos, ...patInfo });
+    }
+    return queueData;
+  }
+
+  for (let i = 0; i < db[placeID].queue.length; i++) {
+    var entry = db[placeID].queue[i];
+    var patInfo = db[placeID].patientData.find((x) => {
+      return x.patientID == entry.id;
+    });
+    queueData.push({ pos: entry.pos, ...patInfo });
+  }
+  return queueData;
+};
+
+const verifyPassword = (placeID, password) => {
+  if (PRODUCTION) {
+    console.log("FIRESORE: verifyPassword");
+    const passRef = PLACES.doc(placeID);
+    passRef
+      .get()
+      .then((docPreview) => {
+        if (docPreview.exists) {
+          if (docPreview.get(PASS) == password) {
+            return true;
+          } else {
+            return false;
+          }
+        } else {
+          return false;
+        }
+      })
+      .catch((err) => {
+        console.log("firestore error on isValidPlace", err);
+      });
+  }
+  return isValidPlace(placeID) && db[placeID]["password"] == password;
+};
+
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
@@ -287,11 +432,13 @@ app.use(express.json()); // for post calls in json format
 const server = http.createServer(app);
 const io = socketIo(server);
 io.origins("*:*");
-
-// -------------------------------------------------------------------JWT--------------------------------------
-//JWT
-
+app.io = io;
 app.use(bodyParser.json());
+
+//++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++ JWT ++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++
+
 const {
   APP_SECRET = "something really random 2000",
   APP_BASE_URL = "http://localhost:3000",
@@ -330,11 +477,9 @@ const isAuthenticationMiddleware = (req, res, next) => {
   }
 };
 
-//JWT
-// -------------------------------------------------------------------JWT--------------------------------------
-
-// making sockets available in rest api
-app.io = io;
+//++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++ JWT ++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++
 
 // --------------------------------------------------------
 // ---------------------all api routes---------------------
@@ -344,13 +489,14 @@ app.get("/", (req, res) => {
     .status(200);
 });
 
-app.post("/admin_details/", (req, res) => {
+// can be removed as details are public
+app.post("/admin/details", (req, res) => {
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false }).status(200);
   } else {
     var details = getDetails(placeID);
-    res.send({ authConfirmed: false, details: details }).status(200);
+    res.send({ authConfirmed: true, details: details }).status(200);
   }
 });
 
@@ -359,37 +505,33 @@ app.get("/details/:placeID", (req, res) => {
   res.send(getDetails(req.params.placeID)).status(200);
 });
 
-app.post("/admin_queue/", (req, res) => {
+app.post("/admin/queue", (req, res) => {
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false, queueData: null }).status(200);
   } else {
-    var queueData = [];
-    for (let i = 0; i < db[placeID].queue.length; i++) {
-      var entry = db[placeID].queue[i];
-      var patInfo = db[placeID].patientData.find((x) => {
-        return x.patientID == entry.id;
-      });
-      queueData.push({ pos: entry.pos, ...patInfo });
-    }
+    var queueData = getQueue(placeID);
     res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
 });
 
+// why /auth/admin not just /auth ?
 app.post("/auth/admin/", (req, res) => {
   var placeID = req.body.praxisID;
   var password = req.body.password;
-  //console.log(placeID + password);
 
-  var placeExists = db.hasOwnProperty(placeID);
-  var existsAndConfirmed = placeExists && db[placeID].password == password;
+  var placeExists = isValidPlace(placeID);
+  var passwordConfirmed = verifyPassword(placeID, password);
 
   var accessToken = null;
-  if (existsAndConfirmed) {
+  if (placeExists && passwordConfirmed) {
     var accessToken = encodeToken({ userId: placeID });
   }
   res
-    .send({ praxisConfirmed: existsAndConfirmed, accessToken: accessToken })
+    .send({
+      praxisConfirmed: placeExists && passwordConfirmed,
+      accessToken: accessToken,
+    })
     .status(200);
 });
 
@@ -397,28 +539,25 @@ app.get("/exists/user/:placeID/:patID", (req, res) => {
   var placeID = req.params.placeID;
   var patientID = req.params.patID;
 
-  // check if place exists
-  var placeExists = db.hasOwnProperty(placeID);
-
-  entry = db[placeID].queue.find((x) => x.id == patientID);
+  // check if place and user exist
+  var patExists = isValidPatient(placeID, patientID);
+  var placeExists = isValidPlace(placeID);
   res
     .send({
       praxisConfirmed: placeExists,
-      userConfirmed: placeExists && typeof entry !== "undefined",
+      userConfirmed: patExists,
     })
     .status(200);
 });
 
 // register a new patient and return its patientID and position
-app.post("/admin/registerpatient/", (req, res) => {
+app.post("/admin/registerpatient", (req, res) => {
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false }).status(200);
   } else {
-    // create a patientID
-    var placeID = req.body.placeID;
-
     // register patient details if not existant and return a unique id
+    var placeID = req.body.placeID;
     var patientID = registerPatient(placeID, {
       first_name: req.body.first_name,
       surname: req.body.surname,
@@ -433,7 +572,12 @@ app.post("/admin/registerpatient/", (req, res) => {
 
     // inform admin interface about patientID and position
     res
-      .send({ response: "registered patient", id: patientID, pos: pos })
+      .send({
+        authConfirmed: true,
+        response: "registered patient",
+        id: patientID,
+        pos: pos,
+      })
       .status(200);
   }
 });

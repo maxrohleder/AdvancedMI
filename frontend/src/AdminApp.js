@@ -5,8 +5,8 @@ import PatientManagement from "./components/PatMan";
 import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
-const updateRoute = "admin_queue/";
-const detailsRoute = "admin_details/";
+const updateRoute = "admin/queue";
+const detailsRoute = "admin/details";
 
 class AdminApp extends React.Component {
   constructor(props) {
@@ -58,8 +58,11 @@ class AdminApp extends React.Component {
           queueData: data.queueData,
         });
       })
-      .catch(() => {
-        console.log("could not fetch data. Backend inactive??");
+      .catch((err) => {
+        console.log(
+          "ComponentMount AdminApp: could not fetch data. Backend inactive??",
+          err
+        );
         if (!auth) {
           console.log("falschesToken");
           alert("Use Valid Token");
