@@ -18,7 +18,7 @@ const port = 8000;
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const PRODUCTION = false;
+const PRODUCTION = true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
@@ -122,25 +122,23 @@ const isValidPlace = (placeID) => {
   return db.hasOwnProperty(placeID);
 };
 
-const getDetails = (placeID) => {
+const getDetails = async (placeID) => {
   if (PRODUCTION) {
     console.log("FIREBASE: getDetails");
     let placeRef = PLACES.doc(placeID);
-    placeRef
-      .get()
-      .then((doc) => {
-        if (!doc.exists) {
-          console.log("document does not exit!");
-          return null;
-        } else {
-          var details = doc.get(DETAILS);
-          console.log(details);
-          return details;
-        }
-      })
-      .catch((err) => {
-        console.log("Error getting document ", err);
-      });
+    try {
+      const placeData = await placeRef.get();
+      if (!placeData.exists) {
+        console.log("document does not exit!");
+        return null;
+      } else {
+        var details = placeData.get(DETAILS);
+        console.log("async details", details);
+        return details;
+      }
+    } catch (err) {
+      console.log("Error getting document ", err);
+    }
   }
   return db[placeID].details;
 };
@@ -227,25 +225,22 @@ const isValidPatient = (placeID, patientID) => {
   return placeExists && typeof entry !== "undefined";
 };
 
-const getPatientInfo = (placeID, patientID) => {
+const getPatientInfo = async (placeID, patientID) => {
   if (PRODUCTION) {
     console.log("FIRESTORE getPatient: ", patientID);
-    const patRef = PATIENTS.collection(placeID).doc(patientID);
-    patRef
-      .get()
-      .then((docPreview) => {
-        if (docPreview.exists) {
-          patRef.onSnapshot((doc) => {
-            console.log(doc.data());
-            return doc.data();
-          });
-        } else {
-          return null;
-        }
-      })
-      .catch((err) => {
-        console.log("firestore error on isValidPlace", err);
-      });
+    const patRef = PLACES.doc(placeID).collection(PATIENTS).doc(patientID);
+    try {
+      const patDoc = await patRef.get();
+      if (patDoc.exists) {
+        console.log("patient exists");
+        return patDoc.data();
+      } else {
+        console.log("patient doesnt exist");
+        return null;
+      }
+    } catch (err) {
+      console.log("firestore error on isValidPlace", err);
+    }
   }
 };
 
@@ -263,19 +258,21 @@ const removeFromQueue = (placeID, patientID) => {
   db[placeID].queue = newQueue;
 };
 
-const updateWaitingNumber = (praxisID, patientID) => {
+const updateWaitingNumber = async (praxisID, patientID) => {
   if (PRODUCTION) {
     console.log("FIREBASE: updateWaitingNumber");
 
     var patRef = PLACES.doc(praxisID).collection(QUEUES).doc(patientID);
-    patRef
-      .get()
-      .then((doc) => {
-        return doc.data().pos;
-      })
-      .catch(
-        console.log("error retrieving patId from queue: ", patientID, praxisID)
-      );
+    try {
+      const patDoc = await patRef.get();
+      if (patDoc.exists) {
+        return patDoc.data().pos;
+      } else {
+        return null;
+      }
+    } catch (err) {
+      console.log("error retrieving patId from queue: ", patientID, praxisID);
+    }
   }
 
   var lst = db[praxisID].queue;
@@ -356,44 +353,42 @@ const queuePatient = (placeID, patientID) => {
   return lastPosition;
 };
 
-var getQueue = (placeID) => {
+var getQueue = async (placeID) => {
   var queueData = [];
   if (PRODUCTION) {
-    console.log("FIRESTORE getQueue:");
+    console.log("FIRESTORE getQueue for", placeID);
     var queueRef = PLACES.doc(placeID).collection(QUEUES);
     var idAndPos = [];
-    queueRef
-      .get()
-      .then((queueSnap) => {
-        if (queueSnap.exists) {
-          queueRef.onSnapshot((doc) => {
-            console.log("queue: ", doc);
-            idAndPos = doc;
+    try {
+      const snapshot = await queueRef.get();
+      if (snapshot.docs.length > 0) {
+        idAndPos = snapshot.docs.map((doc) => doc.data());
+        for (let i = 0; i < idAndPos.length; i++) {
+          var patInfo = await getPatientInfo(placeID, idAndPos[i].id);
+          queueData.push({
+            pos: idAndPos[i].pos,
+            patientID: idAndPos[i].id,
+            ...patInfo,
           });
-        } else {
-          console.log("no queue yet. return empty");
-          idAndPos = [];
         }
-      })
-      .catch((err) => {
-        console.log("FIRESTORE ERROR getQueue: ", err);
+        return queueData;
+      } else {
+        console.log("queue empty");
+        return [];
+      }
+    } catch (err) {
+      console.log("FIRESTORE ERROR getQueue: ", err);
+    }
+  } else {
+    for (let i = 0; i < db[placeID].queue.length; i++) {
+      var entry = db[placeID].queue[i];
+      var patInfo = db[placeID].patientData.find((x) => {
+        return x.patientID == entry.id;
       });
-
-    for (let i = 0; i < idAndPos.length; i++) {
-      var patInfo = getPatientInfo(placeID, idAndPos[i].id);
-      queueData.push({ pos: idAndPos[i].pos, ...patInfo });
+      queueData.push({ pos: entry.pos, ...patInfo });
     }
     return queueData;
   }
-
-  for (let i = 0; i < db[placeID].queue.length; i++) {
-    var entry = db[placeID].queue[i];
-    var patInfo = db[placeID].patientData.find((x) => {
-      return x.patientID == entry.id;
-    });
-    queueData.push({ pos: entry.pos, ...patInfo });
-  }
-  return queueData;
 };
 
 const verifyPassword = (placeID, password) => {
@@ -490,12 +485,12 @@ app.get("/", (req, res) => {
 });
 
 // can be removed as details are public
-app.post("/admin/details", (req, res) => {
+app.post("/admin/details", async (req, res) => {
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false }).status(200);
   } else {
-    var details = getDetails(placeID);
+    var details = await getDetails(placeID);
     res.send({ authConfirmed: true, details: details }).status(200);
   }
 });
@@ -505,12 +500,13 @@ app.get("/details/:placeID", (req, res) => {
   res.send(getDetails(req.params.placeID)).status(200);
 });
 
-app.post("/admin/queue", (req, res) => {
+app.post("/admin/queue", async (req, res) => {
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false, queueData: null }).status(200);
   } else {
-    var queueData = getQueue(placeID);
+    var queueData = await getQueue(placeID);
+    console.log("returned queue:", queueData);
     res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
 });
@@ -624,3 +620,48 @@ io.on("connection", (socket) => {
 // --------------------------------------------------------
 
 server.listen(port, () => console.log(`listening on http://127.0.0.1:` + port));
+
+// code schnibsel
+
+/*
+var getQueue = (placeID) => {
+  var queueData = [];
+  if (PRODUCTION) {
+    console.log("FIRESTORE getQueue for", placeID);
+    var queueRef = PLACES.doc(placeID).collection(QUEUES);
+    var idAndPos = [];
+    queueRef
+      .get()
+      .then((queueSnap) => {
+        if (queueSnap.docs.length > 0) {
+          queueRef.onSnapshot((snapshot) => {
+            idAndPos = snapshot.docs.map((doc) => doc.data());
+            console.log("list from snapshot", idAndPos);
+          });
+        } else {
+          console.log("no queue yet. return empty");
+          idAndPos = [];
+        }
+        console.log("idandpos:", idAndPos);
+        for (let i = 0; i < idAndPos.length; i++) {
+          var patInfo = getPatientInfo(placeID, idAndPos[i].id);
+          queueData.push({ pos: idAndPos[i].pos, ...patInfo });
+        }
+        console.log("queuedata:", queueData);
+        return queueData;
+      })
+      .catch((err) => {
+        console.log("FIRESTORE ERROR getQueue: ", err);
+      });
+  } else {
+    for (let i = 0; i < db[placeID].queue.length; i++) {
+      var entry = db[placeID].queue[i];
+      var patInfo = db[placeID].patientData.find((x) => {
+        return x.patientID == entry.id;
+      });
+      queueData.push({ pos: entry.pos, ...patInfo });
+    }
+    return queueData;
+  }
+};
+*/
