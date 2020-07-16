@@ -18,7 +18,7 @@ const port = 8000;
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const PRODUCTION = false;
+const PRODUCTION = true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
@@ -30,10 +30,11 @@ let PLACES = fdb.collection("places"); // PATIENTS.doc(placeID).doc(patID).colle
 /*
  * patients:
   PLACES.doc(placeID).doc(patID).collection
+  QUEUES.doc(placeID).collection("queue").doc(patID)
  */
 let DETAILS = "details";
-let PATIENTS = "patients"; //
-let QUEUES = "queue"; // QUEUES.doc(placeID).collection("queue").doc(patID)
+let PATIENTS = "patients";
+let QUEUES = "queue";
 let PASS = "passwords";
 
 var db = {
@@ -140,6 +141,7 @@ const getDetails = async (placeID) => {
       console.log("Error getting document ", err);
     }
   }
+
   return db[placeID].details;
 };
 
