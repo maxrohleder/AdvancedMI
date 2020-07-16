@@ -101,7 +101,13 @@ class EditAdminInfo extends Component {
         .then((response) => response.json())
         .then((data) => {
           if (data.Confirmed) {
-            document.cookie = "Access-Token=" + data.accessToken;
+            document.cookie =
+              "Access-Token=" +
+              data.accessToken +
+              "praxisID=" +
+              praxisID +
+              "; max-age = " +
+              60 * 60 * 24 * 31; //einMonat langer cookie
             this.props.onChange("/admin/" + this.state.userName);
           }
         })
