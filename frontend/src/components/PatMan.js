@@ -40,38 +40,48 @@ class PatientManagement extends React.Component {
   }
   handleChange = (event) => {
     var target = event.target;
-    console.log(target.id);
+    //console.log(target.id);
 
     if (target.id === "first_name") {
       if (event.target.value == "first_name") {
         this.setState({ first_name: "" });
-        console.log("updated : " + target.id + " : " + this.state.first_name);
+        //console.log("updated : " + target.id + " : " + this.state.first_name);
       }
       this.setState({ first_name: event.target.value });
-      console.log("updated : " + target.id + " : " + this.state.first_name);
+      //console.log("updated : " + target.id + " : " + this.state.first_name);
     }
     if (target.id === "surname") {
       this.setState({ surname: event.target.value });
-      console.log("updated : " + target.id + " : " + event.target.value);
+      //console.log("updated : " + target.id + " : " + event.target.value);
     }
     if (target.id === "appointment_date") {
       this.setState({ appointment_date: event.target.value });
-      console.log("updated : " + target.id + " : " + event.target.value);
+      //console.log("updated : " + target.id + " : " + event.target.value);
     }
     if (target.id === "short_diagnosis") {
       this.setState({ short_diagnosis: event.target.value });
-      console.log("updated : " + target.id + " : " + event.target.value);
+      //console.log("updated : " + target.id + " : " + event.target.value);
     }
     if (target.id === "mobile") {
       this.setState({ mobile: event.target.value });
-      console.log("updated : " + target.id + " : " + event.target.value);
+      //console.log("updated : " + target.id + " : " + event.target.value);
     }
     if (target.id === "email") {
       this.setState({ email: event.target.value });
-      console.log("email : " + target.id + " : " + event.target.value);
+      //console.log("email : " + target.id + " : " + event.target.value);
     }
   };
 
+  getAdminCookie = () => {
+    function escape(s) {
+      return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
+    }
+    var match = document.cookie.match(
+      RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
+    );
+    var token = match ? match[1] : null;
+    return token.split("praxisID=")[0];
+  };
   // use a post request https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
   handleSubmit = (event) => {
     var patientenData = {
@@ -86,17 +96,9 @@ class PatientManagement extends React.Component {
     };
 
     //getAdminCookie
-    //to change//implement react-cookie structure
-    function escape(s) {
-      return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
-    }
-    var match = document.cookie.match(
-      RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
-    );
-    var token = match ? match[1] : null;
-    //getAdminCookie
-    //to change//implement react-cookie structure
+    var token = this.getAdminCookie();
 
+    //post request
     var praxisID = this.props.praxisID;
     var url = APIendpoint + "admin/registerpatient/";
     var payload = JSON.stringify({
@@ -121,7 +123,7 @@ class PatientManagement extends React.Component {
         this.props.doChange(patientenData);
       })
       .catch(() => {
-        console.log();
+        //console.log();
         this.setState({ redirect: "/error" });
       });
 

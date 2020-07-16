@@ -2,6 +2,7 @@ import React from "react";
 import Queue from "./components/queue";
 import InfoBox from "./components/InfoBox";
 import PatientManagement from "./components/PatMan";
+import { Redirect } from "react-router-dom";
 import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
@@ -20,13 +21,10 @@ class AdminApp extends React.Component {
       field: null, // facharzt
 
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
+      redirect: null,
     };
   }
-  getAdminCookie = () => {};
-
-  componentDidMount() {
-    //getAdminCookie
-    //to change//implement react-cookie structure
+  getAdminCookie = () => {
     function escape(s) {
       return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
     }
@@ -34,12 +32,16 @@ class AdminApp extends React.Component {
       RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
     );
     var token = match ? match[1] : null;
+    return token.split("praxisID=")[0];
+  };
+
+  componentDidMount() {
+    //getAdminCookie
+    var token = this.getAdminCookie();
     var placeID = this.state.placeID;
 
     // fetch initial queue status
     var url = APIendpoint + updateRoute;
-    //console.log(url);
-
     var payload = JSON.stringify({
       placeID: placeID,
       token: token,
@@ -116,7 +118,18 @@ class AdminApp extends React.Component {
     }
   };
 
+  handleClick = () => {
+    console.log("DELETE COOKIE");
+    //THIS DOES NOT WORK ON OPERA_>FUCKs
+    document.cookie = "Access-Token=null" + "; max-age = " + 0; //cant destroy expiration->0sec//CANT CHANGE COOKIE HERE?
+    this.setState({ redirect: "/" });
+  };
   render() {
+    if (this.state.redirect) {
+      console.log("redirecting to: " + this.state.redirect);
+      return <Redirect to={this.state.redirect} />;
+    }
+
     return (
       <div className="app">
         <div className="banner">
@@ -133,6 +146,9 @@ class AdminApp extends React.Component {
             data={this.state.queueData}
             remove={this.deleteFromQueue}
           />
+          <div className="logOut-button">
+            <input onClick={this.handleClick} defaultValue="⮕ LOG OUT" />
+          </div>
         </div>
         <InfoBox />
       </div>

@@ -19,6 +19,8 @@ import LoginUser from "./loginuser";
 import LoginAdmin from "./loginadmin";
 import chatWindow from "./components/chatWindow";
 
+import RegisterAdmin from "./components/registerAdmin";
+
 import "./index.css";
 
 function getAdminCookie() {
@@ -57,6 +59,7 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 ReactDOM.render(
   <Router>
     <Switch>
+      <Route path="/admin/registerAdmin" component={() => <RegisterAdmin />} />
       <PrivateRoute path="/admin/:placeID" component={AdminApp} />
       <Route path="/admin" component={() => <LoginAdmin />} />
       <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />

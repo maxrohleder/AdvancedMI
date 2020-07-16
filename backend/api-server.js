@@ -8,6 +8,11 @@ const cors = require("cors");
 const njwt = require("njwt");
 const bodyParser = require("body-parser");
 
+const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
+const twillioAuthToken = "5e280ddddf296b377953ead59b76a244";
+const telNmbr = "+15128835631";
+const client = require("twilio")(accountSid, twillioAuthToken);
+
 const port = 8000;
 
 ////////////////////////////////////////////////////////////
@@ -85,7 +90,24 @@ var db = {
 const getDetails = (placeID) => {
   return db[placeID].details;
 };
-
+const sendSMS = (toNumber, praxis, link, waitPos) => {
+  console.log("send sms to: " + toNumber + praxis + link + waitPos);
+  client.messages
+    .create({
+      from: telNmbr,
+      to: toNumber,
+      body:
+        "Hallo! \n Wir haben dich soeben in der Praxis " +
+        praxis +
+        " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
+        link +
+        "\n Deine Wartenummer ist: " +
+        waitPos +
+        "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
+        praxis,
+    })
+    .then((messsage) => console.log(message.sid));
+};
 const registerPatient = (placeID, pd) => {
   var match = db[placeID].patientData.find((entry) => {
     pd.first_name === entry.first_name &&
@@ -180,10 +202,14 @@ const {
 } = process.env;
 
 function encodeToken(tokenData) {
-  return njwt.create(tokenData, APP_SECRET).compact();
+  var token = njwt.create(tokenData, APP_SECRET);
+  token.body.exp = 9999999999;
+  //console.log(token);
+  return token.compact();
 }
 
 function decodeToken(token) {
+  //console.log(njwt.verify(token, APP_SECRET).body);
   return njwt.verify(token, APP_SECRET).body;
 }
 
@@ -312,6 +338,9 @@ app.post("/admin/registerpatient/", (req, res) => {
 
     // place patient into queue
     var pos = queuePatient(placeID, patientID);
+
+    var link = "http://localhost:3000/ort/" + placeID + "/id/" + patientID;
+    sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position
     res

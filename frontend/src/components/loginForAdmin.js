@@ -55,7 +55,13 @@ class LoginForAdmin extends Component {
           .then((response) => response.json())
           .then((data) => {
             if (data.praxisConfirmed) {
-              document.cookie = "Access-Token=" + data.accessToken;
+              document.cookie =
+                "Access-Token=" +
+                data.accessToken +
+                "praxisID=" +
+                praxisID +
+                "; max-age = " +
+                60 * 60 * 24 * 31; //einMonat langer cookie
               this.setState({ redirect: newPageUrl });
             } else {
               alert("praxis oder password falsch, please try again");
@@ -70,8 +76,32 @@ class LoginForAdmin extends Component {
       }
     }
   };
+  getAdminCookie = () => {
+    function escape(s) {
+      return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
+    }
+    var match = document.cookie.match(
+      RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
+    );
+    var token = match ? match[1] : null;
+    if (token == null) {
+      console.log("KEIN TOKEN");
+      return null;
+    } else {
+      console.log("TOKEN VORHANDEN");
+      return token.split("praxisID=")[1];
+    }
+  };
 
+  pageSelecter = () => {
+    if (this.getAdminCookie() != null) {
+      this.setState({
+        redirect: "admin/" + this.getAdminCookie(),
+      });
+    }
+  };
   render() {
+    this.pageSelecter();
     if (this.state.redirect) {
       console.log("redirecting to: " + this.state.redirect);
       return <Redirect to={this.state.redirect} />;
