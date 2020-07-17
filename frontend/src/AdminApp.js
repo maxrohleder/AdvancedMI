@@ -51,7 +51,7 @@ class AdminApp extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
-    var auth = true;
+    var auth = false;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
@@ -71,7 +71,6 @@ class AdminApp extends React.Component {
 
     // fetch place information from placeID
     url = APIendpoint + detailsRoute;
-    auth = true;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
