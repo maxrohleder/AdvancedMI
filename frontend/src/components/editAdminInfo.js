@@ -105,7 +105,7 @@ class EditAdminInfo extends Component {
               "Access-Token=" +
               data.accessToken +
               "praxisID=" +
-              praxisID +
+              this.state.userName +
               "; max-age = " +
               60 * 60 * 24 * 31; //einMonat langer cookie
             this.props.onChange("/admin/" + this.state.userName);
