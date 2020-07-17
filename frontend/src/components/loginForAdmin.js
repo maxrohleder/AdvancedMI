@@ -49,17 +49,19 @@ class LoginForAdmin extends Component {
         };
         var url = APIendpoint + "auth/admin/";
         console.log("fetching admin info from " + url);
-        console.log(praxisID);
+        //console.log(praxisID);
 
         fetch(url, requestOptions)
           .then((response) => response.json())
           .then((data) => {
             if (data.praxisConfirmed) {
+              console.log("cookie erstllene");
               document.cookie =
                 "Access-Token=" +
                 data.accessToken +
                 "praxisID=" +
                 praxisID +
+                "; path = / " +
                 "; max-age = " +
                 60 * 60 * 24 * 31; //einMonat langer cookie
               this.setState({ redirect: newPageUrl });
@@ -85,10 +87,10 @@ class LoginForAdmin extends Component {
     );
     var token = match ? match[1] : null;
     if (token == null) {
-      console.log("KEIN TOKEN");
+      //console.log("KEIN TOKEN");
       return null;
     } else {
-      console.log("TOKEN VORHANDEN");
+      //console.log("TOKEN VORHANDEN");
       return token.split("praxisID=")[1];
     }
   };

@@ -35,7 +35,9 @@ function getAdminCookie() {
 }
 function checkAdminToken() {
   var TokenValue = getAdminCookie();
-  //console.log(TokenValue);
+  if (TokenValue == null) {
+    console.log("Kein Token umgeleitet auf index");
+  }
   return TokenValue != null;
 }
 
@@ -59,9 +61,9 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
 ReactDOM.render(
   <Router>
     <Switch>
-      <Route path="/admin/registerAdmin" component={() => <RegisterAdmin />} />
+      <Route path="/admin/registerAdmin" component={RegisterAdmin} />
       <PrivateRoute path="/admin/:placeID" component={AdminApp} />
-      <Route path="/admin" component={() => <LoginAdmin />} />
+      <Route path="/admin" component={LoginAdmin} />
       <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />
       <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
       <Route path="/ort/:placeID" component={LoginUser} />

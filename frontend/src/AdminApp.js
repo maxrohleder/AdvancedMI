@@ -13,7 +13,7 @@ class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAuth: true,
+      isAuth: false,
       placeID: props.match.params.placeID,
 
       name: null,
@@ -61,11 +61,12 @@ class AdminApp extends React.Component {
         });
       })
       .catch(() => {
-        console.log("could not fetch data. Backend inactive??");
         if (!auth) {
           console.log("falschesToken");
           alert("Use Valid Token");
+          this.setState({ redirect: "/" });
         }
+        console.log("could not fetch data. Backend inactive??");
         this.setState({ redirect: "/error" });
       });
 
@@ -82,11 +83,12 @@ class AdminApp extends React.Component {
         });
       })
       .catch(() => {
-        console.log("could not fetch data. Backend inactive??");
         if (!auth) {
           console.log("falschesToken");
           alert("Use Valid Token");
+          this.setState({ redirect: "/" });
         }
+        console.log("could not fetch data. Backend inactive??");
         this.setState({ redirect: "/error" });
       });
   }
@@ -119,8 +121,8 @@ class AdminApp extends React.Component {
 
   handleClick = () => {
     console.log("DELETE COOKIE");
-    //THIS DOES NOT WORK ON OPERA_>FUCKs
-    document.cookie = "Access-Token=null" + "; max-age = " + 0; //cant destroy expiration->0sec//CANT CHANGE COOKIE HERE?
+    document.cookie =
+      "Access-Token= null " + "; path = / " + "; max-age = " + 0; //cant destroy expiration->0sec
     this.setState({ redirect: "/" });
   };
   render() {

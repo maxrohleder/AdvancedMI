@@ -106,13 +106,14 @@ class EditAdminInfo extends Component {
               data.accessToken +
               "praxisID=" +
               this.state.userName +
+              "; path = / " +
               "; max-age = " +
               60 * 60 * 24 * 31; //einMonat langer cookie
             this.props.onChange("/admin/" + this.state.userName);
           }
         })
         .catch(() => {
-          //this.setState({ redirect: "/error" });
+          this.setState({ redirect: "/error" });
         });
 
       event.preventDefault();

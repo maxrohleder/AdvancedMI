@@ -226,12 +226,11 @@ const isAuthenticationMiddleware = (req, res, next) => {
     //console.log("userId", userId);
 
     if (placeID === userId) {
-      console.log("Token and PlaceID match!");
+      //console.log("Token and PlaceID match!");
       //req.userId = userId;
       return userId;
     } else {
-      console.log("Token and PlaceID DO NOT match!");
-      console.log("Try to log in properly");
+      console.log("Token and PlaceID DO NOT match! Try to log in properly");
       return null;
     }
   } catch (e) {

@@ -85,21 +85,25 @@ class RegisterAdmin extends Component {
     );
     var token = match ? match[1] : null;
     if (token == null) {
-      console.log("KEIN TOKEN");
+      //console.log("KEIN TOKEN");
       return null;
     } else {
-      console.log("TOKEN VORHANDEN");
+      //console.log("TOKEN VORHANDEN");
       return token.split("praxisID=")[1];
     }
   };
 
-  pageSelecter = () => {
+  componentDidMount() {
     if (this.getAdminCookie() != null) {
-      console.log(APIendpoint + "admin/" + this.getAdminCookie());
+      //console.log(APIendpoint + "admin/" + this.getAdminCookie());
       this.setState({
         redirect: this.getAdminCookie(),
       });
-    } else if (this.state.editPage == false) {
+    }
+  }
+
+  pageSelecter = () => {
+    if (this.state.editPage == false) {
       return this.renderFirstPage();
     } else {
       return this.renderEditPage();
