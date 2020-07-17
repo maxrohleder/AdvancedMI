@@ -9,7 +9,7 @@ const njwt = require("njwt");
 const bodyParser = require("body-parser");
 
 const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
-const twillioAuthToken = "5e280ddddf296b377953ead59b76a244";
+const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
 const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
 
@@ -91,7 +91,9 @@ const getDetails = (placeID) => {
   return db[placeID].details;
 };
 const sendSMS = (toNumber, praxis, link, waitPos) => {
-  console.log("send sms to: " + toNumber + praxis + link + waitPos);
+  console.log(
+    "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
+  );
   client.messages
     .create({
       from: telNmbr,

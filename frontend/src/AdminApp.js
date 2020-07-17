@@ -86,7 +86,7 @@ class AdminApp extends React.Component {
         console.log("could not fetch data. Backend inactive??");
         if (!auth) {
           console.log("falschesToken");
-          //alert("Use Valid Token");
+          alert("Use Valid Token");
         }
         this.setState({ redirect: "/error" });
       });
