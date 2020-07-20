@@ -23,7 +23,7 @@ const port = 8000;
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const PRODUCTION = true;
+const PRODUCTION = !true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
@@ -153,21 +153,23 @@ const sendSMS = (toNumber, praxis, link, waitPos) => {
   console.log(
     "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
   );
-  client.messages
-    .create({
-      from: telNmbr,
-      to: toNumber,
-      body:
-        "Hallo! \n Wir haben dich soeben in der Praxis " +
-        praxis +
-        " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
-        link +
-        "\n Deine Wartenummer ist: " +
-        waitPos +
-        "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
-        praxis,
-    })
-    .then((messsage) => console.log(message.sid));
+  if (PRODUCTION) {
+    client.messages
+      .create({
+        from: telNmbr,
+        to: toNumber,
+        body:
+          "Hallo! \n Wir haben dich soeben in der Praxis " +
+          praxis +
+          " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
+          link +
+          "\n Deine Wartenummer ist: " +
+          waitPos +
+          "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
+          praxis,
+      })
+      .then((messsage) => console.log(message.sid));
+  }
 };
 
 const registerPatient = async (placeID, pd) => {
