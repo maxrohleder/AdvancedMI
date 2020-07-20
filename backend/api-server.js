@@ -11,6 +11,11 @@ const bodyParser = require("body-parser");
 const { verify } = require("crypto");
 const e = require("express");
 
+const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
+const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
+const telNmbr = "+15128835631";
+const client = require("twilio")(accountSid, twillioAuthToken);
+
 const port = 8000;
 
 ////////////////////////////////////////////////////////////
@@ -143,6 +148,26 @@ const getDetails = async (placeID) => {
   }
 
   return db[placeID].details;
+};
+const sendSMS = (toNumber, praxis, link, waitPos) => {
+  console.log(
+    "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
+  );
+  client.messages
+    .create({
+      from: telNmbr,
+      to: toNumber,
+      body:
+        "Hallo! \n Wir haben dich soeben in der Praxis " +
+        praxis +
+        " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
+        link +
+        "\n Deine Wartenummer ist: " +
+        waitPos +
+        "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
+        praxis,
+    })
+    .then((messsage) => console.log(message.sid));
 };
 
 const registerPatient = async (placeID, pd) => {
@@ -439,10 +464,14 @@ const {
 } = process.env;
 
 function encodeToken(tokenData) {
-  return njwt.create(tokenData, APP_SECRET).compact();
+  var token = njwt.create(tokenData, APP_SECRET);
+  token.body.exp = 9999999999;
+  //console.log(token);
+  return token.compact();
 }
 
 function decodeToken(token) {
+  //console.log(njwt.verify(token, APP_SECRET).body);
   return njwt.verify(token, APP_SECRET).body;
 }
 
@@ -457,12 +486,11 @@ const isAuthenticationMiddleware = (req, res, next) => {
     //console.log("userId", userId);
 
     if (placeID === userId) {
-      console.log("Token and PlaceID match!");
+      //console.log("Token and PlaceID match!");
       //req.userId = userId;
       return userId;
     } else {
-      console.log("Token and PlaceID DO NOT match!");
-      console.log("Try to log in properly");
+      console.log("Token and PlaceID DO NOT match! Try to log in properly");
       return null;
     }
   } catch (e) {
@@ -564,6 +592,9 @@ app.post("/admin/registerpatient", async (req, res) => {
 
     // place patient into queue
     var pos = await queuePatient(placeID, patientID);
+
+    var link = "http://localhost:3000/ort/" + placeID + "/id/" + patientID;
+    sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position
     res

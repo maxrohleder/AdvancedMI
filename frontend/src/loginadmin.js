@@ -17,6 +17,7 @@ class LoginAdmin extends Component {
           </div>
           <div className="login-footer">
             <Link to="/">Patient</Link>
+            <Link to="/admin/registerAdmin">Register</Link>
             <Link to="/impressum">Impressum</Link>
             <Link to="/agb">AGB</Link>
           </div>

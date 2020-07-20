@@ -2,6 +2,7 @@ import React from "react";
 import Queue from "./components/queue";
 import InfoBox from "./components/InfoBox";
 import PatientManagement from "./components/PatMan";
+import { Redirect } from "react-router-dom";
 import "./styles/AdminApp.css";
 
 const APIendpoint = "http://localhost:8000/";
@@ -12,7 +13,7 @@ class AdminApp extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isAuth: true,
+      isAuth: false,
       placeID: props.match.params.placeID,
 
       name: null,
@@ -20,13 +21,10 @@ class AdminApp extends React.Component {
       field: null, // facharzt
 
       queueData: [], // [{patientinfo, pos}, {patientinfo, pos}]
+      redirect: null,
     };
   }
-  getAdminCookie = () => {};
-
-  componentDidMount() {
-    //getAdminCookie
-    //to change//implement react-cookie structure
+  getAdminCookie = () => {
     function escape(s) {
       return s.replace(/([.*+?\^${}()|\[\]\/\\])/g, "\\$1");
     }
@@ -34,12 +32,16 @@ class AdminApp extends React.Component {
       RegExp("(?:^|;\\s*)" + escape("Access-Token") + "=([^;]*)")
     );
     var token = match ? match[1] : null;
+    return token.split("praxisID=")[0];
+  };
+
+  componentDidMount() {
+    //getAdminCookie
+    var token = this.getAdminCookie();
     var placeID = this.state.placeID;
 
     // fetch initial queue status
     var url = APIendpoint + updateRoute;
-    //console.log(url);
-
     var payload = JSON.stringify({
       placeID: placeID,
       token: token,
@@ -49,7 +51,7 @@ class AdminApp extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
-    var auth = true;
+    var auth = false;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
@@ -59,20 +61,20 @@ class AdminApp extends React.Component {
         });
       })
       .catch((err) => {
+        if (!auth) {
+          console.log("falschesToken");
+          alert("Use Valid Token");
+          this.setState({ redirect: "/" });
+        }
         console.log(
           "ComponentMount AdminApp: could not fetch data. Backend inactive??",
           err
         );
-        if (!auth) {
-          console.log("falschesToken");
-          alert("Use Valid Token");
-        }
         this.setState({ redirect: "/error" });
       });
 
     // fetch place information from placeID
     url = APIendpoint + detailsRoute;
-    auth = true;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
@@ -84,11 +86,12 @@ class AdminApp extends React.Component {
         });
       })
       .catch(() => {
-        console.log("could not fetch data. Backend inactive??");
         if (!auth) {
           console.log("falschesToken");
-          //alert("Use Valid Token");
+          alert("Use Valid Token");
+          this.setState({ redirect: "/" });
         }
+        console.log("could not fetch data. Backend inactive??");
         this.setState({ redirect: "/error" });
       });
   }
@@ -119,7 +122,18 @@ class AdminApp extends React.Component {
     }
   };
 
+  handleClick = () => {
+    console.log("DELETE COOKIE");
+    document.cookie =
+      "Access-Token= null " + "; path = / " + "; max-age = " + 0; //cant destroy expiration->0sec
+    this.setState({ redirect: "/" });
+  };
   render() {
+    if (this.state.redirect) {
+      console.log("redirecting to: " + this.state.redirect);
+      return <Redirect to={this.state.redirect} />;
+    }
+
     return (
       <div className="app">
         <div className="banner">
@@ -136,6 +150,9 @@ class AdminApp extends React.Component {
             data={this.state.queueData}
             remove={this.deleteFromQueue}
           />
+          <div className="logOut-button">
+            <input onClick={this.handleClick} defaultValue="⮕ LOG OUT" />
+          </div>
         </div>
         <InfoBox />
       </div>
