@@ -5,7 +5,7 @@
   "description": "backend service for the digital Q project",
   "main": "api-server.js",
   "scripts": {
-    "test": "node api-server.js"
+    "start": "node api-server.js"
   },
   "repository": {
     "type": "git",
