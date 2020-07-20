@@ -229,21 +229,16 @@ const registerPatient = async (placeID, pd) => {
   }
 };
 
-const isValidPatient = (placeID, patientID) => {
+const isValidPatient = async (placeID, patientID) => {
   if (PRODUCTION) {
+    console.log("checking if id exists: ", patientID);
     const patRef = PLACES.doc(placeID).collection(PATIENTS).doc(patientID);
-    patRef
-      .get()
-      .then((docPreview) => {
-        if (docPreview.exists) {
-          return true;
-        } else {
-          return false;
-        }
-      })
-      .catch((err) => {
-        console.log("firestore error on isValidPlace", err);
-      });
+    try {
+      const docPrev = await patRef.get();
+      return docPreview.exists;
+    } catch (err) {
+      console.log("firestore error on isValidPlace", err);
+    }
   }
   var placeExists = isValidPlace(patientID);
   entry = db[placeID].queue.find((x) => x.id == patientID);
