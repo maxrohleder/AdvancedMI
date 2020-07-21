@@ -49,6 +49,7 @@ var db = {
       name: "Universitätsklinikum Erlangen",
       address: "Östliche Stadtmauerstraße 4, 91052 Erlangen",
       field: "Virologie",
+      email: "ukerlangen@fau.de",
     },
     queue: [
       { id: "jj97", pos: 1 },
@@ -81,6 +82,7 @@ var db = {
       name: "Praxis Dr. Covidweg",
       address: "Fledermausweg 19, 12020 Wuhan",
       field: "Allgemeinarzt",
+      email: "drcovid@china.com",
     },
     queue: [
       { id: "jj97", pos: 2 },
@@ -229,6 +231,53 @@ const registerPatient = async (placeID, pd) => {
     });
     return patId;
   }
+};
+
+const registerPraxis = async (placeID, details) => {
+  if (PRODUCTION) {
+    // use firestore to insert PRAXIS
+    //TODO
+  }
+  db[placeID] = {
+    password: details.password,
+    details: {
+      name: details.praxisName,
+      address:
+        details.street +
+        " " +
+        details.houseNumber +
+        " " +
+        details.zipCode +
+        " " +
+        details.place,
+      field: details.field,
+      email: details.email,
+    },
+    queue: [
+      { id: "jj97", pos: 1 },
+      { id: "mr98", pos: 2 },
+    ],
+    patientData: [
+      {
+        patientID: "mr98",
+        first_name: "Max",
+        surname: "Rohleder",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+      {
+        patientID: "jj97",
+        first_name: "Jule",
+        surname: "Verne",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+    ],
+  };
 };
 
 const isValidPatient = async (placeID, patientID) => {
@@ -553,6 +602,29 @@ app.post("/auth/admin/", (req, res) => {
       accessToken: accessToken,
     })
     .status(200);
+});
+
+app.post("/registerPraxis", async (req, res) => {
+  newPlaceID = !isValidPlace(req.body.placeID); //check if placeID unique
+  console.log(newPlaceID);
+  if (newPlaceID) {
+    //anlegen
+    await registerPraxis(req.body.placeID, {
+      praxisName: req.body.praxisName,
+      place: req.body.place,
+      field: req.body.field,
+      zipCode: req.body.zipCode,
+      street: req.body.street,
+      houseNumber: req.body.houseNumber,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      password: req.body.password,
+    });
+    var accessToken = encodeToken({ userId: req.body.placeID });
+    res.send({ newPlaceID: newPlaceID, accessToken: accessToken }).status(200);
+  } else {
+    res.send({ newPlaceID: newPlaceID, accessToken: null }).status(200);
+  }
 });
 
 app.get("/exists/user/:placeID/:patID", (req, res) => {

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Link } from "react-router-dom";
+import bcrypt from "bcryptjs";
 import EditAdminInfo from "./editAdminInfo.js";
 
 const APIendpoint = "http://localhost:8000/";
@@ -38,15 +39,12 @@ class RegisterAdmin extends Component {
       alert("Bitte jedes Feld ausfüllen");
       event.preventDefault();
     } else {
-      //this is test
-      if (true) {
-        this.setState({ editPage: true });
-      } //this is test
+      this.setState({ editPage: true });
 
       var payload = JSON.stringify({
         userName: this.state.userName,
         email: this.state.email,
-        password: this.state.password,
+        password: bcrypt.hashSync(this.state.password, 10),
       });
       const requestOptions = {
         method: "POST",
@@ -178,7 +176,7 @@ class RegisterAdmin extends Component {
             <div className="form-user">
               <EditAdminInfo
                 email={this.state.email}
-                password={this.state.userName}
+                password={bcrypt.hashSync(this.state.password, 10)}
                 onRedirect={this.changeRedirect}
               />
             </div>
