@@ -29,11 +29,8 @@ class LoginForAdmin extends Component {
     var praxisID = this.state.praxisID;
     var password = this.state.password;
 
-    //remove IF later, just excuse for non hashed password of ukerlangen and drcovid
-    if (!(password == "123" || password == "666")) {
-      password = bcrypt.hashSync(password, 10);
-      console.log("hash password!");
-    }
+    password = bcrypt.hashSync(password, 10);
+
     var newPageUrl = "/admin/" + praxisID;
 
     if (praxisID == null) {

@@ -507,10 +507,6 @@ const verifyPassword = (placeID, password) => {
       });
   }
 
-  //remove IF later. Excuse for non hashed password of ukerlangen and drcovid
-  if (password == "123" || password == "666") {
-    return isValidPlace(placeID) && db[placeID]["password"] == password;
-  }
   return (
     isValidPlace(placeID) &&
     bcrypt.compareSync(db[placeID]["password"], password)
