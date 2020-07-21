@@ -119,7 +119,7 @@ class EditAdminInfo extends Component {
               "; path = / " +
               "; max-age = " +
               60 * 60 * 24 * 31; //einMonat langer cookie
-            this.props.onChange("/admin/" + this.state.placeID);
+            this.props.onRedirect("/admin/" + this.state.placeID);
           }
         })
         .catch(() => {

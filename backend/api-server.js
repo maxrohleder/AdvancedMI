@@ -49,7 +49,6 @@ var db = {
       name: "Universitätsklinikum Erlangen",
       address: "Östliche Stadtmauerstraße 4, 91052 Erlangen",
       field: "Virologie",
-      email: "ukerlangen@fau.de",
     },
     queue: [
       { id: "jj97", pos: 1 },
@@ -148,29 +147,35 @@ const getDetails = async (placeID) => {
       console.log("Error getting document ", err);
     }
   }
-
+  //console.log(db[placeID].details);
   return db[placeID].details;
 };
 const sendSMS = (toNumber, praxis, link, waitPos) => {
-  console.log(
-    "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
-  );
+  var text =
+    "Hallo! \n Wir haben dich soeben in der Praxis " +
+    praxis +
+    " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
+    link +
+    "\n Deine Wartenummer ist: " +
+    waitPos +
+    "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
+    praxis;
+
   if (PRODUCTION) {
+    console.log(
+      "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
+    );
     client.messages
       .create({
         from: telNmbr,
         to: toNumber,
-        body:
-          "Hallo! \n Wir haben dich soeben in der Praxis " +
-          praxis +
-          " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
-          link +
-          "\n Deine Wartenummer ist: " +
-          waitPos +
-          "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
-          praxis,
+        body: text,
       })
       .then((messsage) => console.log(message.sid));
+  } else {
+    console.log(
+      "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
+    );
   }
 };
 
@@ -568,9 +573,10 @@ app.post("/admin/details", async (req, res) => {
   }
 });
 
-app.get("/details/:placeID", (req, res) => {
+app.get("/details/:placeID", async (req, res) => {
   console.log("place details requested");
-  res.send(getDetails(req.params.placeID)).status(200);
+  var details = await getDetails(req.params.placeID);
+  res.send(details).status(200);
 });
 
 app.post("/admin/queue", async (req, res) => {

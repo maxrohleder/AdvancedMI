@@ -83,6 +83,7 @@ class PatientApp extends React.Component {
     fetch(apicall)
       .then((response) => response.json())
       .then((data) => {
+        //console.log(data);
         this.setState({
           name: data.name,
           address: data.address,
