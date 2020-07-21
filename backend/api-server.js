@@ -17,6 +17,7 @@ const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
 
 const port = 8000;
+const smsLinkTo = "http://127.0.0.1:3000/";
 
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
@@ -357,17 +358,20 @@ const updateWaitingNumber = async (praxisID, patientID) => {
       console.log("error retrieving patId from queue: ", patientID, praxisID);
     }
   }
-
-  var lst = db[praxisID].queue;
-  var entry = lst.find((x) => {
-    return x.id == patientID;
-  });
-  if (typeof entry === "undefined") {
-    // the patientID is not registered (anymore)//TODO
-    return null;
-  } else {
-    //console.log(entry.pos);
-    return entry.pos;
+  try {
+    var lst = db[praxisID].queue;
+    var entry = lst.find((x) => {
+      return x.id == patientID;
+    });
+    if (typeof entry === "undefined") {
+      // the patientID is not registered (anymore)//TODO
+      return null;
+    } else {
+      //console.log(entry.pos);
+      return entry.pos;
+    }
+  } catch (err) {
+    console.log("error retrieving patId from queue: ", patientID, praxisID);
   }
 };
 
@@ -668,7 +672,7 @@ app.post("/admin/registerpatient", async (req, res) => {
     // place patient into queue
     var pos = await queuePatient(placeID, patientID);
 
-    var link = "http://localhost:3000/ort/" + placeID + "/id/" + patientID;
+    var link = smsLinkTo + "ort/" + placeID + "/id/" + patientID;
     sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position
