@@ -221,7 +221,7 @@ const registerPatient = async (placeID, pd) => {
     return match.patientID;
   } else {
     db[placeID].patientData.push({
-      patientID: patId,
+      patientID: patID,
       first_name: pd.first_name,
       surname: pd.surname,
       appointment_date: pd.appointment_date,
@@ -229,7 +229,7 @@ const registerPatient = async (placeID, pd) => {
       mobile: pd.mobile,
       email: pd.email,
     });
-    return patId;
+    return patID;
   }
 };
 
