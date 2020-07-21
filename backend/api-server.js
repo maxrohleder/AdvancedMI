@@ -15,6 +15,7 @@ const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
 const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
 const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
+const bcrypt = require("bcryptjs");
 
 const port = 8000;
 const smsLinkTo = "http://127.0.0.1:3000/";
@@ -252,7 +253,7 @@ const registerPraxis = async (placeID, details) => {
         details.street +
         " " +
         details.houseNumber +
-        " " +
+        ", " +
         details.zipCode +
         " " +
         details.place,
@@ -284,6 +285,16 @@ const registerPraxis = async (placeID, details) => {
       },
     ],
   };
+};
+
+const isValidEmail = async (email) => {
+  if (PRODUCTION) {
+    // use firestore to insert PRAXIS
+    //TODO
+  }
+
+  //db.find((x) => x.? == patientID); TODO
+  return true;
 };
 
 const isValidPatient = async (placeID, patientID) => {
@@ -459,14 +470,18 @@ var getQueue = async (placeID) => {
       console.log("FIRESTORE ERROR getQueue: ", err);
     }
   } else {
-    for (let i = 0; i < db[placeID].queue.length; i++) {
-      var entry = db[placeID].queue[i];
-      var patInfo = db[placeID].patientData.find((x) => {
-        return x.patientID == entry.id;
-      });
-      queueData.push({ pos: entry.pos, ...patInfo });
+    try {
+      for (let i = 0; i < db[placeID].queue.length; i++) {
+        var entry = db[placeID].queue[i];
+        var patInfo = db[placeID].patientData.find((x) => {
+          return x.patientID == entry.id;
+        });
+        queueData.push({ pos: entry.pos, ...patInfo });
+      }
+      return queueData;
+    } catch (err) {
+      console.log("FIRESTORE ERROR getQueue: ", err);
     }
-    return queueData;
   }
 };
 
@@ -491,7 +506,15 @@ const verifyPassword = (placeID, password) => {
         console.log("firestore error on isValidPlace", err);
       });
   }
-  return isValidPlace(placeID) && db[placeID]["password"] == password;
+
+  //remove IF later. Excuse for non hashed password of ukerlangen and drcovid
+  if (password == "123" || password == "666") {
+    return isValidPlace(placeID) && db[placeID]["password"] == password;
+  }
+  return (
+    isValidPlace(placeID) &&
+    bcrypt.compareSync(db[placeID]["password"], password)
+  );
 };
 
 ////////////////////////////////////////////////////////////
@@ -589,13 +612,12 @@ app.post("/admin/queue", async (req, res) => {
     res.send({ authConfirmed: false, queueData: null }).status(200);
   } else {
     var queueData = await getQueue(placeID);
-    console.log("returned queue:", queueData);
+    //console.log("returned queue:", queueData);
     res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
 });
 
-// why /auth/admin not just /auth ?
-app.post("/auth/admin/", (req, res) => {
+app.post("/auth", (req, res) => {
   var placeID = req.body.praxisID;
   var password = req.body.password;
 
@@ -614,9 +636,15 @@ app.post("/auth/admin/", (req, res) => {
     .status(200);
 });
 
+app.post("/auth-email", async (req, res) => {
+  var isNewMail = await isValidEmail(req.body.email);
+  console.log("is new mail");
+  res.send({ isNewMail: isNewMail }).status(200);
+});
+
 app.post("/registerPraxis", async (req, res) => {
   newPlaceID = !isValidPlace(req.body.placeID); //check if placeID unique
-  console.log(newPlaceID);
+  //console.log(newPlaceID);
   if (newPlaceID) {
     //anlegen
     await registerPraxis(req.body.placeID, {
@@ -630,6 +658,7 @@ app.post("/registerPraxis", async (req, res) => {
       email: req.body.email,
       password: req.body.password,
     });
+    console.log("Praxis " + req.body.placeID + "added!");
     var accessToken = encodeToken({ userId: req.body.placeID });
     res.send({ newPlaceID: newPlaceID, accessToken: accessToken }).status(200);
   } else {

@@ -103,8 +103,6 @@ class EditAdminInfo extends Component {
       console.log(payload);
       console.log("Bitte JWT vom Backend");
 
-      //this.props.onRedirect("/admin/" + this.state.userName); //<--this is test
-
       fetch(APIendpoint + "registerPraxis/", requestOptions)
         .then((response) => response.json())
         .then((data) => {

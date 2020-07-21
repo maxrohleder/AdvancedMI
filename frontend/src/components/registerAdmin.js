@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Link } from "react-router-dom";
-import bcrypt from "bcryptjs";
 import EditAdminInfo from "./editAdminInfo.js";
 
 const APIendpoint = "http://localhost:8000/";
@@ -39,26 +38,21 @@ class RegisterAdmin extends Component {
       alert("Bitte jedes Feld ausfüllen");
       event.preventDefault();
     } else {
-      this.setState({ editPage: true });
-
       var payload = JSON.stringify({
-        userName: this.state.userName,
         email: this.state.email,
-        password: bcrypt.hashSync(this.state.password, 10),
       });
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: payload,
       };
-      console.log("fetch: " + APIendpoint + "register/user/");
+      console.log("fetch: " + APIendpoint + "auth-email/");
       console.log(payload);
-      /*
-      fetch(APIendpoint + "exists/user/", requestOptions)
+
+      fetch(APIendpoint + "auth-email/", requestOptions)
         .then((response) => response.json())
         .then((data) => {
-          var dataConfirmed = data.EmailConfirmed;
-          if (data.EmailConfirmed) {
+          if (data.isNewMail) {
             //email und password gehen klar
             this.setState({ editPage: true });
           } else {
@@ -68,7 +62,7 @@ class RegisterAdmin extends Component {
         .catch(() => {
           console.log();
           this.setState({ redirect: "/error" });
-        });*/
+        });
 
       event.preventDefault();
     }
@@ -176,7 +170,7 @@ class RegisterAdmin extends Component {
             <div className="form-user">
               <EditAdminInfo
                 email={this.state.email}
-                password={bcrypt.hashSync(this.state.password, 10)}
+                password={this.state.password}
                 onRedirect={this.changeRedirect}
               />
             </div>
