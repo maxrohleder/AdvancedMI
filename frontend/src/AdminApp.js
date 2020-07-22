@@ -64,6 +64,8 @@ class AdminApp extends React.Component {
         if (!auth) {
           console.log("falschesToken");
           alert("Use Valid Token");
+          document.cookie =
+            "Access-Token= null " + "; path = / " + "; max-age = " + 0; //cant destroy expiration->0sec
           this.setState({ redirect: "/" });
         }
         console.log(
@@ -89,6 +91,8 @@ class AdminApp extends React.Component {
         if (!auth) {
           console.log("falschesToken");
           alert("Use Valid Token");
+          document.cookie =
+            "Access-Token= null " + "; path = / " + "; max-age = " + 0; //cant destroy expiration->0sec
           this.setState({ redirect: "/" });
         }
         console.log("could not fetch data. Backend inactive??");

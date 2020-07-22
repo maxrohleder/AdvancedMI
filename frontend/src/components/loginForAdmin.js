@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import bcrypt from "bcryptjs";
 import { Redirect } from "react-router-dom";
 //import Jumbotron from "../react-bootstrap/Jumbotron";
 
@@ -27,6 +28,9 @@ class LoginForAdmin extends Component {
     console.log("PASWORD: " + this.state.password);
     var praxisID = this.state.praxisID;
     var password = this.state.password;
+
+    password = bcrypt.hashSync(password, 10);
+
     var newPageUrl = "/admin/" + praxisID;
 
     if (praxisID == null) {
@@ -47,10 +51,9 @@ class LoginForAdmin extends Component {
           headers: { "Content-Type": "application/json" },
           body: payload,
         };
-        var url = APIendpoint + "auth/admin/";
+        var url = APIendpoint + "auth";
         console.log("fetching admin info from " + url);
         //console.log(praxisID);
-
         fetch(url, requestOptions)
           .then((response) => response.json())
           .then((data) => {

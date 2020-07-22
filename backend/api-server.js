@@ -16,15 +16,17 @@ const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
 const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
 const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
+const bcrypt = require("bcryptjs");
 
 const port = 8000;
+const smsLinkTo = "http://127.0.0.1:3000/";
 
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const PRODUCTION = true;
+const PRODUCTION = !true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
@@ -82,6 +84,7 @@ var db = {
       name: "Praxis Dr. Covidweg",
       address: "Fledermausweg 19, 12020 Wuhan",
       field: "Allgemeinarzt",
+      email: "drcovid@china.com",
     },
     queue: [
       { id: "jj97", pos: 2 },
@@ -147,28 +150,36 @@ const getDetails = async (placeID) => {
       console.log("Error getting document ", err);
     }
   }
-
+  //console.log(db[placeID].details);
   return db[placeID].details;
 };
 const sendSMS = (toNumber, praxis, link, waitPos) => {
-  console.log(
-    "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
-  );
-  client.messages
-    .create({
-      from: telNmbr,
-      to: toNumber,
-      body:
-        "Hallo! \n Wir haben dich soeben in der Praxis " +
-        praxis +
-        " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
-        link +
-        "\n Deine Wartenummer ist: " +
-        waitPos +
-        "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
-        praxis,
-    })
-    .then((messsage) => console.log(message.sid));
+  var text =
+    "Hallo! \n Wir haben dich soeben in der Praxis " +
+    praxis +
+    " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
+    link +
+    "\n Deine Wartenummer ist: " +
+    waitPos +
+    "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
+    praxis;
+
+  if (PRODUCTION) {
+    console.log(
+      "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
+    );
+    client.messages
+      .create({
+        from: telNmbr,
+        to: toNumber,
+        body: text,
+      })
+      .then((messsage) => console.log(message.sid));
+  } else {
+    console.log(
+      "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
+    );
+  }
 };
 
 const registerPatient = async (placeID, pd) => {
@@ -218,7 +229,7 @@ const registerPatient = async (placeID, pd) => {
     return match.patientID;
   } else {
     db[placeID].patientData.push({
-      patientID: patId,
+      patientID: patID,
       first_name: pd.first_name,
       surname: pd.surname,
       appointment_date: pd.appointment_date,
@@ -226,8 +237,65 @@ const registerPatient = async (placeID, pd) => {
       mobile: pd.mobile,
       email: pd.email,
     });
-    return patId;
+    return patID;
   }
+};
+
+const registerPraxis = async (placeID, details) => {
+  if (PRODUCTION) {
+    // use firestore to insert PRAXIS
+    //TODO
+  }
+  db[placeID] = {
+    password: details.password,
+    details: {
+      name: details.praxisName,
+      address:
+        details.street +
+        " " +
+        details.houseNumber +
+        ", " +
+        details.zipCode +
+        " " +
+        details.place,
+      field: details.field,
+      email: details.email,
+    },
+    queue: [
+      { id: "jj97", pos: 1 },
+      { id: "mr98", pos: 2 },
+    ],
+    patientData: [
+      {
+        patientID: "mr98",
+        first_name: "Max",
+        surname: "Rohleder",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+      {
+        patientID: "jj97",
+        first_name: "Jule",
+        surname: "Verne",
+        appointment_date: new Date(),
+        short_diagnosis: "Corona",
+        mobile: "0123456789",
+        email: "corona@covid19.de",
+      },
+    ],
+  };
+};
+
+const isValidEmail = async (email) => {
+  if (PRODUCTION) {
+    // use firestore to insert PRAXIS
+    //TODO
+  }
+
+  //db.find((x) => x.? == patientID); TODO
+  return true;
 };
 
 const isValidPatient = async (placeID, patientID) => {
@@ -302,17 +370,20 @@ const updateWaitingNumber = async (praxisID, patientID) => {
       console.log("error retrieving patId from queue: ", patientID, praxisID);
     }
   }
-
-  var lst = db[praxisID].queue;
-  var entry = lst.find((x) => {
-    return x.id == patientID;
-  });
-  if (typeof entry === "undefined") {
-    // the patientID is not registered (anymore)//TODO
-    return null;
-  } else {
-    //console.log(entry.pos);
-    return entry.pos;
+  try {
+    var lst = db[praxisID].queue;
+    var entry = lst.find((x) => {
+      return x.id == patientID;
+    });
+    if (typeof entry === "undefined") {
+      // the patientID is not registered (anymore)//TODO
+      return null;
+    } else {
+      //console.log(entry.pos);
+      return entry.pos;
+    }
+  } catch (err) {
+    console.log("error retrieving patId from queue: ", patientID, praxisID);
   }
 };
 
@@ -400,14 +471,18 @@ var getQueue = async (placeID) => {
       console.log("FIRESTORE ERROR getQueue: ", err);
     }
   } else {
-    for (let i = 0; i < db[placeID].queue.length; i++) {
-      var entry = db[placeID].queue[i];
-      var patInfo = db[placeID].patientData.find((x) => {
-        return x.patientID == entry.id;
-      });
-      queueData.push({ pos: entry.pos, ...patInfo });
+    try {
+      for (let i = 0; i < db[placeID].queue.length; i++) {
+        var entry = db[placeID].queue[i];
+        var patInfo = db[placeID].patientData.find((x) => {
+          return x.patientID == entry.id;
+        });
+        queueData.push({ pos: entry.pos, ...patInfo });
+      }
+      return queueData;
+    } catch (err) {
+      console.log("FIRESTORE ERROR getQueue: ", err);
     }
-    return queueData;
   }
 };
 
@@ -432,7 +507,11 @@ const verifyPassword = (placeID, password) => {
         console.log("firestore error on isValidPlace", err);
       });
   }
-  return isValidPlace(placeID) && db[placeID]["password"] == password;
+
+  return (
+    isValidPlace(placeID) &&
+    bcrypt.compareSync(db[placeID]["password"], password)
+  );
 };
 
 ////////////////////////////////////////////////////////////
@@ -518,9 +597,10 @@ app.post("/admin/details", async (req, res) => {
   }
 });
 
-app.get("/details/:placeID", (req, res) => {
+app.get("/details/:placeID", async (req, res) => {
   console.log("place details requested");
-  res.send(getDetails(req.params.placeID)).status(200);
+  var details = await getDetails(req.params.placeID);
+  res.send(details).status(200);
 });
 
 app.post("/admin/queue", async (req, res) => {
@@ -529,13 +609,12 @@ app.post("/admin/queue", async (req, res) => {
     res.send({ authConfirmed: false, queueData: null }).status(200);
   } else {
     var queueData = await getQueue(placeID);
-    console.log("returned queue:", queueData);
+    //console.log("returned queue:", queueData);
     res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
 });
 
-// why /auth/admin not just /auth ?
-app.post("/auth/admin/", (req, res) => {
+app.post("/auth", (req, res) => {
   var placeID = req.body.praxisID;
   var password = req.body.password;
 
@@ -552,6 +631,36 @@ app.post("/auth/admin/", (req, res) => {
       accessToken: accessToken,
     })
     .status(200);
+});
+
+app.post("/auth-email", async (req, res) => {
+  var isNewMail = await isValidEmail(req.body.email);
+  console.log("is new mail");
+  res.send({ isNewMail: isNewMail }).status(200);
+});
+
+app.post("/registerPraxis", async (req, res) => {
+  newPlaceID = !isValidPlace(req.body.placeID); //check if placeID unique
+  //console.log(newPlaceID);
+  if (newPlaceID) {
+    //anlegen
+    await registerPraxis(req.body.placeID, {
+      praxisName: req.body.praxisName,
+      place: req.body.place,
+      field: req.body.field,
+      zipCode: req.body.zipCode,
+      street: req.body.street,
+      houseNumber: req.body.houseNumber,
+      phoneNumber: req.body.phoneNumber,
+      email: req.body.email,
+      password: req.body.password,
+    });
+    console.log("Praxis " + req.body.placeID + "added!");
+    var accessToken = encodeToken({ userId: req.body.placeID });
+    res.send({ newPlaceID: newPlaceID, accessToken: accessToken }).status(200);
+  } else {
+    res.send({ newPlaceID: newPlaceID, accessToken: null }).status(200);
+  }
 });
 
 app.get("/exists/user/:placeID/:patID", (req, res) => {
@@ -589,7 +698,7 @@ app.post("/admin/registerpatient", async (req, res) => {
     // place patient into queue
     var pos = await queuePatient(placeID, patientID);
 
-    var link = "http://localhost:3000/ort/" + placeID + "/id/" + patientID;
+    var link = smsLinkTo + "ort/" + placeID + "/id/" + patientID;
     sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position

@@ -38,29 +38,21 @@ class RegisterAdmin extends Component {
       alert("Bitte jedes Feld ausfüllen");
       event.preventDefault();
     } else {
-      //this is test
-      if (true) {
-        this.setState({ editPage: true });
-      } //this is test
-
       var payload = JSON.stringify({
-        userName: this.state.userName,
         email: this.state.email,
-        password: this.state.password,
       });
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: payload,
       };
-      console.log("fetch: " + APIendpoint + "register/user/");
+      console.log("fetch: " + APIendpoint + "auth-email/");
       console.log(payload);
-      /*
-      fetch(APIendpoint + "exists/user/", requestOptions)
+
+      fetch(APIendpoint + "auth-email/", requestOptions)
         .then((response) => response.json())
         .then((data) => {
-          var dataConfirmed = data.EmailConfirmed;
-          if (data.EmailConfirmed) {
+          if (data.isNewMail) {
             //email und password gehen klar
             this.setState({ editPage: true });
           } else {
@@ -70,7 +62,7 @@ class RegisterAdmin extends Component {
         .catch(() => {
           console.log();
           this.setState({ redirect: "/error" });
-        });*/
+        });
 
       event.preventDefault();
     }
@@ -178,7 +170,7 @@ class RegisterAdmin extends Component {
             <div className="form-user">
               <EditAdminInfo
                 email={this.state.email}
-                password={this.state.userName}
+                password={this.state.password}
                 onRedirect={this.changeRedirect}
               />
             </div>

@@ -12,12 +12,13 @@ class EditAdminInfo extends Component {
       password: props.password,
 
       praxisName: null,
-      userName: "",
+      placeID: "",
       zipCode: null,
       place: null,
       street: null,
       houseNumber: null,
       phoneNumber: null,
+      field: null,
 
       agbChecked: false,
     };
@@ -35,10 +36,10 @@ class EditAdminInfo extends Component {
         userNameVorschlag =
           userNameVorschlag[0].substring(0, 2) + userNameVorschlag[1];
       }
-      this.setState({ userName: userNameVorschlag });
+      this.setState({ placeID: userNameVorschlag });
       //console.log("updated : " + target.id + " : " + event.target.value);
-    } else if (target.id === "userName") {
-      this.setState({ userName: event.target.value });
+    } else if (target.id === "placeID") {
+      this.setState({ placeID: event.target.value });
       //console.log("updated : " + target.id + " : " + event.target.value);
     } else if (target.id === "zipCode") {
       this.setState({ zipCode: event.target.value });
@@ -58,6 +59,9 @@ class EditAdminInfo extends Component {
     } else if (target.id === "email") {
       this.setState({ email: event.target.value });
       //console.log("updated : " + target.id + " : " + event.target.value);
+    } else if (target.id === "field") {
+      this.setState({ field: event.target.value });
+      //console.log("updated : " + target.id + " : " + event.target.value);
     } else if (target.id === "AGB") {
       this.setState({ agbChecked: event.target.checked });
       console.log("updated : " + target.id + " : " + event.target.checked);
@@ -67,12 +71,13 @@ class EditAdminInfo extends Component {
   handleSubmit = (event) => {
     if (
       this.state.praxisName == null ||
-      this.state.userName == null ||
+      this.state.placeID == null ||
       this.state.zipCode == null ||
       this.state.place == null ||
       this.state.street == null ||
       this.state.houseNumber == null ||
       this.state.phoneNumber == null ||
+      this.state.field == null ||
       this.state.email == null
     ) {
       alert("Bitte jedes Feld ausfüllen");
@@ -80,12 +85,15 @@ class EditAdminInfo extends Component {
     } else if (this.state.agbChecked) {
       var payload = JSON.stringify({
         praxisName: this.state.praxisName,
-        userName: this.state.userName,
+        placeID: this.state.placeID,
+        field: this.state.field,
+        place: this.state.place,
         zipCode: this.state.zipCode,
         street: this.state.street,
         houseNumber: this.state.houseNumber,
         phoneNumber: this.state.phoneNumber,
         email: this.state.email,
+        password: this.state.password,
       });
       const requestOptions = {
         method: "POST",
@@ -95,21 +103,21 @@ class EditAdminInfo extends Component {
       console.log(payload);
       console.log("Bitte JWT vom Backend");
 
-      this.props.onRedirect("/admin/" + this.state.userName); //<--this is test
-
-      fetch(APIendpoint + "register/user/", requestOptions)
+      fetch(APIendpoint + "registerPraxis/", requestOptions)
         .then((response) => response.json())
         .then((data) => {
-          if (data.Confirmed) {
+          if (!data.newPlaceID) {
+            alert("Place ID bereits vergeben! /n Bitte eine neue Angeben");
+          } else {
             document.cookie =
               "Access-Token=" +
               data.accessToken +
               "praxisID=" +
-              this.state.userName +
+              this.state.placeID +
               "; path = / " +
               "; max-age = " +
               60 * 60 * 24 * 31; //einMonat langer cookie
-            this.props.onChange("/admin/" + this.state.userName);
+            this.props.onRedirect("/admin/" + this.state.placeID);
           }
         })
         .catch(() => {
@@ -139,12 +147,21 @@ class EditAdminInfo extends Component {
               />
             </label>
             <label>
-              Praxis UserName
+              Praxis PlaceID
               <input
                 type="text"
-                name="userName"
-                id="userName"
-                value={this.state.userName}
+                name="placeID"
+                id="placeID"
+                value={this.state.placeID}
+                onChange={this.handleChange}
+              />
+            </label>
+            <label>
+              Praxis Field
+              <input
+                type="text"
+                name="field"
+                id="field"
                 onChange={this.handleChange}
               />
             </label>
