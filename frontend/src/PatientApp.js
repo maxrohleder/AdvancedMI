@@ -40,6 +40,12 @@ class PatientApp extends React.Component {
     });
   };
 
+  setUnCalledCb = (cb) => {
+    this.socket.on("uncalled", (patId) => {
+      cb(null, patId);
+    });
+  };
+
   setUpdateCb = (cb) => {
     this.socket.on("update", (data) => {
       cb(null, data);
@@ -64,13 +70,46 @@ class PatientApp extends React.Component {
       this.setState({ isCalled: c });
     });
 
+    // subscribe to called channel
+    this.setUnCalledCb((err, num) => {
+      this.setState({ isCalled: false });
+    });
+
     // subscribe to update channel
-    this.setUpdateCb((err, pos) => {
-      if (pos == null) {
-        // the patientID is not registered (anymore)
-        this.setState({ redirect: "/place/" + this.state.placeID });
+    this.setUpdateCb((err, data) => {
+      console.log(data);
+      var pos = data.split("+")[1];
+      if (data.split("+")[0] == this.state.patientID) {
+        if (pos == "null") {
+          // the patientID is not registered (anymore)
+          this.setState({ redirect: "/place/" + this.state.placeID });
+        } else {
+          this.setState({ waitingPosition: pos });
+        }
       } else {
-        this.setState({ waitingPosition: pos });
+        console.log(
+          "fetching position " +
+            APIendpoint +
+            "/update/" +
+            this.state.placeID +
+            "/" +
+            this.state.patientID
+        );
+        fetch(
+          APIendpoint +
+            "update/" +
+            this.state.placeID +
+            "/" +
+            this.state.patientID
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            this.setState({ waitingPosition: data.pos });
+          })
+          .catch(() => {
+            console.log();
+            this.setState({ redirect: "/error" });
+          });
       }
     });
 

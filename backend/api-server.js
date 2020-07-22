@@ -350,6 +350,11 @@ const removeFromQueue = async (placeID, patientID) => {
   var newQueue = db[placeID].queue.filter((entry) => {
     return entry.id !== patientID;
   });
+
+  Object.keys(newQueue).forEach((key, index) => {
+    //console.log(key, index, newQueue[key]);
+    newQueue[key].pos = index + 1;
+  });
   db[placeID].queue = newQueue;
 };
 
@@ -368,21 +373,21 @@ const updateWaitingNumber = async (praxisID, patientID) => {
     } catch (err) {
       console.log("error retrieving patId from queue: ", patientID, praxisID);
     }
-  }
-  try {
-    var lst = db[praxisID].queue;
-    var entry = lst.find((x) => {
-      return x.id == patientID;
-    });
-    if (typeof entry === "undefined") {
-      // the patientID is not registered (anymore)//TODO
-      return null;
-    } else {
-      //console.log(entry.pos);
-      return entry.pos;
+  } else {
+    try {
+      var lst = db[praxisID].queue;
+      var entry = lst.find((x) => {
+        return x.id == patientID;
+      });
+      if (typeof entry === "undefined") {
+        return null;
+      } else {
+        //console.log(entry.pos);
+        return entry.pos;
+      }
+    } catch (err) {
+      console.log("error retrieving patId from queue: ", patientID, praxisID);
     }
-  } catch (err) {
-    console.log("error retrieving patId from queue: ", patientID, praxisID);
   }
 };
 
@@ -722,6 +727,12 @@ app.post("/call", (req, res) => {
   res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
 
+app.get("/update/:placeID/:patID", async (req, res) => {
+  console.log("position details requested");
+  var pos = await updateWaitingNumber(req.params.placeID, req.params.patID);
+  res.send({ pos: pos }).status(200);
+});
+
 app.post("/del", async (req, res) => {
   // res
   //   .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
@@ -729,7 +740,9 @@ app.post("/del", async (req, res) => {
   try {
     await removeFromQueue(req.body.placeID, req.body.patientID);
     const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
-    req.app.io.emit("update", pos);
+    var t = req.body.patientID + "+" + pos;
+    console.log(t);
+    req.app.io.emit("update", t);
     res
       .send({ response: "deleted patientID" + req.body.patientID })
       .status(200);
@@ -751,9 +764,11 @@ io.on("connection", async (socket) => {
   patDaten = patDaten.split(" x+x "); //allow " " in prakisID
 
   console.log(patDaten[0] + " : " + patDaten[1]);
-
+  //console.log(updateWaitingNumber(patDaten[0], patDaten[1]));
+  var pos = await updateWaitingNumber(patDaten[0], patDaten[1]);
+  var t = patDaten[1] + "+" + pos;
   try {
-    socket.emit("update", await updateWaitingNumber(patDaten[0], patDaten[1]));
+    socket.emit("update", t);
   } catch (err) {
     console.log(err);
   }
