@@ -53,7 +53,7 @@ class LoginUser extends Component {
             />
           </div>
           <div className="login-footer">
-            <Link to="/admin">Admin</Link>
+            <Link to="/admin/registerAdmin">Admin</Link>
             <Link to="/impressum">Impressum</Link>
             <Link to="/agb">AGB</Link>
           </div>

@@ -108,14 +108,24 @@ class PatientApp extends React.Component {
 
     let status;
     if (this.state.isCalled) {
-      status = <div>Bitte in die Praxis kommen.</div>;
+      status = (
+        <React.Fragment>
+          Let's go:
+          <div className="circle-green-haken"></div>
+          <div>Bitte in die Praxis kommen.</div>
+        </React.Fragment>
+      );
     } else {
       var timeEstimate = this.state.waitingPosition * this.state.minPerPerson;
       status = (
-        <div>
-          Ihre ungefähre Wartezeit beträgt <br />
-          <span>{timeEstimate} Minuten.</span>
-        </div>
+        <React.Fragment>
+          Patienten vor Ihnen:
+          <div className="circle">{this.state.waitingPosition}</div>
+          <div>
+            Ihre ungefähre Wartezeit beträgt <br />
+            <span>{timeEstimate} Minuten.</span>
+          </div>
+        </React.Fragment>
       );
     }
 
@@ -140,11 +150,7 @@ class PatientApp extends React.Component {
           <Logo id="img" />
         </div>
 
-        <div className="card">
-          Patienten vor Ihnen:
-          <div className="circle">{this.state.waitingPosition}</div>
-          {status}
-        </div>
+        <div className="card">{status}</div>
       </div>
     );
   }
