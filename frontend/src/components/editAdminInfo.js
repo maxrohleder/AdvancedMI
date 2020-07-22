@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
+import bcrypt from "bcryptjs";
 import { Link } from "react-router-dom";
 
 const APIendpoint = "http://localhost:8000/";
@@ -93,7 +94,7 @@ class EditAdminInfo extends Component {
         houseNumber: this.state.houseNumber,
         phoneNumber: this.state.phoneNumber,
         email: this.state.email,
-        password: this.state.password,
+        password: bcrypt.hashSync(this.state.password, 10),
       });
       const requestOptions = {
         method: "POST",

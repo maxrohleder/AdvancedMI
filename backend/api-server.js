@@ -46,7 +46,7 @@ let PASS = "passwords";
 
 var db = {
   ukerlangen: {
-    password: "123",
+    password: "$2a$10$RcDp3OIhEpqhirLYhH2xCeN3uHEJKfz1o.WThIiPtfR55k2o8S6Ra",
     details: {
       name: "Universitätsklinikum Erlangen",
       address: "Östliche Stadtmauerstraße 4, 91052 Erlangen",
@@ -78,7 +78,7 @@ var db = {
     ],
   },
   drcovid: {
-    password: "666",
+    password: "$2a$10$sIk01uusweLdYAgEAO0xgudUSQKyEfZWo7AhSw959TiaT0B5yDxZm",
     details: {
       name: "Praxis Dr. Covidweg",
       address: "Fledermausweg 19, 12020 Wuhan",
@@ -507,9 +507,10 @@ const verifyPassword = (placeID, password) => {
       });
   }
 
+  //console.log(db[placeID]["password"] + " ? " + password);
   return (
     isValidPlace(placeID) &&
-    bcrypt.compareSync(db[placeID]["password"], password)
+    bcrypt.compareSync(password, db[placeID]["password"])
   );
 };
 
@@ -618,8 +619,10 @@ app.post("/auth", (req, res) => {
   var password = req.body.password;
 
   var placeExists = isValidPlace(placeID);
-  var passwordConfirmed = verifyPassword(placeID, password);
-
+  var passwordConfirmed = false;
+  if (placeExists) {
+    passwordConfirmed = verifyPassword(placeID, password);
+  }
   var accessToken = null;
   if (placeExists && passwordConfirmed) {
     var accessToken = encodeToken({ userId: placeID });
@@ -654,7 +657,7 @@ app.post("/registerPraxis", async (req, res) => {
       email: req.body.email,
       password: req.body.password,
     });
-    console.log("Praxis " + req.body.placeID + "added!");
+    console.log("Praxis " + req.body.placeID + " added!");
     var accessToken = encodeToken({ userId: req.body.placeID });
     res.send({ newPlaceID: newPlaceID, accessToken: accessToken }).status(200);
   } else {
