@@ -11,6 +11,7 @@ const bodyParser = require("body-parser");
 const { verify } = require("crypto");
 const e = require("express");
 
+// TODO move these from secrets
 const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
 const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
 const telNmbr = "+15128835631";
@@ -27,7 +28,7 @@ const PRODUCTION = true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
-  keyFilename: "../../gcloud/admin-key-wartezimmer.json",
+  keyFilename: "secrets/admin-key-wartezimmer.json",
 });
 
 // firestore convention: large collections with small documents
