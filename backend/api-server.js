@@ -593,6 +593,7 @@ app.get("/", (req, res) => {
 
 // can be removed as details are public
 app.post("/admin/details", async (req, res) => {
+  console.log("admin place details requested");
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false }).status(200);
@@ -609,6 +610,7 @@ app.get("/details/:placeID", async (req, res) => {
 });
 
 app.post("/admin/queue", async (req, res) => {
+  console.log("admin queue requested");
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false, queueData: null }).status(200);
@@ -620,6 +622,7 @@ app.post("/admin/queue", async (req, res) => {
 });
 
 app.post("/auth", (req, res) => {
+  console.log("authentication requested");
   var placeID = req.body.praxisID;
   var password = req.body.password;
 
@@ -647,6 +650,7 @@ app.post("/auth-email", async (req, res) => {
 });
 
 app.post("/registerPraxis", async (req, res) => {
+  console.log("registerPraxis requested");
   newPlaceID = !isValidPlace(req.body.placeID); //check if placeID unique
   //console.log(newPlaceID);
   if (newPlaceID) {
@@ -740,9 +744,7 @@ app.post("/del", async (req, res) => {
   try {
     await removeFromQueue(req.body.placeID, req.body.patientID);
     const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
-    var t = req.body.patientID + "+" + pos;
-    console.log(t);
-    req.app.io.emit("update", t);
+    req.app.io.emit("update", req.body.patientID + "+" + pos);
     res
       .send({ response: "deleted patientID" + req.body.patientID })
       .status(200);
@@ -762,13 +764,11 @@ io.on("connection", async (socket) => {
   // send inital information
   var patDaten = socket.handshake.query.patDaten;
   patDaten = patDaten.split(" x+x "); //allow " " in prakisID
-
   console.log(patDaten[0] + " : " + patDaten[1]);
-  //console.log(updateWaitingNumber(patDaten[0], patDaten[1]));
+
   var pos = await updateWaitingNumber(patDaten[0], patDaten[1]);
-  var t = patDaten[1] + "+" + pos;
   try {
-    socket.emit("update", t);
+    socket.emit("update", patDaten[1] + "+" + pos);
   } catch (err) {
     console.log(err);
   }
