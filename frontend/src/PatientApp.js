@@ -68,7 +68,7 @@ class PatientApp extends React.Component {
     this.setUpdateCb((err, pos) => {
       if (pos == null) {
         // the patientID is not registered (anymore)
-        this.setState({ redirect: "/" + this.state.placeID });
+        this.setState({ redirect: "/place/" + this.state.placeID });
       } else {
         this.setState({ waitingPosition: pos });
       }

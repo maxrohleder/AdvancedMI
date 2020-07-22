@@ -700,7 +700,7 @@ app.post("/admin/registerpatient", async (req, res) => {
     // place patient into queue
     var pos = await queuePatient(placeID, patientID);
 
-    var link = smsLinkTo + "ort/" + placeID + "/id/" + patientID;
+    var link = smsLinkTo + "place/" + placeID + "/id/" + patientID;
     sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position
