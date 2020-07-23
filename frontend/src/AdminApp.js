@@ -129,25 +129,7 @@ class AdminApp extends React.Component {
 
   // used to remove from queue state from Queue
   moveQueue = (entry) => {
-    var tmp = this.state.queueData;
-    var index = tmp.indexOf(entry.entryData);
-    //console.log(tmp);
-    if (entry.direction == "down") {
-      if (index != Object.keys(tmp).length - 1) {
-        console.log("NACH UNTEN SCHIEBEN");
-        var pat = tmp[index];
-        tmp[index] = tmp[index + 1];
-        tmp[index + 1] = pat;
-      }
-    } else {
-      if (index != 0) {
-        console.log("NACH OBEN SCHIEBEN");
-        var pat = tmp[index];
-        tmp[index] = tmp[index - 1];
-        tmp[index - 1] = pat;
-      }
-    }
-    this.setState({ queueData: tmp });
+    this.setState({ queueData: entry });
   };
 
   handleClick = () => {

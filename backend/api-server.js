@@ -357,6 +357,32 @@ const removeFromQueue = async (placeID, patientID) => {
   });
   db[placeID].queue = newQueue;
 };
+const moveInQueue = async (placeID, index, direction) => {
+  if (PRODUCTION) {
+    //TODO
+  } else {
+    var newQueue = db[placeID].queue;
+    console.log(index);
+    console.log(newQueue);
+    if (direction == "up") {
+      console.log("MOVE UP");
+      var pat = newQueue[index];
+      newQueue[index] = newQueue[index - 1];
+      newQueue[index - 1] = pat;
+      newQueue[index].pos = newQueue[index].pos + 1;
+      newQueue[index - 1].pos = newQueue[index - 1].pos - 1;
+    } else {
+      console.log("MOVE DOWN");
+      var pat = newQueue[index];
+      newQueue[index] = newQueue[index + 1];
+      newQueue[index + 1] = pat;
+      newQueue[index].pos = newQueue[index].pos - 1;
+      newQueue[index + 1].pos = newQueue[index + 1].pos + 1;
+    }
+  }
+  console.log(newQueue);
+  db[placeID].queue = newQueue;
+};
 
 const updateWaitingNumber = async (praxisID, patientID) => {
   if (PRODUCTION) {
@@ -738,8 +764,9 @@ app.get("/update/:placeID/:patID", async (req, res) => {
 });
 
 app.post("/move", async (req, res) => {
-  console.log("move " + req.body.direction);
-  //req.app.io.emit("update", req.body.patientID + "+" + pos);
+  //console.log("move " + req.body.direction);
+  await moveInQueue(req.body.placeID, req.body.index, req.body.direction);
+  req.app.io.emit("update", null + "+" + null);
 });
 app.post("/del", async (req, res) => {
   // res

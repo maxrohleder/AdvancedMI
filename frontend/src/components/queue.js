@@ -78,22 +78,41 @@ class QueueEntry extends React.Component {
 
   move = (direction) => {
     //console.log("moving patient " + direction);
+    var tmp = this.props.data;
+    var index = tmp.indexOf(this.props.entrydata);
+
+    //console.log(this.props.data);
     var url = APIendpoint + moveRoute;
     var payload = JSON.stringify({
       placeID: this.props.placeID,
       patientID: this.props.entrydata.patientID,
       direction: direction,
+      index: index,
     });
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
-    //fetch(url, requestOptions);
-    this.props.move({
-      entryData: this.props.entrydata,
-      direction: direction,
-    });
+
+    if (direction == "down") {
+      if (index != Object.keys(tmp).length - 1) {
+        console.log("NACH UNTEN SCHIEBEN");
+        var pat = tmp[index];
+        tmp[index] = tmp[index + 1];
+        tmp[index + 1] = pat;
+        fetch(url, requestOptions);
+      }
+    } else {
+      if (index != 0) {
+        console.log("NACH OBEN SCHIEBEN");
+        var pat = tmp[index];
+        tmp[index] = tmp[index - 1];
+        tmp[index - 1] = pat;
+        fetch(url, requestOptions);
+      }
+    }
+    this.props.move(tmp);
   };
 
   render() {
@@ -130,10 +149,15 @@ class Queue extends React.Component {
       cb={this.props.remove}
       move={this.props.move}
       placeID={this.props.placeID}
+      data={this.props.data}
     />
   );
   notEmpty = () => {
-    if (this.props.data !== null && this.renderEntries !== null) {
+    if (
+      this.props.data !== null &&
+      this.renderEntries !== null &&
+      this.props.data !== undefined
+    ) {
       return <ol>{this.props.data.map(this.renderEntries)}</ol>;
     }
   };
