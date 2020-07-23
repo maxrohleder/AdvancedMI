@@ -105,7 +105,7 @@ class Queue extends React.Component {
     />
   );
   notEmpty = () => {
-    if (this.props.data !== null) {
+    if (this.props.data !== null && this.renderEntries !== null) {
       return <ol>{this.props.data.map(this.renderEntries)}</ol>;
     }
   };
