@@ -118,12 +118,36 @@ class AdminApp extends React.Component {
 
   // used to remove from queue state from Queue
   deleteFromQueue = (entry) => {
+    console.log(entry);
     var tmp = this.state.queueData;
     const index = tmp.indexOf(entry);
     if (index > -1) {
       tmp.splice(index, 1);
       this.setState({ queueData: tmp });
     }
+  };
+
+  // used to remove from queue state from Queue
+  moveQueue = (entry) => {
+    var tmp = this.state.queueData;
+    var index = tmp.indexOf(entry.entryData);
+    //console.log(tmp);
+    if (entry.direction == "down") {
+      if (index != Object.keys(tmp).length - 1) {
+        console.log("NACH UNTEN SCHIEBEN");
+        var pat = tmp[index];
+        tmp[index] = tmp[index + 1];
+        tmp[index + 1] = pat;
+      }
+    } else {
+      if (index != 0) {
+        console.log("NACH OBEN SCHIEBEN");
+        var pat = tmp[index];
+        tmp[index] = tmp[index - 1];
+        tmp[index - 1] = pat;
+      }
+    }
+    this.setState({ queueData: tmp });
   };
 
   handleClick = () => {
@@ -153,6 +177,7 @@ class AdminApp extends React.Component {
             placeID={this.state.placeID}
             data={this.state.queueData}
             remove={this.deleteFromQueue}
+            move={this.moveQueue}
           />
           <div className="logOut-button">
             <input onClick={this.handleClick} defaultValue="⮕ LOG OUT" />

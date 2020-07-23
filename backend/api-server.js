@@ -737,6 +737,10 @@ app.get("/update/:placeID/:patID", async (req, res) => {
   res.send({ pos: pos }).status(200);
 });
 
+app.post("/move", async (req, res) => {
+  console.log("move " + req.body.direction);
+  //req.app.io.emit("update", req.body.patientID + "+" + pos);
+});
 app.post("/del", async (req, res) => {
   // res
   //   .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })

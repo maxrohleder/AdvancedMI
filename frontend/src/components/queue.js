@@ -29,6 +29,7 @@ queuedata: [{..patientinfo, pos}, {..patientinfo, pos}]
 const APIendpoint = "http://localhost:8000/";
 const callRoute = "call";
 const delRoute = "del";
+const moveRoute = "move";
 
 // stateless component
 class QueueEntry extends React.Component {
@@ -75,6 +76,26 @@ class QueueEntry extends React.Component {
     this.props.cb(this.props.entrydata);
   }
 
+  move = (direction) => {
+    //console.log("moving patient " + direction);
+    var url = APIendpoint + moveRoute;
+    var payload = JSON.stringify({
+      placeID: this.props.placeID,
+      patientID: this.props.entrydata.patientID,
+      direction: direction,
+    });
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+    };
+    //fetch(url, requestOptions);
+    this.props.move({
+      entryData: this.props.entrydata,
+      direction: direction,
+    });
+  };
+
   render() {
     var status = "";
     if (this.state.isCalled) {
@@ -88,6 +109,8 @@ class QueueEntry extends React.Component {
         {this.props.entrydata.short_diagnosis}, {this.props.entrydata.mobile}{" "}
         {status}
         <button onClick={this.callPatient.bind(this)}>call</button>
+        <button onClick={() => this.move("up")}>↑</button>
+        <button onClick={() => this.move("down")}>↓</button>
         <button onClick={this.removePatient.bind(this)}>remove</button>
       </li>
     );
@@ -105,6 +128,7 @@ class Queue extends React.Component {
       key={entry.patientID}
       entrydata={entry}
       cb={this.props.remove}
+      move={this.props.move}
       placeID={this.props.placeID}
     />
   );
