@@ -38,6 +38,7 @@ class QueueEntry extends React.Component {
       isCalled: false,
     };
   }
+
   callPatient() {
     // set state and inform backend
     var newIsCalled = !this.state.isCalled;
@@ -81,7 +82,10 @@ class QueueEntry extends React.Component {
     }
     return (
       <li key={this.props.entrydata.patientID}>
-        Patient {this.props.entrydata.patientID}
+        Patient {this.props.entrydata.patientID},{" "}
+        {this.props.entrydata.first_name}, {this.props.entrydata.surname},{" "}
+        {this.props.entrydata.appointment_date},{" "}
+        {this.props.entrydata.short_diagnosis}, {this.props.entrydata.mobile}{" "}
         {status}
         <button onClick={this.callPatient.bind(this)}>call</button>
         <button onClick={this.removePatient.bind(this)}>remove</button>
