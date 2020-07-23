@@ -767,6 +767,7 @@ app.post("/move", async (req, res) => {
   //console.log("move " + req.body.direction);
   await moveInQueue(req.body.placeID, req.body.index, req.body.direction);
   req.app.io.emit("update", null + "+" + null);
+  res.send({ response: "moved patientID" }).status(200);
 });
 app.post("/del", async (req, res) => {
   // res

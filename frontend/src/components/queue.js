@@ -112,6 +112,8 @@ class QueueEntry extends React.Component {
         fetch(url, requestOptions);
       }
     }
+    //manchmal zu schnell so dass backend nicht hinterherkommt
+    //vlt n await adden
     this.props.move(tmp);
   };
 
