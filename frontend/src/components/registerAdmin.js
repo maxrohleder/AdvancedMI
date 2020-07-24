@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Link } from "react-router-dom";
 import EditAdminInfo from "./editAdminInfo.js";
-
-const APIendpoint = "http://localhost:8000/";
+import { API_URL } from "../constants/all";
 
 class RegisterAdmin extends Component {
   constructor(props) {
@@ -46,10 +45,10 @@ class RegisterAdmin extends Component {
         headers: { "Content-Type": "application/json" },
         body: payload,
       };
-      console.log("fetch: " + APIendpoint + "auth-email/");
+      console.log("fetch: " + API_URL + "auth-email/");
       console.log(payload);
 
-      fetch(APIendpoint + "auth-email/", requestOptions)
+      fetch(API_URL + "auth-email/", requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.isNewMail) {
@@ -87,7 +86,7 @@ class RegisterAdmin extends Component {
 
   componentDidMount() {
     if (this.getAdminCookie() != null) {
-      //console.log(APIendpoint + "admin/" + this.getAdminCookie());
+      //console.log(API_URL + "admin/" + this.getAdminCookie());
       this.setState({
         redirect: this.getAdminCookie(),
       });

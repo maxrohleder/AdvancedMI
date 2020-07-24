@@ -4,8 +4,8 @@ import { Redirect, Link } from "react-router-dom";
 
 import io from "socket.io-client";
 import { ReactComponent as Logo } from "./img/doctor-svgrepo-com.svg";
+import { API_URL } from "./constants/all";
 
-const APIendpoint = "http://127.0.0.1:8000/";
 const detailsRoute = "details/";
 class PatientApp extends React.Component {
   constructor(props) {
@@ -25,7 +25,7 @@ class PatientApp extends React.Component {
     };
   }
 
-  socket = io.connect(APIendpoint, {
+  socket = io.connect(API_URL, {
     autoConnect: false,
     query:
       "patDaten=" +
@@ -89,18 +89,14 @@ class PatientApp extends React.Component {
       } else {
         console.log(
           "fetching position " +
-            APIendpoint +
+            API_URL +
             "/update/" +
             this.state.placeID +
             "/" +
             this.state.patientID
         );
         fetch(
-          APIendpoint +
-            "update/" +
-            this.state.placeID +
-            "/" +
-            this.state.patientID
+          API_URL + "update/" + this.state.placeID + "/" + this.state.patientID
         )
           .then((response) => response.json())
           .then((data) => {
@@ -117,7 +113,7 @@ class PatientApp extends React.Component {
     this.setTimingCb((err, dt) => this.setState({ minPerPerson: dt }));
 
     // fetch place information from placeID
-    var apicall = APIendpoint + detailsRoute + this.state.placeID;
+    var apicall = API_URL + detailsRoute + this.state.placeID;
     console.log("fetching placedetails");
     fetch(apicall)
       .then((response) => response.json())

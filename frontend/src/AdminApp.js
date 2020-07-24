@@ -4,8 +4,8 @@ import InfoBox from "./components/InfoBox";
 import PatientManagement from "./components/PatMan";
 import { Redirect } from "react-router-dom";
 import "./styles/AdminApp.css";
+import { API_URL } from "./constants/all";
 
-const APIendpoint = "http://localhost:8000/";
 const updateRoute = "admin/queue";
 const detailsRoute = "admin/details";
 
@@ -41,7 +41,7 @@ class AdminApp extends React.Component {
     var placeID = this.state.placeID;
 
     // fetch initial queue status
-    var url = APIendpoint + updateRoute;
+    var url = API_URL + updateRoute;
     var payload = JSON.stringify({
       placeID: placeID,
       token: token,
@@ -76,7 +76,7 @@ class AdminApp extends React.Component {
       });
 
     // fetch place information from placeID
-    url = APIendpoint + detailsRoute;
+    url = API_URL + detailsRoute;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {

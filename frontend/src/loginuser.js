@@ -1,9 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import LoginForUser from "./components/loginForUser.js";
-
-const APIendpoint = "http://127.0.0.1";
-const port = 8000;
+import { API_URL } from "./constants/all";
 
 class LoginUser extends Component {
   constructor(props) {
@@ -18,7 +16,7 @@ class LoginUser extends Component {
     };
   }
   componentDidMount() {
-    var apicall = APIendpoint + ":" + port + "/details/" + this.state.placeID;
+    var apicall = API_URL + "/details/" + this.state.placeID;
     console.log(apicall);
     fetch(apicall)
       .then((response) => response.json())

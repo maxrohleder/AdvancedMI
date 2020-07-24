@@ -1,7 +1,6 @@
 import React from "react";
 import "../styles/AdminApp.css";
-
-const APIendpoint = "http://localhost:8000/";
+import { API_URL } from "../constants/all";
 
 /*
 
@@ -100,7 +99,7 @@ class PatientManagement extends React.Component {
 
     //post request
     var praxisID = this.props.praxisID;
-    var url = APIendpoint + "admin/registerpatient/";
+    var url = API_URL + "admin/registerpatient/";
     var payload = JSON.stringify({
       placeID: praxisID,
       token: token,

@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-//import Jumbotron from "../react-bootstrap/Jumbotron";
+import { API_URL } from "../constants/all";
 
-const APIendpoint = "http://localhost:8000/";
 class LoginForAdmin extends Component {
   constructor(props) {
     super(props);
@@ -47,7 +46,7 @@ class LoginForAdmin extends Component {
           headers: { "Content-Type": "application/json" },
           body: payload,
         };
-        var url = APIendpoint + "auth";
+        var url = API_URL + "auth";
         console.log("fetching admin info from " + url);
         console.log(payload);
         fetch(url, requestOptions)

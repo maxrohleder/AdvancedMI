@@ -1,5 +1,6 @@
 import React from "react";
 import "../styles/AdminApp.css";
+import { API_URL } from "../constants/all";
 
 /*
 
@@ -26,7 +27,6 @@ queuedata: [{..patientinfo, pos}, {..patientinfo, pos}]
 
 */
 
-const APIendpoint = "http://localhost:8000/";
 const callRoute = "call";
 const delRoute = "del";
 const moveRoute = "move";
@@ -44,7 +44,7 @@ class QueueEntry extends React.Component {
     // set state and inform backend
     var newIsCalled = !this.state.isCalled;
     this.setState({ isCalled: newIsCalled });
-    var url = APIendpoint + callRoute;
+    var url = API_URL + callRoute;
     var payload = JSON.stringify({
       patientID: this.props.entrydata.patientID,
       isCalled: newIsCalled,
@@ -59,7 +59,7 @@ class QueueEntry extends React.Component {
 
   removePatient() {
     console.log("removing patient");
-    var url = APIendpoint + delRoute;
+    var url = API_URL + delRoute;
     var payload = JSON.stringify({
       placeID: this.props.placeID,
       patientID: this.props.entrydata.patientID,
@@ -82,7 +82,7 @@ class QueueEntry extends React.Component {
     var index = tmp.indexOf(this.props.entrydata);
 
     //console.log(this.props.data);
-    var url = APIendpoint + moveRoute;
+    var url = API_URL + moveRoute;
     var payload = JSON.stringify({
       placeID: this.props.placeID,
       patientID: this.props.entrydata.patientID,
@@ -94,19 +94,19 @@ class QueueEntry extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
-
-    if (direction == "down") {
-      if (index != Object.keys(tmp).length - 1) {
+    let pat;
+    if (direction === "down") {
+      if (index !== Object.keys(tmp).length - 1) {
         console.log("NACH UNTEN SCHIEBEN");
-        var pat = tmp[index];
+        pat = tmp[index];
         tmp[index] = tmp[index + 1];
         tmp[index + 1] = pat;
         fetch(url, requestOptions);
       }
     } else {
-      if (index != 0) {
+      if (index !== 0) {
         console.log("NACH OBEN SCHIEBEN");
-        var pat = tmp[index];
+        pat = tmp[index];
         tmp[index] = tmp[index - 1];
         tmp[index - 1] = pat;
         fetch(url, requestOptions);

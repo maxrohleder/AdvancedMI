@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-
-const APIendpoint = "http://localhost:8000/";
+import { API_URL } from "../constants/all";
 
 class LoginForUser extends Component {
   constructor(props) {
@@ -50,7 +49,7 @@ class LoginForUser extends Component {
       console.log("newPageUrl: " + newPageUrl);
       console.log("fetching user info");
 
-      fetch(APIendpoint + "exists/user/" + praxisID + "/" + userID)
+      fetch(API_URL + "exists/user/" + praxisID + "/" + userID)
         .then((response) => response.json())
         .then((data) => {
           if (data.praxisConfirmed) {

@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import bcrypt from "bcryptjs";
 import { Link } from "react-router-dom";
-
-const APIendpoint = "http://localhost:8000/";
+import { API_URL } from "../constants/all";
 
 class EditAdminInfo extends Component {
   constructor(props) {
@@ -104,7 +103,8 @@ class EditAdminInfo extends Component {
       console.log(payload);
       console.log("Bitte JWT vom Backend");
 
-      fetch(APIendpoint + "registerPraxis/", requestOptions)
+      // TODO change to /register
+      fetch(API_URL + "registerPraxis/", requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (!data.newPlaceID) {

@@ -14,7 +14,7 @@ const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
 
 const port = 8080;
-const smsLinkTo = "http://wartezimmer-a2415.web.app/";
+const FrontEndUrl = "http://wartezimmer-a2415.web.app/";
 
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
@@ -725,7 +725,7 @@ app.post("/admin/registerpatient", async (req, res) => {
     // place patient into queue
     var pos = await queuePatient(placeID, patientID);
 
-    var link = smsLinkTo + "place/" + placeID + "/id/" + patientID;
+    var link = FrontEndUrl + "place/" + placeID + "/id/" + patientID;
     sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position
