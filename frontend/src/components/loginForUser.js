@@ -43,7 +43,7 @@ class LoginForUser extends Component {
     if (praxisID == null) {
       alert("Gultige PraxisID eingeben ...: " + praxisID);
     } else {
-      var newPageUrl = "/ort/" + praxisID;
+      var newPageUrl = "/place/" + praxisID;
       if (userID != "null") {
         newPageUrl += "/id/" + userID;
       }
@@ -63,7 +63,7 @@ class LoginForUser extends Component {
                   alert("Bitte UserId eingeben");
                 } else {
                   console.log(
-                    "praxis confirmed and userId null -> /ort/praxis"
+                    "praxis confirmed and userId null -> /place/praxis"
                   );
                   this.setState({ redirect: newPageUrl });
                 }

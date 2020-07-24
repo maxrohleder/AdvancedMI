@@ -42,7 +42,7 @@ let PASS = "passwords";
 
 var db = {
   ukerlangen: {
-    password: "123",
+    password: "$2a$10$RcDp3OIhEpqhirLYhH2xCeN3uHEJKfz1o.WThIiPtfR55k2o8S6Ra",
     details: {
       name: "Universitätsklinikum Erlangen",
       address: "Östliche Stadtmauerstraße 4, 91052 Erlangen",
@@ -74,7 +74,7 @@ var db = {
     ],
   },
   drcovid: {
-    password: "666",
+    password: "$2a$10$sIk01uusweLdYAgEAO0xgudUSQKyEfZWo7AhSw959TiaT0B5yDxZm",
     details: {
       name: "Praxis Dr. Covidweg",
       address: "Fledermausweg 19, 12020 Wuhan",
@@ -346,6 +346,37 @@ const removeFromQueue = async (placeID, patientID) => {
   var newQueue = db[placeID].queue.filter((entry) => {
     return entry.id !== patientID;
   });
+
+  Object.keys(newQueue).forEach((key, index) => {
+    //console.log(key, index, newQueue[key]);
+    newQueue[key].pos = index + 1;
+  });
+  db[placeID].queue = newQueue;
+};
+const moveInQueue = async (placeID, index, direction) => {
+  if (PRODUCTION) {
+    //TODO
+  } else {
+    var newQueue = db[placeID].queue;
+    console.log(index);
+    console.log(newQueue);
+    if (direction == "up") {
+      console.log("MOVE UP");
+      var pat = newQueue[index];
+      newQueue[index] = newQueue[index - 1];
+      newQueue[index - 1] = pat;
+      newQueue[index].pos = newQueue[index].pos + 1;
+      newQueue[index - 1].pos = newQueue[index - 1].pos - 1;
+    } else {
+      console.log("MOVE DOWN");
+      var pat = newQueue[index];
+      newQueue[index] = newQueue[index + 1];
+      newQueue[index + 1] = pat;
+      newQueue[index].pos = newQueue[index].pos - 1;
+      newQueue[index + 1].pos = newQueue[index + 1].pos + 1;
+    }
+  }
+  console.log(newQueue);
   db[placeID].queue = newQueue;
 };
 
@@ -364,21 +395,21 @@ const updateWaitingNumber = async (praxisID, patientID) => {
     } catch (err) {
       console.log("error retrieving patId from queue: ", patientID, praxisID);
     }
-  }
-  try {
-    var lst = db[praxisID].queue;
-    var entry = lst.find((x) => {
-      return x.id == patientID;
-    });
-    if (typeof entry === "undefined") {
-      // the patientID is not registered (anymore)//TODO
-      return null;
-    } else {
-      //console.log(entry.pos);
-      return entry.pos;
+  } else {
+    try {
+      var lst = db[praxisID].queue;
+      var entry = lst.find((x) => {
+        return x.id == patientID;
+      });
+      if (typeof entry === "undefined") {
+        return null;
+      } else {
+        //console.log(entry.pos);
+        return entry.pos;
+      }
+    } catch (err) {
+      console.log("error retrieving patId from queue: ", patientID, praxisID);
     }
-  } catch (err) {
-    console.log("error retrieving patId from queue: ", patientID, praxisID);
   }
 };
 
@@ -503,9 +534,10 @@ const verifyPassword = (placeID, password) => {
       });
   }
 
+  //console.log(db[placeID]["password"] + " ? " + password);
   return (
     isValidPlace(placeID) &&
-    bcrypt.compareSync(db[placeID]["password"], password)
+    bcrypt.compareSync(password, db[placeID]["password"])
   );
 };
 
@@ -577,6 +609,7 @@ app.get("/", (req, res) => {
 
 // can be removed as details are public
 app.post("/admin/details", async (req, res) => {
+  console.log("admin place details requested");
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false }).status(200);
@@ -593,6 +626,7 @@ app.get("/details/:placeID", async (req, res) => {
 });
 
 app.post("/admin/queue", async (req, res) => {
+  console.log("admin queue requested");
   var placeID = isAuthenticationMiddleware(req, res);
   if (placeID == null) {
     res.send({ authConfirmed: false, queueData: null }).status(200);
@@ -604,12 +638,15 @@ app.post("/admin/queue", async (req, res) => {
 });
 
 app.post("/auth", (req, res) => {
+  console.log("authentication requested");
   var placeID = req.body.praxisID;
   var password = req.body.password;
 
   var placeExists = isValidPlace(placeID);
-  var passwordConfirmed = verifyPassword(placeID, password);
-
+  var passwordConfirmed = false;
+  if (placeExists) {
+    passwordConfirmed = verifyPassword(placeID, password);
+  }
   var accessToken = null;
   if (placeExists && passwordConfirmed) {
     var accessToken = encodeToken({ userId: placeID });
@@ -629,6 +666,7 @@ app.post("/auth-email", async (req, res) => {
 });
 
 app.post("/registerPraxis", async (req, res) => {
+  console.log("registerPraxis requested");
   newPlaceID = !isValidPlace(req.body.placeID); //check if placeID unique
   //console.log(newPlaceID);
   if (newPlaceID) {
@@ -644,7 +682,7 @@ app.post("/registerPraxis", async (req, res) => {
       email: req.body.email,
       password: req.body.password,
     });
-    console.log("Praxis " + req.body.placeID + "added!");
+    console.log("Praxis " + req.body.placeID + " added!");
     var accessToken = encodeToken({ userId: req.body.placeID });
     res.send({ newPlaceID: newPlaceID, accessToken: accessToken }).status(200);
   } else {
@@ -687,7 +725,7 @@ app.post("/admin/registerpatient", async (req, res) => {
     // place patient into queue
     var pos = await queuePatient(placeID, patientID);
 
-    var link = smsLinkTo + "ort/" + placeID + "/id/" + patientID;
+    var link = smsLinkTo + "place/" + placeID + "/id/" + patientID;
     sendSMS(req.body.mobile, placeID, link, pos);
 
     // inform admin interface about patientID and position
@@ -709,6 +747,18 @@ app.post("/call", (req, res) => {
   res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
 
+app.get("/update/:placeID/:patID", async (req, res) => {
+  console.log("position details requested");
+  var pos = await updateWaitingNumber(req.params.placeID, req.params.patID);
+  res.send({ pos: pos }).status(200);
+});
+
+app.post("/move", async (req, res) => {
+  //console.log("move " + req.body.direction);
+  await moveInQueue(req.body.placeID, req.body.index, req.body.direction);
+  req.app.io.emit("update", null + "+" + null);
+  res.send({ response: "moved patientID" }).status(200);
+});
 app.post("/del", async (req, res) => {
   // res
   //   .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
@@ -716,7 +766,7 @@ app.post("/del", async (req, res) => {
   try {
     await removeFromQueue(req.body.placeID, req.body.patientID);
     const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
-    req.app.io.emit("update", pos);
+    req.app.io.emit("update", req.body.patientID + "+" + pos);
     res
       .send({ response: "deleted patientID" + req.body.patientID })
       .status(200);
@@ -736,11 +786,11 @@ io.on("connection", async (socket) => {
   // send inital information
   var patDaten = socket.handshake.query.patDaten;
   patDaten = patDaten.split(" x+x "); //allow " " in prakisID
-
   console.log(patDaten[0] + " : " + patDaten[1]);
 
+  var pos = await updateWaitingNumber(patDaten[0], patDaten[1]);
   try {
-    socket.emit("update", await updateWaitingNumber(patDaten[0], patDaten[1]));
+    socket.emit("update", patDaten[1] + "+" + pos);
   } catch (err) {
     console.log(err);
   }

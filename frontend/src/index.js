@@ -64,9 +64,9 @@ ReactDOM.render(
       <Route path="/admin/registerAdmin" component={RegisterAdmin} />
       <PrivateRoute path="/admin/:placeID" component={AdminApp} />
       <Route path="/admin" component={LoginAdmin} />
-      <Route path="/ort/:placeID/id/:patientID/chat" component={chatWindow} />
-      <Route path="/ort/:placeID/id/:patientID" component={PatientApp} />
-      <Route path="/ort/:placeID" component={LoginUser} />
+      <Route path="/place/:placeID/id/:patientID/chat" component={chatWindow} />
+      <Route path="/place/:placeID/id/:patientID" component={PatientApp} />
+      <Route path="/place/:placeID" component={LoginUser} />
       <Route path="/error" component={Error} />
       <Route exact path="/" component={Login} />
     </Switch>
