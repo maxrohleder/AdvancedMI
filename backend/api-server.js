@@ -1,25 +1,20 @@
-// inspired by https://www.valentinog.com/blog/socket-react/
-
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
+const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const Firestore = require("@google-cloud/firestore");
 
 const njwt = require("njwt");
 const bodyParser = require("body-parser");
-const { verify } = require("crypto");
-const e = require("express");
 
-// TODO move these from secrets
-const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
-const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const twillioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
-const bcrypt = require("bcryptjs");
 
-const port = 8000;
-const smsLinkTo = "http://127.0.0.1:3000/";
+const port = 8080;
+const smsLinkTo = "http://wartezimmer-a2415.web.app/";
 
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
@@ -532,11 +527,7 @@ app.use(bodyParser.json());
 //++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++ JWT ++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++
-
-const {
-  APP_SECRET = "something really random 2000",
-  APP_BASE_URL = "http://localhost:3000",
-} = process.env;
+const APP_SECRET = process.env.APP_SECRET;
 
 function encodeToken(tokenData) {
   var token = njwt.create(tokenData, APP_SECRET);
@@ -581,9 +572,7 @@ const isAuthenticationMiddleware = (req, res, next) => {
 // --------------------------------------------------------
 // ---------------------all api routes---------------------
 app.get("/", (req, res) => {
-  res
-    .send({ response: "This is the Digitales Wartezimmer Backend" })
-    .status(200);
+  res.send("This is the Digitales Wartezimmer Backend").status(200);
 });
 
 // can be removed as details are public
@@ -766,49 +755,12 @@ io.on("connection", async (socket) => {
 // -------------------all socket cbs-----------------------
 // --------------------------------------------------------
 
-server.listen(port, () => console.log(`listening on http://127.0.0.1:` + port));
-
-// code schnibsel
-
-/*
-var getQueue = (placeID) => {
-  var queueData = [];
-  if (PRODUCTION) {
-    console.log("FIRESTORE getQueue for", placeID);
-    var queueRef = PLACES.doc(placeID).collection(QUEUES);
-    var idAndPos = [];
-    queueRef
-      .get()
-      .then((queueSnap) => {
-        if (queueSnap.docs.length > 0) {
-          queueRef.onSnapshot((snapshot) => {
-            idAndPos = snapshot.docs.map((doc) => doc.data());
-            console.log("list from snapshot", idAndPos);
-          });
-        } else {
-          console.log("no queue yet. return empty");
-          idAndPos = [];
-        }
-        console.log("idandpos:", idAndPos);
-        for (let i = 0; i < idAndPos.length; i++) {
-          var patInfo = getPatientInfo(placeID, idAndPos[i].id);
-          queueData.push({ pos: idAndPos[i].pos, ...patInfo });
-        }
-        console.log("queuedata:", queueData);
-        return queueData;
-      })
-      .catch((err) => {
-        console.log("FIRESTORE ERROR getQueue: ", err);
-      });
-  } else {
-    for (let i = 0; i < db[placeID].queue.length; i++) {
-      var entry = db[placeID].queue[i];
-      var patInfo = db[placeID].patientData.find((x) => {
-        return x.patientID == entry.id;
-      });
-      queueData.push({ pos: entry.pos, ...patInfo });
-    }
-    return queueData;
-  }
-};
-*/
+if (PRODUCTION) {
+  server.listen(port, "0.0.0.0", () =>
+    console.log(`listening on http://0.0.0.0:` + port)
+  );
+} else {
+  server.listen(port, () =>
+    console.log(`listening on http://127.0.0.1:` + port)
+  );
+}

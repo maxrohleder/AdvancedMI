@@ -1,1 +1,6 @@
 runtime: nodejs12
+
+env_variables:
+  APP_SECRET: "<app_secret_here>"
+  TWILIO_ACCOUNT_SID: "<acc_sid_here>"
+  TWILIO_AUTH_TOKEN: "<auth_token_here>"
