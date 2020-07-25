@@ -239,57 +239,61 @@ const registerPatient = async (placeID, pd) => {
 const registerPraxis = async (placeID, details) => {
   if (PRODUCTION) {
     // use firestore to insert PRAXIS
-    //TODO
+    var success = await PLACES.doc(placeID).set(details);
+    console.log(
+      "[Firestore] succesfully added new place with id: ",
+      placeID,
+      success
+    );
+  } else {
+    db[placeID] = {
+      password: details.password,
+      details: {
+        name: details.praxisName,
+        address:
+          details.street +
+          " " +
+          details.houseNumber +
+          ", " +
+          details.zipCode +
+          " " +
+          details.place,
+        field: details.field,
+        email: details.email,
+      },
+      queue: [
+        { id: "jj97", pos: 1 },
+        { id: "mr98", pos: 2 },
+      ],
+      patientData: [
+        {
+          patientID: "mr98",
+          first_name: "Max",
+          surname: "Rohleder",
+          appointment_date: new Date(),
+          short_diagnosis: "Corona",
+          mobile: "0123456789",
+          email: "corona@covid19.de",
+        },
+        {
+          patientID: "jj97",
+          first_name: "Jule",
+          surname: "Verne",
+          appointment_date: new Date(),
+          short_diagnosis: "Corona",
+          mobile: "0123456789",
+          email: "corona@covid19.de",
+        },
+      ],
+    };
   }
-  db[placeID] = {
-    password: details.password,
-    details: {
-      name: details.praxisName,
-      address:
-        details.street +
-        " " +
-        details.houseNumber +
-        ", " +
-        details.zipCode +
-        " " +
-        details.place,
-      field: details.field,
-      email: details.email,
-    },
-    queue: [
-      { id: "jj97", pos: 1 },
-      { id: "mr98", pos: 2 },
-    ],
-    patientData: [
-      {
-        patientID: "mr98",
-        first_name: "Max",
-        surname: "Rohleder",
-        appointment_date: new Date(),
-        short_diagnosis: "Corona",
-        mobile: "0123456789",
-        email: "corona@covid19.de",
-      },
-      {
-        patientID: "jj97",
-        first_name: "Jule",
-        surname: "Verne",
-        appointment_date: new Date(),
-        short_diagnosis: "Corona",
-        mobile: "0123456789",
-        email: "corona@covid19.de",
-      },
-    ],
-  };
 };
 
-const isValidEmail = async (email) => {
+const sendValidationMail = async (email) => {
   if (PRODUCTION) {
-    // use firestore to insert PRAXIS
-    //TODO
+    //TODO V1 send Email with link to verify email
+    return true;
   }
-
-  //db.find((x) => x.? == patientID); TODO
   return true;
 };
 
@@ -353,9 +357,33 @@ const removeFromQueue = async (placeID, patientID) => {
   });
   db[placeID].queue = newQueue;
 };
+
 const moveInQueue = async (placeID, index, direction) => {
+  /**
+   * retrieve entire queue of place with id @param placeID and swap position
+   * of queue entry at @param index with the entry
+   * above or below depending on @param direction
+   *
+   * ASSUMPTION: Front end checks that there are at least 2 patients in the queue
+   *
+   * then update positions of these two entries
+   */
   if (PRODUCTION) {
-    //TODO
+    var startAt = direction === "up" ? index - 1 : index;
+    var queueRef = PLACES.doc(placeID).collection(QUEUES);
+    var twoEntriesRef = queueRef.orderBy("pos", "asc").limit(2).offset(startAt);
+    try {
+      const entriesDoc = await twoEntriesRef.get();
+      console.log("QUEUEDOC", entriesDoc);
+      console.log("entry 0:", entriesDoc[0]);
+      console.log("entry 1:", entriesDoc[1]);
+
+      // switch the positions of the two consecutive queue entries
+      await queueRef.doc(entriesDoc[0].id).update({ pos: entriesDoc[1].pos });
+      await queueRef.doc(entriesDoc[1].id).update({ pos: entriesDoc[0].pos });
+    } catch (err) {
+      console.log("Error moving patient in queue", err);
+    }
   } else {
     var newQueue = db[placeID].queue;
     console.log(index);
@@ -660,7 +688,7 @@ app.post("/auth", (req, res) => {
 });
 
 app.post("/auth-email", async (req, res) => {
-  var isNewMail = await isValidEmail(req.body.email);
+  var isNewMail = await sendValidationMail(req.body.email);
   console.log("is new mail");
   res.send({ isNewMail: isNewMail }).status(200);
 });
