@@ -16,7 +16,7 @@ class LoginUser extends Component {
     };
   }
   componentDidMount() {
-    var apicall = API_URL + "/details/" + this.state.placeID;
+    var apicall = API_URL + "details/" + this.state.placeID;
     console.log(apicall);
     fetch(apicall)
       .then((response) => response.json())
