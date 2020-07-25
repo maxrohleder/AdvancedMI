@@ -35,7 +35,7 @@ class PatientApp extends React.Component {
   });
 
   setCalledCb = (cb) => {
-    this.socket.on("called", (patId) => {
+    this.socket.on("call", (patId) => {
       cb(null, patId);
     });
   };
@@ -65,15 +65,12 @@ class PatientApp extends React.Component {
     }
 
     // subscribe to called channel
-    this.setCalledCb((err, num) => {
-      var c = num === this.state.patientID;
-      this.setState({ isCalled: c });
-    });
-
-    // subscribe to UnCalled channel
-    this.setUnCalledCb((err, num) => {
-      var c = num === this.state.patientID;
-      this.setState({ isCalled: !c });
+    this.setCalledCb((err, data) => {
+      var patID = data;
+      if (patID === this.state.patientID) {
+        var t = this.state.isCalled === true ? false : true;
+        this.setState({ isCalled: t });
+      }
     });
 
     // subscribe to update channel

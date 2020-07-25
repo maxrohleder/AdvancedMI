@@ -766,9 +766,9 @@ app.post("/admin/registerpatient", async (req, res) => {
 });
 
 app.post("/call", (req, res) => {
-  var channel = req.body.isCalled ? "called" : "uncalled";
-  req.app.io.emit(channel, req.body.patientID);
-  console.log(channel + " " + req.body.patientID);
+  var type = req.body.isCalled ? "called" : "uncalled";
+  req.app.io.emit("call", req.body.patientID);
+  console.log(type + " " + req.body.patientID);
   res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
 
