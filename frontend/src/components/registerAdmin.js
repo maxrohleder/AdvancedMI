@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { Link } from "react-router-dom";
 import EditAdminInfo from "./editAdminInfo.js";
-import { API_URL } from "../constants/all";
+import { API_URL, VERIFY_EMAIL_ROUTE } from "../constants/all";
 
 class RegisterAdmin extends Component {
   constructor(props) {
@@ -16,19 +16,17 @@ class RegisterAdmin extends Component {
     };
   }
 
-  handleClick = () => {
+  handleChangeToLogin = () => {
     this.setState({ redirect: "/admin" });
   };
 
   handleChange = (event) => {
     var target = event.target;
-    //console.log(target.id);
+    // save fields in component state
     if (target.id === "email") {
       this.setState({ email: event.target.value });
-      //console.log("updated : " + target.id + " : " + event.target.value);
     } else if (target.id === "password") {
       this.setState({ password: event.target.value });
-      //console.log("updated : " + target.id + " : " + event.target.value);
     }
   };
 
@@ -45,17 +43,17 @@ class RegisterAdmin extends Component {
         headers: { "Content-Type": "application/json" },
         body: payload,
       };
-      console.log("fetch: " + API_URL + "auth-email/");
+      console.log("fetch: " + API_URL + VERIFY_EMAIL_ROUTE);
       console.log(payload);
 
-      fetch(API_URL + "auth-email/", requestOptions)
+      fetch(API_URL + VERIFY_EMAIL_ROUTE, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (data.isNewMail) {
-            //email und password gehen klar
+            //email und password are not yet existant
             this.setState({ editPage: true });
           } else {
-            alert("Enter Valid Email/ Email allready taken ");
+            alert("Enter Valid Email/ Email already taken ");
           }
         })
         .catch(() => {
@@ -76,24 +74,25 @@ class RegisterAdmin extends Component {
     );
     var token = match ? match[1] : null;
     if (token == null) {
-      //console.log("KEIN TOKEN");
+      // no token. must be a new user
       return null;
     } else {
-      //console.log("TOKEN VORHANDEN");
+      // known cookie. redirect to admin view
       return token.split("praxisID=")[1];
     }
   };
 
   componentDidMount() {
-    if (this.getAdminCookie() != null) {
-      //console.log(API_URL + "admin/" + this.getAdminCookie());
+    var cook = this.getAdminCookie();
+    if (cook != null) {
+      // if a cookie is set; redirect to the encoded admin page
       this.setState({
-        redirect: this.getAdminCookie(),
+        redirect: cook,
       });
     }
   }
 
-  pageSelecter = () => {
+  pageSelector = () => {
     if (this.state.editPage == false) {
       return this.renderFirstPage();
     } else {
@@ -104,7 +103,9 @@ class RegisterAdmin extends Component {
   changeRedirect = (e) => {
     this.setState({ redirect: e });
   };
+
   renderFirstPage = () => {
+    // this page is shown initially to create a new user with email and pwd
     return (
       <div className="login-img">
         <div className="login-main">
@@ -136,13 +137,13 @@ class RegisterAdmin extends Component {
                 </label>
                 <br />
                 <div className="register-button">
-                  <input type="submit" value="⮕ Registrieren" />
+                  <input type="submit" value="neu Anmelden" />
                 </div>
                 <br />
                 <div className="register-button">
                   <input
-                    onClick={this.handleClick}
-                    defaultValue="⮕ Allready have an Account?"
+                    onClick={this.handleChangeToLogin}
+                    defaultValue="Already have an Account?"
                   />
                 </div>
               </form>
@@ -157,6 +158,7 @@ class RegisterAdmin extends Component {
       </div>
     );
   };
+
   renderEditPage = () => {
     return (
       <div className="login-img">
@@ -185,13 +187,14 @@ class RegisterAdmin extends Component {
       </div>
     );
   };
+
   render() {
     if (this.state.redirect) {
       console.log("redirecting to: " + this.state.redirect);
       return <Redirect to={this.state.redirect} />;
     }
 
-    return <div>{this.pageSelecter()}</div>;
+    return <div>{this.pageSelector()}</div>;
   }
 }
 

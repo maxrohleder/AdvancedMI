@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import bcrypt from "bcryptjs";
 import { Link } from "react-router-dom";
-import { API_URL } from "../constants/all";
+import { API_URL, SALT, REGISTER_PLACE } from "../constants/all";
 
 class EditAdminInfo extends Component {
   constructor(props) {
@@ -93,7 +93,7 @@ class EditAdminInfo extends Component {
         houseNumber: this.state.houseNumber,
         phoneNumber: this.state.phoneNumber,
         email: this.state.email,
-        password: bcrypt.hashSync(this.state.password, 10),
+        password: bcrypt.hashSync(this.state.password, SALT),
       });
       const requestOptions = {
         method: "POST",
@@ -104,7 +104,7 @@ class EditAdminInfo extends Component {
       console.log("Bitte JWT vom Backend");
 
       // TODO change to /register
-      fetch(API_URL + "registerPraxis/", requestOptions)
+      fetch(API_URL + REGISTER_PLACE, requestOptions)
         .then((response) => response.json())
         .then((data) => {
           if (!data.newPlaceID) {
