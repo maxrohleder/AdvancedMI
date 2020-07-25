@@ -364,8 +364,8 @@ const moveInQueue = async (placeID, index, direction) => {
     //
   } else {
     var newQueue = db[placeID].queue;
-    console.log(index);
-    console.log(newQueue);
+    //console.log(index);
+    //console.log(newQueue);
     if (direction == "up") {
       console.log("MOVE UP");
       var pat = newQueue[index];
@@ -810,7 +810,6 @@ io.on("connection", async (socket) => {
 
   //await updateWaitingNumber(patDaten[0], patDaten[1]);
   var queueData = await getQueuePos(patDaten[0]);
-  console.log(queueData);
   try {
     socket.emit("update", queueData);
   } catch (err) {
