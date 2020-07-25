@@ -443,12 +443,20 @@ const updateWaitingNumber = async (praxisID, patientID) => {
 };
 
 const getQueuePos = async (praxisID) => {
+  // return the entire queue with the first position starting at 1
+  // TODO test
   if (PRODUCTION) {
     console.log("FIREBASE: getQueuePos");
-
-    var patRef = null;
+    var queueRef = PLACES.collection(QUEUES).orderBy("pos", "asc");
     try {
-      //TODO
+      const queueDoc = await queueRef.get();
+      var relativePositions = {};
+      var i = 1;
+      for (const doc of queueDoc.docs) {
+        relativePositions.update({ id: doc.id, pos: i });
+        i = i + 1;
+      }
+      return relativePositions;
     } catch (err) {
       console.log("error retrieving queue: ", praxisID);
     }
