@@ -8,8 +8,11 @@ const Firestore = require("@google-cloud/firestore");
 const njwt = require("njwt");
 const bodyParser = require("body-parser");
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const twillioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+//const accountSid = process.env.TWILIO_ACCOUNT_SID;
+//const twillioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+const accountSid = "AC70f7f2bccb0bd528df589f5b305f50aa";
+const twillioAuthToken = "a42e38aa8ce7852ac972722532660f17";
+const APP_SECRET = "as;dfknwepkfjbpeiuhwf";
 const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
 
@@ -47,6 +50,7 @@ var db = {
       name: "Universitätsklinikum Erlangen",
       address: "Östliche Stadtmauerstraße 4, 91052 Erlangen",
       field: "Virologie",
+      email: "uk@erlangen.com",
     },
     queue: [
       { id: "jj97", pos: 1 },
@@ -330,6 +334,7 @@ const getPatientInfo = async (placeID, patientID) => {
 
 const removeFromQueue = async (placeID, patientID) => {
   if (PRODUCTION) {
+    //TODO update all pos
     console.log("FIREBASE: removeFromQueue");
     try {
       const res = await PLACES.doc(placeID)
@@ -356,6 +361,7 @@ const removeFromQueue = async (placeID, patientID) => {
 const moveInQueue = async (placeID, index, direction) => {
   if (PRODUCTION) {
     //TODO
+    //
   } else {
     var newQueue = db[placeID].queue;
     console.log(index);
@@ -409,6 +415,25 @@ const updateWaitingNumber = async (praxisID, patientID) => {
       }
     } catch (err) {
       console.log("error retrieving patId from queue: ", patientID, praxisID);
+    }
+  }
+};
+
+const getQueuePos = async (praxisID) => {
+  if (PRODUCTION) {
+    console.log("FIREBASE: getQueuePos");
+
+    var patRef = null;
+    try {
+      //TODO
+    } catch (err) {
+      console.log("error retrieving queue: ", praxisID);
+    }
+  } else {
+    try {
+      return db[praxisID].queue;
+    } catch (err) {
+      console.log("error retrieving queue: ", praxisID);
     }
   }
 };
@@ -559,7 +584,7 @@ app.use(bodyParser.json());
 //++++++++++++++++++++++++++++++++++++++++++++
 //+++++++++++++++++ JWT ++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++
-const APP_SECRET = process.env.APP_SECRET;
+//const APP_SECRET = process.env.APP_SECRET;
 
 function encodeToken(tokenData) {
   var token = njwt.create(tokenData, APP_SECRET);
@@ -661,7 +686,7 @@ app.post("/auth", (req, res) => {
 
 app.post("/auth-email", async (req, res) => {
   var isNewMail = await isValidEmail(req.body.email);
-  console.log("is new mail");
+  console.log("is valid mail");
   res.send({ isNewMail: isNewMail }).status(200);
 });
 
@@ -747,26 +772,21 @@ app.post("/call", (req, res) => {
   res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
 
-app.get("/update/:placeID/:patID", async (req, res) => {
-  console.log("position details requested");
-  var pos = await updateWaitingNumber(req.params.placeID, req.params.patID);
-  res.send({ pos: pos }).status(200);
-});
-
 app.post("/move", async (req, res) => {
   //console.log("move " + req.body.direction);
   await moveInQueue(req.body.placeID, req.body.index, req.body.direction);
   req.app.io.emit("update", null + "+" + null);
   res.send({ response: "moved patientID" }).status(200);
 });
+
 app.post("/del", async (req, res) => {
-  // res
-  //   .send({ response: "updated " + JSON.stringify(updateWaitingNumber()) })
-  //   .status(200);
   try {
     await removeFromQueue(req.body.placeID, req.body.patientID);
-    const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
-    req.app.io.emit("update", req.body.patientID + "+" + pos);
+
+    //const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
+    var queueData = await getQueuePos(req.body.placeID);
+    req.app.io.emit("update", queueData);
+
     res
       .send({ response: "deleted patientID" + req.body.patientID })
       .status(200);
@@ -788,9 +808,11 @@ io.on("connection", async (socket) => {
   patDaten = patDaten.split(" x+x "); //allow " " in prakisID
   console.log(patDaten[0] + " : " + patDaten[1]);
 
-  var pos = await updateWaitingNumber(patDaten[0], patDaten[1]);
+  //await updateWaitingNumber(patDaten[0], patDaten[1]);
+  var queueData = await getQueuePos(patDaten[0]);
+  console.log(queueData);
   try {
-    socket.emit("update", patDaten[1] + "+" + pos);
+    socket.emit("update", queueData);
   } catch (err) {
     console.log(err);
   }

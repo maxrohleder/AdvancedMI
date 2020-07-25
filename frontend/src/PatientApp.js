@@ -70,42 +70,28 @@ class PatientApp extends React.Component {
       this.setState({ isCalled: c });
     });
 
-    // subscribe to called channel
+    // subscribe to UnCalled channel
     this.setUnCalledCb((err, num) => {
-      this.setState({ isCalled: false });
+      var c = num === this.state.patientID;
+      this.setState({ isCalled: !c });
     });
 
     // subscribe to update channel
     this.setUpdateCb((err, data) => {
-      console.log(data);
-      var pos = data.split("+")[1];
-      if (data.split("+")[0] == this.state.patientID) {
-        if (pos == "null") {
-          // the patientID is not registered (anymore)
+      if (data == null || data == undefined) {
+        console.log("redirecting to: /place/" + this.state.placeID);
+        this.setState({ redirect: "/place/" + this.state.placeID });
+      } else {
+        var pos = data.filter((entry) => {
+          return entry.id === this.state.patientID;
+        });
+        if (pos[0] == undefined) {
+          console.log("redirecting to: /place/" + this.state.placeID);
           this.setState({ redirect: "/place/" + this.state.placeID });
         } else {
+          pos = pos[0].pos;
           this.setState({ waitingPosition: pos });
         }
-      } else {
-        console.log(
-          "fetching position " +
-            API_URL +
-            "/update/" +
-            this.state.placeID +
-            "/" +
-            this.state.patientID
-        );
-        fetch(
-          API_URL + "update/" + this.state.placeID + "/" + this.state.patientID
-        )
-          .then((response) => response.json())
-          .then((data) => {
-            this.setState({ waitingPosition: data.pos });
-          })
-          .catch(() => {
-            console.log();
-            this.setState({ redirect: "/error" });
-          });
       }
     });
 
