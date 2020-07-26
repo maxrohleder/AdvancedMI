@@ -410,11 +410,15 @@ const moveInQueue = async (placeID, index, direction) => {
   }
 };
 
-const setCalledQueue = async (placeID, patientID, type) => {
+const setCalledQueue = async (placeID, patientID, isCalled) => {
+  // change status of patID in queue of placeID to boolean isCalled
+
   if (PRODUCTION) {
-    //TODO
-    //change in placeID the called type of patientID //type == true/false
     try {
+      await PLACES.doc(placeID)
+        .collection(QUEUES)
+        .doc(patientID)
+        .update({ called: isCalled });
     } catch (err) {
       console.log("Error setCalledQueue", err);
     }
@@ -425,7 +429,7 @@ const setCalledQueue = async (placeID, patientID, type) => {
         return e.id;
       })
       .indexOf(patientID);
-    newQueue[pos].called = type;
+    newQueue[pos].called = isCalled;
     db[placeID].queue = newQueue;
   }
 };
@@ -518,9 +522,6 @@ const createUID = async (placeID, first, sur) => {
 const queuePatient = async (placeID, patientID) => {
   if (PRODUCTION) {
     console.log("FIREBASE: queuePatient");
-    //TODO
-    //add in QUEUE CALLED : FALSE/TRUE
-
     var maxPos = -1;
     var queueRef = PLACES.doc(placeID).collection(QUEUES);
     try {
@@ -528,8 +529,9 @@ const queuePatient = async (placeID, patientID) => {
       for (const doc of queueDoc.docs) {
         maxPos = doc.data().pos;
       }
-      console.log("maxpos: ", maxPos);
-      await queueRef.doc(patientID).set({ pos: maxPos + 1, id: patientID });
+      await queueRef
+        .doc(patientID)
+        .set({ pos: maxPos + 1, id: patientID, called: false });
     } catch (err) {
       console.log("Error queuing patient ", err);
     }
