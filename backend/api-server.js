@@ -345,7 +345,7 @@ const removeFromQueue = async (placeID, patientID) => {
         .doc(patientID)
         .delete();
       return res;
-    } catch (error) {
+    } catch (err) {
       console.log(err);
     }
   }
@@ -533,24 +533,23 @@ const queuePatient = async (placeID, patientID) => {
   return lastPosition;
 };
 
+// PROTECTED
 var getQueueWithInfo = async (placeID) => {
+  // returning the queue enriched with patient info
   var queueData = [];
   if (PRODUCTION) {
-    console.log("FIRESTORE getQueue for", placeID);
-    var queueRef = PLACES.doc(placeID).collection(QUEUES);
-    var idAndPos = [];
+    console.log("[FIRESTORE] getQueueWithInfo for", placeID);
     try {
-      const snapshot = await queueRef.get();
-      if (snapshot.docs.length > 0) {
-        idAndPos = snapshot.docs.map((doc) => doc.data());
+      var idAndPos = await getQueue(placeID);
+      if (idAndPos.length > 0) {
         for (let i = 0; i < idAndPos.length; i++) {
           var patInfo = await getPatientInfo(placeID, idAndPos[i].id);
           queueData.push({
-            pos: idAndPos[i].pos,
-            patientID: idAndPos[i].id,
+            ...idAndPos[i],
             ...patInfo,
           });
         }
+        console.log("queueData:", queueData);
         return queueData;
       } else {
         console.log("queue empty");
@@ -816,15 +815,13 @@ app.post("/move", async (req, res) => {
 
 app.post("/del", async (req, res) => {
   try {
-    await removeFromQueue(req.body.placeID, req.body.patientID);
+    await removeFromQueue(req.body.placeID, req.body.id);
 
     // sending entire queue now with relative positions
     var queueData = await getQueue(req.body.placeID);
     req.app.io.emit("update", queueData);
 
-    res
-      .send({ response: "deleted patientID" + req.body.patientID })
-      .status(200);
+    res.send({ response: "deleted patientID" + req.body.id }).status(200);
   } catch (err) {
     console.log(err);
   }
