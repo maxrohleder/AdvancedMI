@@ -444,39 +444,6 @@ const setCalledQueue = async (placeID, patientID, isCalled) => {
   }
 };
 
-const updateWaitingNumber = async (praxisID, patientID) => {
-  if (PRODUCTION) {
-    console.log("FIREBASE: updateWaitingNumber", patientID);
-
-    var patRef = PLACES.doc(praxisID).collection(QUEUES).doc(patientID);
-    try {
-      const patDoc = await patRef.get();
-      if (patDoc.exists) {
-        return patDoc.data().pos;
-      } else {
-        return null;
-      }
-    } catch (err) {
-      console.log("error retrieving patId from queue: ", patientID, praxisID);
-    }
-  } else {
-    try {
-      var lst = db[praxisID].queue;
-      var entry = lst.find((x) => {
-        return x.id == patientID;
-      });
-      if (typeof entry === "undefined") {
-        return null;
-      } else {
-        //console.log(entry.pos);
-        return entry.pos;
-      }
-    } catch (err) {
-      console.log("error retrieving patId from queue: ", patientID, praxisID);
-    }
-  }
-};
-
 const getQueuePos = async (praxisID) => {
   // return the entire queue with the first position starting at 1
   if (PRODUCTION) {
