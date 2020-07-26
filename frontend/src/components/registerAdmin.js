@@ -109,45 +109,50 @@ class RegisterAdmin extends Component {
     return (
       <div className="login-img">
         <div className="login-main">
+          <div className="login-bar">
+            <div>
+              Digitaler <span>Warteraum</span>
+            </div>
+            <div>
+              <Link to="/admin/registerAdmin">Sign In</Link>
+            </div>
+          </div>
           <div className="login-header">
             Digitaler Warteraum <br />
             <span>Registrierung</span>
           </div>
 
-          <div className="login-form">
-            <div className="form-user">
-              <form onSubmit={this.handleSubmit}>
-                <label>
-                  E-Mail:
-                  <input
-                    type="text"
-                    name="email"
-                    id="email"
-                    onChange={this.handleChange}
-                  />
-                </label>
-                <label>
-                  Password:
-                  <input
-                    type="text"
-                    name="password"
-                    id="password"
-                    onChange={this.handleChange}
-                  />
-                </label>
-                <br />
-                <div className="register-button">
-                  <input type="submit" value="neu Anmelden" />
-                </div>
-                <br />
-                <div className="register-button">
-                  <input
-                    onClick={this.handleChangeToLogin}
-                    defaultValue="Already have an Account?"
-                  />
-                </div>
-              </form>
-            </div>
+          <div className="register-form">
+            <form onSubmit={this.handleSubmit}>
+              <label>
+                E-Mail:
+                <input
+                  type="text"
+                  name="email"
+                  id="email"
+                  onChange={this.handleChange}
+                />
+              </label>
+              <label>
+                Password:
+                <input
+                  type="text"
+                  name="password"
+                  id="password"
+                  onChange={this.handleChange}
+                />
+              </label>
+
+              <div className="register-button">
+                <input type="submit" value="Neuen Akkount anlegen" />
+              </div>
+              <div className="sign-in-switch">
+                <input
+                  onClick={this.handleChangeToLogin}
+                  defaultValue="Already have an Account?"
+                />
+              </div>
+            </form>
           </div>
           <div className="login-footer">
             <Link to="/">Home</Link>

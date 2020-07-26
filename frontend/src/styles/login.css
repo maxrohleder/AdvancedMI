@@ -15,6 +15,67 @@
   width: 100vw;
 }
 
+.login-bar {
+  position: relative !important;
+  color: white;
+  font-size: large;
+
+  height: 7vh;
+  max-height: 100px;
+  width: 100vw;
+  background-color: var(--primary-highlight-color);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
+  padding-left: 4vw;
+  padding-right: 4vw;
+}
+
+.login-bar span {
+  font-style: italic;
+  font-weight: bold;
+}
+
+.login-bar a {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  border: white;
+  box-sizing: border-box;
+  border-style: solid;
+  stroke-width: 0.5px;
+  border-radius: 0.7em;
+  padding: 0.3em;
+  margin-right: 10%;
+  box-shadow: none;
+}
+
+.register-form {
+  align-self: center;
+  align-content: center;
+}
+.register-form form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 60vw;
+  height: 60vh;
+}
+
+.register-button input[type="text"] {
+  background-color: khaki;
+}
+
+.register-button input[type="submit"] {
+  border-radius: 0em;
+}
+
+.sign-in-switch input {
+  background-color: teal;
+}
+
 .login-img {
   background-color: burlywood;
   background: url("../img/room.jpg") no-repeat center center fixed;
@@ -49,7 +110,7 @@
   justify-content: space-around;
 }
 
-a {
+.login-footer a {
   text-decoration: none;
   color: white;
 }
