@@ -27,7 +27,7 @@ class PatientManagement extends React.Component {
     this.state = {
       data: props.data,
 
-      patientID: null,
+      id: null,
 
       first_name: "first_name",
       surname: "surname",
@@ -84,14 +84,14 @@ class PatientManagement extends React.Component {
   // use a post request https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
   handleSubmit = (event) => {
     var patientenData = {
-      patientID: null,
+      id: null, // filled in later
+      pos: null,
       first_name: this.state.first_name,
       surname: this.state.surname,
       appointment_date: this.state.appointment_date,
       short_diagnosis: this.state.short_diagnosis,
       mobile: this.state.mobile,
       email: this.state.email,
-      pos: null,
     };
 
     //getAdminCookie
@@ -110,19 +110,18 @@ class PatientManagement extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: payload,
     };
-    var auth = true;
+
     console.log("fetching admin info from " + url);
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
-        patientenData.patientID = data.id;
+        patientenData.id = data.id;
         patientenData.pos = data.pos;
-        console.log("data from patman: " + patientenData);
-        //ab zum admin
+        // inform the queue component about new entry
         this.props.doChange(patientenData);
       })
-      .catch(() => {
-        //console.log();
+      .catch((err) => {
+        console.log(err);
         this.setState({ redirect: "/error" });
       });
 

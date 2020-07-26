@@ -13,7 +13,7 @@ future:
 - drag and drop --> position change
 
 patientinfo {
-    patientID: str,
+    id: str,
     first_name: str,
     surname: str,
     appointment_date: Date(),
@@ -46,7 +46,7 @@ class QueueEntry extends React.Component {
     this.setState({ isCalled: newIsCalled });
     var url = API_URL + callRoute;
     var payload = JSON.stringify({
-      patientID: this.props.entrydata.patientID,
+      id: this.props.entrydata.id,
       placeID: this.props.placeID,
       isCalled: newIsCalled,
     });
@@ -63,7 +63,7 @@ class QueueEntry extends React.Component {
     var url = API_URL + delRoute;
     var payload = JSON.stringify({
       placeID: this.props.placeID,
-      patientID: this.props.entrydata.patientID,
+      id: this.props.entrydata.id,
     });
     const requestOptions = {
       method: "POST",
@@ -86,7 +86,7 @@ class QueueEntry extends React.Component {
     var url = API_URL + moveRoute;
     var payload = JSON.stringify({
       placeID: this.props.placeID,
-      patientID: this.props.entrydata.patientID,
+      id: this.props.entrydata.id,
       direction: direction,
       index: index,
     });
@@ -124,10 +124,9 @@ class QueueEntry extends React.Component {
       status = "called";
     }
     return (
-      <li key={this.props.entrydata.patientID}>
-        Patient {this.props.entrydata.patientID},{" "}
-        {this.props.entrydata.first_name}, {this.props.entrydata.surname},{" "}
-        {this.props.entrydata.appointment_date},{" "}
+      <li key={this.props.entrydata.id}>
+        Patient {this.props.entrydata.id}, {this.props.entrydata.first_name},{" "}
+        {this.props.entrydata.surname}, {this.props.entrydata.appointment_date},{" "}
         {this.props.entrydata.short_diagnosis}, {this.props.entrydata.mobile}{" "}
         {status}
         <button onClick={this.callPatient.bind(this)}>call</button>
@@ -147,7 +146,7 @@ class Queue extends React.Component {
   }
   renderEntries = (entry) => (
     <QueueEntry
-      key={entry.patientID}
+      key={entry.id}
       entrydata={entry}
       cb={this.props.remove}
       move={this.props.move}
