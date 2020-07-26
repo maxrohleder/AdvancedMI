@@ -47,6 +47,7 @@ class QueueEntry extends React.Component {
     var url = API_URL + callRoute;
     var payload = JSON.stringify({
       patientID: this.props.entrydata.patientID,
+      placeID: this.props.placeID,
       isCalled: newIsCalled,
     });
     const requestOptions = {

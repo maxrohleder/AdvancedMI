@@ -51,8 +51,8 @@ var db = {
       email: "uk@erlangen.com",
     },
     queue: [
-      { id: "jj97", pos: 1 },
-      { id: "mr98", pos: 2 },
+      { id: "jj97", pos: 1, called: false },
+      { id: "mr98", pos: 2, called: false },
     ],
     patientData: [
       {
@@ -84,8 +84,8 @@ var db = {
       email: "drcovid@china.com",
     },
     queue: [
-      { id: "jj97", pos: 2 },
-      { id: "mr98", pos: 1 },
+      { id: "jj97", pos: 2, called: false },
+      { id: "mr98", pos: 1, called: false },
     ],
     patientData: [
       {
@@ -150,6 +150,7 @@ const getDetails = async (placeID) => {
   //console.log(db[placeID].details);
   return db[placeID].details;
 };
+
 const sendSMS = (toNumber, praxis, link, waitPos) => {
   var text =
     "Hallo! \n Wir haben dich soeben in der Praxis " +
@@ -404,9 +405,29 @@ const moveInQueue = async (placeID, index, direction) => {
       newQueue[index].pos = newQueue[index].pos - 1;
       newQueue[index + 1].pos = newQueue[index + 1].pos + 1;
     }
+    console.log(newQueue);
+    db[placeID].queue = newQueue;
   }
-  console.log(newQueue);
-  db[placeID].queue = newQueue;
+};
+
+const setCalledQueue = async (placeID, patientID, type) => {
+  if (PRODUCTION) {
+    //TODO
+    //change in placeID the called type of patientID //type == true/false
+    try {
+    } catch (err) {
+      console.log("Error setCalledQueue", err);
+    }
+  } else {
+    var newQueue = db[placeID].queue;
+    var pos = newQueue
+      .map(function (e) {
+        return e.id;
+      })
+      .indexOf(patientID);
+    newQueue[pos].called = type;
+    db[placeID].queue = newQueue;
+  }
 };
 
 const updateWaitingNumber = async (praxisID, patientID) => {
@@ -497,6 +518,8 @@ const createUID = async (placeID, first, sur) => {
 const queuePatient = async (placeID, patientID) => {
   if (PRODUCTION) {
     console.log("FIREBASE: queuePatient");
+    //TODO
+    //add in QUEUE CALLED : FALSE/TRUE
 
     var maxPos = -1;
     var queueRef = PLACES.doc(placeID).collection(QUEUES);
@@ -521,7 +544,7 @@ const queuePatient = async (placeID, patientID) => {
     lastPosition = lastPosition > tmp ? lastPosition : tmp;
   }
   lastPosition += 1; // next free last position
-  db[placeID].queue.push({ id: patientID, pos: lastPosition });
+  db[placeID].queue.push({ id: patientID, pos: lastPosition, called: false });
   console.log(db[placeID].queue);
   return lastPosition;
 };
@@ -794,17 +817,20 @@ app.post("/admin/registerpatient", async (req, res) => {
   }
 });
 
-app.post("/call", (req, res) => {
-  var type = req.body.isCalled ? "called" : "uncalled";
+app.post("/call", async (req, res) => {
+  var called = req.body.isCalled ? "called" : "uncalled";
+  var type = req.body.isCalled ? true : false;
+  await setCalledQueue(req.body.placeID, req.body.patientID, type);
   req.app.io.emit("call", req.body.patientID);
-  console.log(type + " " + req.body.patientID);
+  console.log(called + " " + req.body.patientID + " in: " + req.body.placeID);
   res.send({ response: "called patientID" + req.body.patientID }).status(200);
 });
 
 app.post("/move", async (req, res) => {
   //console.log("move " + req.body.direction);
   await moveInQueue(req.body.placeID, req.body.index, req.body.direction);
-  req.app.io.emit("update", null + "+" + null);
+  var queueData = await getQueuePos(req.body.placeID);
+  req.app.io.emit("update", queueData);
   res.send({ response: "moved patientID" }).status(200);
 });
 

@@ -40,12 +40,6 @@ class PatientApp extends React.Component {
     });
   };
 
-  setUnCalledCb = (cb) => {
-    this.socket.on("uncalled", (patId) => {
-      cb(null, patId);
-    });
-  };
-
   setUpdateCb = (cb) => {
     this.socket.on("update", (data) => {
       cb(null, data);
@@ -75,19 +69,21 @@ class PatientApp extends React.Component {
 
     // subscribe to update channel
     this.setUpdateCb((err, data) => {
+      console.log(data);
       if (data == null || data == undefined) {
         console.log("redirecting to: /place/" + this.state.placeID);
         this.setState({ redirect: "/place/" + this.state.placeID });
       } else {
-        var pos = data.filter((entry) => {
-          return entry.id === this.state.patientID;
+        var patient = data.find((x) => {
+          return x.id == this.state.patientID;
         });
-        if (pos[0] == undefined) {
+        if (patient == undefined) {
           console.log("redirecting to: /place/" + this.state.placeID);
           this.setState({ redirect: "/place/" + this.state.placeID });
         } else {
-          pos = pos[0].pos;
-          this.setState({ waitingPosition: pos });
+          var pos = patient.pos;
+          var called = patient.called;
+          this.setState({ waitingPosition: pos, isCalled: called });
         }
       }
     });
