@@ -22,7 +22,7 @@ const FrontEndUrl = "http://wartezimmer-a2415.web.app/";
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const PRODUCTION = !true;
+const PRODUCTION = true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
@@ -306,7 +306,7 @@ const isValidPatient = async (placeID, patientID) => {
     const patRef = PLACES.doc(placeID).collection(PATIENTS).doc(patientID);
     try {
       const docPrev = await patRef.get();
-      return docPreview.exists;
+      return docPrev.exists;
     } catch (err) {
       console.log("firestore error on isValidPlace", err);
     }
@@ -444,10 +444,10 @@ const setCalledQueue = async (placeID, patientID, isCalled) => {
   }
 };
 
-const getQueuePos = async (praxisID) => {
+const getQueue = async (praxisID) => {
   // return the entire queue with the first position starting at 1
   if (PRODUCTION) {
-    console.log("[Firestore] getQueuePos:");
+    console.log("[Firestore] getQueue:");
     var queueRef = PLACES.doc(praxisID)
       .collection(QUEUES)
       .orderBy("pos", "asc");
@@ -533,7 +533,7 @@ const queuePatient = async (placeID, patientID) => {
   return lastPosition;
 };
 
-var getQueue = async (placeID) => {
+var getQueueWithInfo = async (placeID) => {
   var queueData = [];
   if (PRODUCTION) {
     console.log("FIRESTORE getQueue for", placeID);
@@ -560,18 +560,14 @@ var getQueue = async (placeID) => {
       console.log("FIRESTORE ERROR getQueue: ", err);
     }
   } else {
-    try {
-      for (let i = 0; i < db[placeID].queue.length; i++) {
-        var entry = db[placeID].queue[i];
-        var patInfo = db[placeID].patientData.find((x) => {
-          return x.patientID == entry.id;
-        });
-        queueData.push({ pos: entry.pos, ...patInfo });
-      }
-      return queueData;
-    } catch (err) {
-      console.log("FIRESTORE ERROR getQueue: ", err);
+    for (let i = 0; i < db[placeID].queue.length; i++) {
+      var entry = db[placeID].queue[i];
+      var patInfo = db[placeID].patientData.find((x) => {
+        return x.patientID == entry.id;
+      });
+      queueData.push({ pos: entry.pos, ...patInfo });
     }
+    return queueData;
   }
 };
 
@@ -692,7 +688,7 @@ app.post("/admin/queue", async (req, res) => {
   if (placeID == null) {
     res.send({ authConfirmed: false, queueData: null }).status(200);
   } else {
-    var queueData = await getQueue(placeID);
+    var queueData = await getQueueWithInfo(placeID);
     //console.log("returned queue:", queueData);
     res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
@@ -813,7 +809,7 @@ app.post("/call", async (req, res) => {
 app.post("/move", async (req, res) => {
   //console.log("move " + req.body.direction);
   await moveInQueue(req.body.placeID, req.body.index, req.body.direction);
-  var queueData = await getQueuePos(req.body.placeID);
+  var queueData = await getQueue(req.body.placeID);
   req.app.io.emit("update", queueData);
   res.send({ response: "moved patientID" }).status(200);
 });
@@ -823,7 +819,7 @@ app.post("/del", async (req, res) => {
     await removeFromQueue(req.body.placeID, req.body.patientID);
 
     // sending entire queue now with relative positions
-    var queueData = await getQueuePos(req.body.placeID);
+    var queueData = await getQueue(req.body.placeID);
     req.app.io.emit("update", queueData);
 
     res
@@ -848,7 +844,7 @@ io.on("connection", async (socket) => {
   console.log(patDaten[0] + " : " + patDaten[1]);
 
   // send entire queue. frontend will qick the right position
-  var queueData = await getQueuePos(patDaten[0]);
+  var queueData = await getQueue(patDaten[0]);
   try {
     socket.emit("update", queueData);
   } catch (err) {
