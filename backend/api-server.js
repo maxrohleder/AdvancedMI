@@ -377,14 +377,24 @@ const moveInQueue = async (placeID, index, direction) => {
     var queueRef = PLACES.doc(placeID).collection(QUEUES);
     var twoEntriesRef = queueRef.orderBy("pos", "asc").limit(2).offset(startAt);
     try {
+      // these query snapshots can only be read out with foreach ?!
+      // https://stackoverflow.com/questions/49088708/return-document-collection-as-json-from-firestore
       const entriesDoc = await twoEntriesRef.get();
-      console.log("QUEUEDOC", entriesDoc);
-      console.log("entry 0:", entriesDoc[0]);
-      console.log("entry 1:", entriesDoc[1]);
+      var entries = [];
+      for (const doc of entriesDoc.docs) {
+        entries.push({ ...doc.data() });
+      }
+      console.log("entries to switch positions", entries);
 
       // switch the positions of the two consecutive queue entries
-      await queueRef.doc(entriesDoc[0].id).update({ pos: entriesDoc[1].pos });
-      await queueRef.doc(entriesDoc[1].id).update({ pos: entriesDoc[0].pos });
+      var tmp = entries[0].pos;
+      entries[0].pos = entries[1].pos;
+      entries[1].pos = tmp;
+      console.log("after switch", entries);
+
+      // upload the new entries
+      await queueRef.doc(entries[0].id).set(entries[0]);
+      await queueRef.doc(entries[1].id).set(entries[1]);
     } catch (err) {
       console.log("Error moving patient in queue", err);
     }
@@ -469,21 +479,26 @@ const updateWaitingNumber = async (praxisID, patientID) => {
 
 const getQueuePos = async (praxisID) => {
   // return the entire queue with the first position starting at 1
-  // TODO test
   if (PRODUCTION) {
-    console.log("FIREBASE: getQueuePos");
-    var queueRef = PLACES.collection(QUEUES).orderBy("pos", "asc");
+    console.log("[Firestore] getQueuePos:");
+    var queueRef = PLACES.doc(praxisID)
+      .collection(QUEUES)
+      .orderBy("pos", "asc");
     try {
       const queueDoc = await queueRef.get();
-      var relativePositions = {};
+      var relativePositions = [];
       var i = 1;
       for (const doc of queueDoc.docs) {
-        relativePositions.update({ id: doc.id, pos: i });
+        var rel = doc.data();
+        rel.pos = i;
+        relativePositions.push(rel);
         i = i + 1;
       }
+      console.log("relative positions:", relativePositions);
       return relativePositions;
     } catch (err) {
       console.log("error retrieving queue: ", praxisID);
+      console.log(err);
     }
   } else {
     try {
@@ -840,7 +855,7 @@ app.post("/del", async (req, res) => {
   try {
     await removeFromQueue(req.body.placeID, req.body.patientID);
 
-    //const pos = await updateWaitingNumber(req.body.placeID, req.body.patientID);
+    // sending entire queue now with relative positions
     var queueData = await getQueuePos(req.body.placeID);
     req.app.io.emit("update", queueData);
 
