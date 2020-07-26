@@ -134,7 +134,7 @@ class PatientApp extends React.Component {
       status = (
         <React.Fragment>
           Patienten vor Ihnen:
-          <div className="circle">{this.state.waitingPosition}</div>
+          <div className="circle">{this.state.waitingPosition - 1}</div>
           <div>
             Ihre ungefähre Wartezeit beträgt <br />
             <span>{timeEstimate} Minuten.</span>
