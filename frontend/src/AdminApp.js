@@ -104,7 +104,7 @@ class AdminApp extends React.Component {
   appendToQueue = (e) => {
     console.log(e);
     var dummy = {
-      patientID: e.patientID,
+      id: e.id,
       first_name: e.first_name,
       surname: e.surname,
       appointment_date: e.appointment_date,
@@ -136,7 +136,7 @@ class AdminApp extends React.Component {
     console.log("DELETE COOKIE");
     document.cookie =
       "Access-Token= null " + "; path = / " + "; max-age = " + 0; //cant destroy expiration->0sec
-    this.setState({ redirect: "/" });
+    this.setState({ redirect: "/admin" });
   };
   render() {
     if (this.state.redirect) {
