@@ -22,7 +22,7 @@ const FrontEndUrl = "http://wartezimmer-a2415.web.app/";
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
 
-const PRODUCTION = true;
+const PRODUCTION = !true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",

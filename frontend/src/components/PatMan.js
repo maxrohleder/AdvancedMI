@@ -93,7 +93,14 @@ class PatientManagement extends React.Component {
       mobile: this.state.mobile,
       email: this.state.email,
     };
-
+    this.setState({
+      first_name: "first_name",
+      surname: "surname",
+      appointment_date: "appointment_date",
+      short_diagnosis: "short_diagnosis",
+      mobile: "mobile",
+      email: "email",
+    });
     //getAdminCookie
     var token = this.getAdminCookie();
 
