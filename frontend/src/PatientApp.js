@@ -22,6 +22,7 @@ class PatientApp extends React.Component {
       minPerPerson: null, // used to calculate time estimate
       isCalled: null,
       redirect: null, // set by update callback when patientID is not found
+      goodbye: null,
     };
   }
 
@@ -83,7 +84,10 @@ class PatientApp extends React.Component {
               this.state.patientID + " " + "VIELEN DANK FÜR DEN AUFENHALT!"
             );
             console.log("redirecting to: /place/" + this.state.placeID);
-            this.setState({ redirect: "/place/" + this.state.placeID });
+            this.setState({
+              goodbye: true,
+              redirect: "/place/" + this.state.placeID,
+            });
           } else {
             console.log("redirecting to: /place/" + this.state.placeID);
             this.setState({ redirect: "/place/" + this.state.placeID });
@@ -124,6 +128,16 @@ class PatientApp extends React.Component {
 
   render() {
     // Redirect to login screen if the patientID was not found
+    if (this.state.goodbye) {
+      return (
+        <Redirect
+          to={{
+            pathname: this.state.redirect,
+            state: { goodbye: true },
+          }}
+        />
+      );
+    }
     if (this.state.redirect) {
       return <Redirect to={this.state.redirect} />;
     }

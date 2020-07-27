@@ -84,6 +84,7 @@ class LoginForUser extends Component {
   };
 
   isPraxis = () => {
+    console.log(this.props);
     if (!(this.props.isPraxis === true)) {
       return (
         <React.Fragment>

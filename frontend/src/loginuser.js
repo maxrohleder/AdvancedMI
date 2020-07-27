@@ -16,6 +16,7 @@ class LoginUser extends Component {
     };
   }
   componentDidMount() {
+    console.log(this.props);
     var apicall = API_URL + "details/" + this.state.placeID;
     console.log(apicall);
     fetch(apicall)
@@ -30,6 +31,19 @@ class LoginUser extends Component {
       .catch(console.log);
   }
 
+  isGoodBye = () => {
+    console.log(this.props);
+    if (this.props.location.state) {
+      return (
+        <div className="login-greeting">
+          Vielen Dank für Ihren Besuch
+          <br />
+          Wir hoffen wir sehen sie nie wieder :D
+        </div>
+      );
+    }
+  };
+
   render() {
     return (
       <div className="login-img">
@@ -41,9 +55,10 @@ class LoginUser extends Component {
           <div className="login-greeting">
             <span>{this.state.name}</span> <br />
             {this.state.field} <br />
-            {this.state.address}
+            {this.state.address} <br />
           </div>
 
+          {this.isGoodBye()}
           <div className="login-form">
             <LoginForUser
               praxisID={this.state.placeID}
