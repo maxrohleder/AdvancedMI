@@ -46,10 +46,12 @@ class QueueEntry extends React.Component {
     this.setState({ isCalled: newIsCalled });
     var url = API_URL + callRoute;
     var payload = JSON.stringify({
-      id: this.props.entrydata.id,
       placeID: this.props.placeID,
+      id: this.props.entrydata.id,
       isCalled: newIsCalled,
     });
+    console.log(payload);
+    console.log(this.props.entrydata);
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },

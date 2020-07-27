@@ -56,7 +56,7 @@ var db = {
     ],
     patientData: [
       {
-        patientID: "mr98",
+        id: "mr98",
         first_name: "Max",
         surname: "Rohleder",
         appointment_date: new Date(),
@@ -65,7 +65,7 @@ var db = {
         email: "corona@covid19.de",
       },
       {
-        patientID: "jj97",
+        id: "jj97",
         first_name: "Jule",
         surname: "Verne",
         appointment_date: new Date(),
@@ -89,7 +89,7 @@ var db = {
     ],
     patientData: [
       {
-        patientID: "mr98",
+        id: "mr98",
         first_name: "Max",
         surname: "Rohleder",
         appointment_date: new Date(),
@@ -98,7 +98,7 @@ var db = {
         email: "corona@covid19.de",
       },
       {
-        patientID: "jj97",
+        id: "jj97",
         first_name: "Jule",
         surname: "Verne",
         appointment_date: new Date(),
@@ -227,7 +227,7 @@ const registerPatient = async (placeID, pd) => {
     return match.patientID;
   } else {
     db[placeID].patientData.push({
-      patientID: patID,
+      id: patID,
       first_name: pd.first_name,
       surname: pd.surname,
       appointment_date: pd.appointment_date,
@@ -270,7 +270,7 @@ const registerPraxis = async (placeID, details) => {
       ],
       patientData: [
         {
-          patientID: "mr98",
+          id: "mr98",
           first_name: "Max",
           surname: "Rohleder",
           appointment_date: new Date(),
@@ -279,7 +279,7 @@ const registerPraxis = async (placeID, details) => {
           email: "corona@covid19.de",
         },
         {
-          patientID: "jj97",
+          id: "jj97",
           first_name: "Jule",
           surname: "Verne",
           appointment_date: new Date(),
@@ -562,10 +562,11 @@ var getQueueWithInfo = async (placeID) => {
     for (let i = 0; i < db[placeID].queue.length; i++) {
       var entry = db[placeID].queue[i];
       var patInfo = db[placeID].patientData.find((x) => {
-        return x.patientID == entry.id;
+        return x.id == entry.id;
       });
       queueData.push({ pos: entry.pos, ...patInfo });
     }
+    console.log(queueData);
     return queueData;
   }
 };
@@ -799,10 +800,10 @@ app.post("/admin/registerpatient", async (req, res) => {
 app.post("/call", async (req, res) => {
   var called = req.body.isCalled ? "called" : "uncalled";
   var type = req.body.isCalled ? true : false;
-  await setCalledQueue(req.body.placeID, req.body.patientID, type);
-  req.app.io.emit("call", req.body.patientID);
-  console.log(called + " " + req.body.patientID + " in: " + req.body.placeID);
-  res.send({ response: "called patientID" + req.body.patientID }).status(200);
+  console.log(called + " " + req.body.id + " in: " + req.body.placeID);
+  await setCalledQueue(req.body.placeID, req.body.id, type);
+  req.app.io.emit("call", req.body.id);
+  res.send({ response: "called patientID" + req.body.id }).status(200);
 });
 
 app.post("/move", async (req, res) => {
