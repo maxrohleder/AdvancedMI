@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
 import { API_URL } from "../constants/all";
 
+const authRoute = "auth";
 class LoginForAdmin extends Component {
   constructor(props) {
     super(props);
@@ -46,7 +47,7 @@ class LoginForAdmin extends Component {
           headers: { "Content-Type": "application/json" },
           body: payload,
         };
-        var url = API_URL + "auth";
+        var url = API_URL + authRoute;
         console.log("fetching admin info from " + url);
         console.log(payload);
         fetch(url, requestOptions)

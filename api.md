@@ -36,12 +36,13 @@ POST:
 > }@200;
 
 > <br>HTTP-POST: /auth
-> <br>JSON-PAYLOAD: { TODO }
+> <br>JSON-PAYLOAD: {
+> <br> > > >praxisID: integer,
+> <br> > > >password: string, }
 > <br>ANSWER: {
 > <br> > > > praxisConfirmed: bool,
 > <br> > > > accessToken: encoded JWT-AccessToken | null,
 > } @200;
-> <br>SIDE-NOTE: never used?
 
 > <br>HTTP-POST: /auth-email
 > <br>JSON-PAYLOAD: { email: string }
