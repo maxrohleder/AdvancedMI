@@ -2,6 +2,7 @@ import React from "react";
 import "../styles/AdminApp.css";
 import { API_URL } from "../constants/all";
 
+const registerRoute = "admin/registerpatient/";
 /*
 
 Todos:
@@ -106,7 +107,7 @@ class PatientManagement extends React.Component {
 
     //post request
     var praxisID = this.props.praxisID;
-    var url = API_URL + "admin/registerpatient/";
+    var url = API_URL + registerRoute;
     var payload = JSON.stringify({
       placeID: praxisID,
       token: token,
