@@ -224,7 +224,7 @@ const registerPatient = async (placeID, pd) => {
   });
 
   if (typeof match !== "undefined") {
-    return match.patientID;
+    return match.id;
   } else {
     db[placeID].patientData.push({
       id: patID,

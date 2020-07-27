@@ -78,8 +78,16 @@ class PatientApp extends React.Component {
           return x.id == this.state.patientID;
         });
         if (patient == undefined) {
-          console.log("redirecting to: /place/" + this.state.placeID);
-          this.setState({ redirect: "/place/" + this.state.placeID });
+          if (this.state.isCalled != null) {
+            console.log(
+              this.state.patientID + " " + "VIELEN DANK FÜR DEN AUFENHALT!"
+            );
+            console.log("redirecting to: /place/" + this.state.placeID);
+            this.setState({ redirect: "/place/" + this.state.placeID });
+          } else {
+            console.log("redirecting to: /place/" + this.state.placeID);
+            this.setState({ redirect: "/place/" + this.state.placeID });
+          }
         } else {
           var pos = patient.pos;
           var called = patient.called;
