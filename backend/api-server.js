@@ -162,7 +162,7 @@ const sendSMS = (toNumber, placeName, link, firstName) => {
     "\n \nKlicke auf den Link um den digitalen Warteraum zu betreten! \nBitte halte dich von anderen fern, um das Infektionsrisiko zu senken. \n \nDeine Praxis \n" +
     placeName;
 
-  if (!PRODUCTION) {
+  if (PRODUCTION) {
     console.log("send sms to: " + toNumber + " " + placeName + " " + link);
     client.messages
       .create({
