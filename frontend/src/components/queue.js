@@ -127,14 +127,24 @@ class QueueEntry extends React.Component {
     }
     return (
       <li key={this.props.entrydata.id}>
-        Patient {this.props.entrydata.id}, {this.props.entrydata.first_name},{" "}
-        {this.props.entrydata.surname}, {this.props.entrydata.appointment_date},{" "}
-        {this.props.entrydata.short_diagnosis}, {this.props.entrydata.mobile}{" "}
-        {status}
-        <button onClick={this.callPatient.bind(this)}>call</button>
-        <button onClick={() => this.move("up")}>↑</button>
-        <button onClick={() => this.move("down")}>↓</button>
-        <button onClick={this.removePatient.bind(this)}>remove</button>
+        <div className="queue-entry">
+          <div className="queue-info">
+            <div className="essentials">
+              {this.props.entrydata.surname}, {this.props.entrydata.first_name}
+            </div>
+            <div className="additionals">
+              {this.props.entrydata.id}, {this.props.entrydata.appointment_date}
+              , {this.props.entrydata.short_diagnosis},{" "}
+              {this.props.entrydata.mobile} {status}
+            </div>
+          </div>
+          <div>
+            <button onClick={this.callPatient.bind(this)}>call</button>
+            <button onClick={() => this.move("up")}>↑</button>
+            <button onClick={() => this.move("down")}>↓</button>
+            <button onClick={this.removePatient.bind(this)}>remove</button>
+          </div>
+        </div>
       </li>
     );
   }

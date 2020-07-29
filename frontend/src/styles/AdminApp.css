@@ -15,34 +15,64 @@
 .app {
   height: 100vh;
   width: 100vw;
-  border-radius: 0.5em;
-  border: 2px solid #eaf0f7;
-  box-shadow: 5px 5px 5px var(--shadow-color);
-  background-color: whitesmoke;
+
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+}
+
+.hamburger {
+  font-size: xxx-large;
+}
+.hamburger ol {
+  display: none;
+}
+.hamburger:hover ol {
+  display: block;
+  position: fixed;
+  height: 100vh;
+  background-color: whitesmoke;
+  left: 0;
+  top: 0;
 }
 
 .banner {
   width: 100%;
+  height: 10vh;
   background-color: var(--primary-highlight-color);
   text-align: center;
+  align-items: center;
   color: black;
   padding: 5vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
-
+.banner input {
+  border-radius: 0.7em;
+  border: solid;
+  background-color: transparent;
+  box-sizing: border-box;
+}
 .main {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  width: 100vw;
-  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin: 0;
 }
 
 .patman {
   display: flex;
+  width: 41vw;
+  margin-left: 4vw;
+
   flex-direction: column;
+  border-radius: 0.5em;
+  border: 2px solid #eaf0f7;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  background-color: whitesmoke;
+  padding: 2em;
 }
 
 .patman label {
@@ -53,9 +83,7 @@
 }
 
 .patman input[type="text"] {
-  width: 15vw;
   height: 1.5vw;
-  min-width: 300px;
   min-height: 30px;
   box-shadow: 2px 2px 2px var(--shadow-color);
   padding: 1em;
@@ -71,18 +99,72 @@
 
 .patman input[type="submit"] {
   width: 30%;
-  margin-left: 70%;
 
   height: 1.5vw;
   min-width: 100px;
   min-height: 30px;
 
+  background-color: orange;
+
+  margin: 0.5em 0;
+
   border-radius: 0.5em;
   border: 0.1em solid black;
 }
 
-.overview ul {
-  height: 10px;
+.overview {
+  /* height: 100%;
+  width: 100%; */
+  /* border: solid;
+  border-color: chartreuse; */
+}
+
+.overview ol {
+  margin-top: 0;
+  margin-bottom: 0;
+
+  height: 84vh;
+  width: 72vw;
+  padding-right: 4vw;
+  padding-left: 4vw;
   overflow: hidden;
   overflow-y: scroll;
+}
+
+.overview li {
+  margin-bottom: 1em;
+
+  padding: 1em;
+  border-radius: 0.5em;
+  border: 2px solid #eaf0f7;
+  box-shadow: 5px 5px 5px var(--shadow-color);
+  background-color: whitesmoke;
+  overflow: hidden;
+  overflow-y: scroll;
+}
+
+.overview li:first-of-type {
+  margin-top: 1em;
+}
+
+.queue-entry {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.queue-info {
+  /* border-style: solid; */
+}
+
+.essentials {
+  /* background-color: aquamarine; */
+}
+
+.additionals {
+  /* display: none; */
+  /* background-color: blueviolet; */
+}
+.essentials:hover ~ .essentials {
+  display: block;
 }

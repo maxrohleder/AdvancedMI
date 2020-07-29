@@ -147,8 +147,20 @@ class AdminApp extends React.Component {
     return (
       <div className="app">
         <div className="banner">
-          <h1>Wartezimmer {this.state.name}!</h1>
+          <h1 className="hamburger">
+            ☰
+            <ol>
+              <li>AGB</li>
+            </ol>
+          </h1>
+          <div>
+            <h1>Wartezimmer {this.state.name}!</h1>
+          </div>
+          <div>
+            <input onClick={this.handleClick} defaultValue="LOG OUT" />
+          </div>
         </div>
+
         <div className="main">
           <PatientManagement
             praxisID={this.state.placeID}
@@ -160,12 +172,9 @@ class AdminApp extends React.Component {
             data={this.state.queueData}
             remove={this.deleteFromQueue}
             move={this.moveQueue}
+            className="queue-section"
           />
-          <div className="logOut-button">
-            <input onClick={this.handleClick} defaultValue="⮕ LOG OUT" />
-          </div>
         </div>
-        <InfoBox />
       </div>
     );
   }
