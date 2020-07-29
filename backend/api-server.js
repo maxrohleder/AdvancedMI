@@ -10,7 +10,7 @@ const bodyParser = require("body-parser");
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const twillioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-const APP_SECRET = process.env.APP_SECRET;
+const APP_SECRET = "process.env.APP_SECRET";
 const telNmbr = "+15128835631";
 const client = require("twilio")(accountSid, twillioAuthToken);
 
@@ -151,21 +151,19 @@ const getDetails = async (placeID) => {
   return db[placeID].details;
 };
 
-const sendSMS = (toNumber, praxis, link, waitPos) => {
+const sendSMS = (toNumber, placeName, link, firstName) => {
   var text =
-    "Hallo! \n Wir haben dich soeben in der Praxis " +
-    praxis +
-    " angemeldet!\n \n Hier findest du den digitalen Warteraum: \n" +
+    "Hallo " +
+    firstName +
+    "!\nWir haben dich soeben in der Praxis " +
+    placeName +
+    " angemeldet!\n \nHier findest du den digitalen Warteraum: \n" +
     link +
-    "\n Deine Wartenummer ist: " +
-    waitPos +
-    "\n \n Wenn du bereit bist in die Praxis zu kommen, klicke auf Beitreten! \n Bitte halte dich von anderen fern, um das Infektionsrisiko zu senken \n \n  Deine Praxis \n " +
-    praxis;
+    "\n \nKlicke auf den Link um den digitalen Warteraum zu betreten! \nBitte halte dich von anderen fern, um das Infektionsrisiko zu senken. \n \nDeine Praxis \n" +
+    placeName;
 
   if (PRODUCTION) {
-    console.log(
-      "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
-    );
+    console.log("send sms to: " + toNumber + " " + placeName + " " + link);
     client.messages
       .create({
         from: telNmbr,
@@ -174,9 +172,8 @@ const sendSMS = (toNumber, praxis, link, waitPos) => {
       })
       .then((messsage) => console.log(message.sid));
   } else {
-    console.log(
-      "send sms to: " + toNumber + " " + praxis + " " + link + " " + waitPos
-    );
+    console.log("send sms to: " + toNumber + " " + placeName + " " + link);
+    console.log(text);
   }
 };
 
@@ -783,7 +780,10 @@ app.post("/admin/registerpatient", async (req, res) => {
     var pos = await queuePatient(placeID, patientID);
 
     var link = FrontEndUrl + "place/" + placeID + "/id/" + patientID;
-    sendSMS(req.body.mobile, placeID, link, pos);
+    var placeDetail = await getDetails(placeID);
+    //console.log(placeDetail);
+
+    sendSMS(req.body.mobile, placeDetail.name, link, req.body.first_name);
 
     // inform admin interface about patientID and position
     res
