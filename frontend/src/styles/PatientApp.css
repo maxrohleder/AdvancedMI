@@ -6,6 +6,11 @@
   color: #67758d;
 }
 
+body {
+  position: fixed;
+  overflow: hidden;
+}
+
 .header {
   padding: 3%;
   display: flex;
@@ -59,29 +64,23 @@
 }
 
 .called-circle {
-  background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='100' ry='100' stroke='%2314AAE4FF' stroke-width='11' stroke-dasharray='52' stroke-dashoffset='47' stroke-linecap='round'/%3e%3c/svg%3e");
+  /* background-image: url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='100' ry='100' stroke='%2314AAE4FF' stroke-width='11' stroke-dasharray='52' stroke-dashoffset='47' stroke-linecap='round'/%3e%3c/svg%3e"); */
   border-radius: 50%;
   width: 200px;
   height: 200px;
   /* max-width: 200px;
   max-height: 200px; */
-  /* border-radius: 50%;
-  border: 1em dotted green; */
+  border-radius: 50%;
+  border: 1em dotted green;
 
   /* font-size: 1em; */
   display: flex;
   flex-direction: column;
   justify-content: center;
 
-  -webkit-animation: spin 10s linear infinite;
+  /* -webkit-animation: spin 10s linear infinite;
   -moz-animation: spin 10s linear infinite;
-  animation: spin 10s linear infinite;
-}
-
-.called-circle span {
-  animation: none;
-  -webkit-animation: none;
-  -moz-animation: none;
+  animation: spin 10s linear infinite; */
 }
 
 .card {
@@ -112,7 +111,7 @@
   font-size: 1.5em;
 }
 
-@-moz-keyframes spin {
+/* @-moz-keyframes spin {
   100% {
     -moz-transform: rotate(360deg);
   }
@@ -127,4 +126,4 @@
     -webkit-transform: rotate(360deg);
     transform: rotate(360deg);
   }
-}
+} */

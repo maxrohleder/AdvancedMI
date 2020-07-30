@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import { API_URL } from "../constants/all";
 
 const authRoute = "auth";
@@ -131,8 +131,11 @@ class LoginForAdmin extends Component {
             />
           </label>
           <br />
-          <div className="login-button-container">
+          <div className="register-button">
             <input type="submit" value="⮕" />
+          </div>
+          <div className="signin-switch">
+            <Link to="/admin/registerAdmin">Register</Link>
           </div>
         </form>
       </div>

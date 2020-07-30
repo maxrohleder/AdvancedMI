@@ -80,6 +80,7 @@ class AdminApp extends React.Component {
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         auth = data.authConfirmed;
         this.setState({
           name: data.details.name,

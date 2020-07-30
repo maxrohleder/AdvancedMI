@@ -30,12 +30,12 @@ class PatientManagement extends React.Component {
 
       id: null,
 
-      first_name: "first_name",
-      surname: "surname",
-      appointment_date: "appointment_date",
-      short_diagnosis: "short_diagnosis",
-      mobile: "mobile",
-      email: "email",
+      first_name: "",
+      surname: "",
+      appointment_date: "",
+      short_diagnosis: "",
+      mobile: "",
+      email: "",
     };
   }
   handleChange = (event) => {
@@ -43,10 +43,6 @@ class PatientManagement extends React.Component {
     //console.log(target.id);
 
     if (target.id === "first_name") {
-      if (event.target.value == "first_name") {
-        this.setState({ first_name: "" });
-        //console.log("updated : " + target.id + " : " + this.state.first_name);
-      }
       this.setState({ first_name: event.target.value });
       //console.log("updated : " + target.id + " : " + this.state.first_name);
     }
@@ -84,6 +80,16 @@ class PatientManagement extends React.Component {
   };
   // use a post request https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch
   handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (
+      this.state.first_name === null ||
+      this.state.surname === null ||
+      this.state.mobile == null
+    ) {
+      alert("bitte die Felder ausfüllen");
+      return;
+    }
     var patientenData = {
       id: null, // filled in later
       pos: null,
@@ -95,12 +101,12 @@ class PatientManagement extends React.Component {
       email: this.state.email,
     };
     this.setState({
-      first_name: "first_name",
-      surname: "surname",
-      appointment_date: "appointment_date",
-      short_diagnosis: "short_diagnosis",
-      mobile: "mobile",
-      email: "email",
+      first_name: "",
+      surname: "",
+      appointment_date: "",
+      short_diagnosis: "",
+      mobile: "",
+      email: "",
     });
     //getAdminCookie
     var token = this.getAdminCookie();
@@ -146,7 +152,7 @@ class PatientManagement extends React.Component {
               type="text"
               name="first_name"
               id="first_name"
-              placeholder="First Name"
+              placeholder="Vorname"
               value={this.state.first_name}
               onChange={this.handleChange}
             />
@@ -154,6 +160,7 @@ class PatientManagement extends React.Component {
               type="text"
               name="surname"
               id="surname"
+              placeholder="Nachname"
               value={this.state.surname}
               onChange={this.handleChange}
             />
@@ -161,6 +168,7 @@ class PatientManagement extends React.Component {
               type="text"
               name="appointment_date"
               id="appointment_date"
+              placeholder="Termin"
               value={this.state.appointment_date}
               onChange={this.handleChange}
             />
@@ -168,6 +176,7 @@ class PatientManagement extends React.Component {
               type="text"
               name="short_diagnosis"
               id="short_diagnosis"
+              placeholder="Kurzdiagnose"
               value={this.state.short_diagnosis}
               onChange={this.handleChange}
             />
@@ -175,6 +184,7 @@ class PatientManagement extends React.Component {
               type="text"
               name="mobile"
               id="mobile"
+              placeholder="Mobil"
               value={this.state.mobile}
               onChange={this.handleChange}
             />
@@ -182,6 +192,7 @@ class PatientManagement extends React.Component {
               type="text"
               name="email"
               id="email"
+              placeholder="Email"
               value={this.state.email}
               onChange={this.handleChange}
             />

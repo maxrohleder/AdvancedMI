@@ -144,8 +144,6 @@ class PatientApp extends React.Component {
 
     let status;
     if (this.state.isCalled) {
-      var vib = window.navigator.vibrate([1000, 500, 1000]);
-      console.log("vibrated: ", vib);
       status = (
         <React.Fragment>
           <div>Deine Identifikation: {this.state.patientID}</div>

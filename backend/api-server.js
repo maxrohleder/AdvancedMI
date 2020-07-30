@@ -10,19 +10,26 @@ const bodyParser = require("body-parser");
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const twillioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-const APP_SECRET = "process.env.APP_SECRET";
-const telNmbr = "+15128835631";
+const APP_SECRET = process.env.APP_SECRET;
+const telNmbr = process.env.TWILIO_NBR;
+
 const client = require("twilio")(accountSid, twillioAuthToken);
 
-const port = 8080;
-const FrontEndUrl = "http://wartezimmer-a2415.web.app/";
+const PRODUCTION = true;
+
+let port;
+if (PRODUCTION) {
+  port = process.env.PORT;
+} else {
+  port = 8080;
+}
+
+const FrontEndUrl = "https://wartezimmer-a2415.web.app/";
 
 ////////////////////////////////////////////////////////////
 /////////////////// database wrapper ///////////////////////
 ////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////
-
-const PRODUCTION = !true;
 
 const fdb = new Firestore({
   projectId: "wartezimmer-a2415",
@@ -39,7 +46,7 @@ let PLACES = fdb.collection("places"); // PATIENTS.doc(placeID).doc(patID).colle
 let DETAILS = "details";
 let PATIENTS = "patients";
 let QUEUES = "queue";
-let PASS = "passwords";
+let PASS = "password";
 
 var db = {
   ukerlangen: {
@@ -110,23 +117,25 @@ var db = {
   },
 };
 
-const isValidPlace = (placeID) => {
+const isValidPlace = async (placeID) => {
   if (PRODUCTION) {
-    const placeRef = PLACES.doc(placeID);
-    placeRef
-      .get()
-      .then((docPreview) => {
-        if (docPreview.exists) {
-          return true;
-        } else {
-          return false;
-        }
-      })
-      .catch((err) => {
-        console.log("firestore error on isValidPlace", err);
-      });
+    console.log("checking if place exists: ", placeID);
+    let placeRef = PLACES.doc(placeID);
+    try {
+      const placePrev = await placeRef.get();
+      console.log("[Firestore] answer from backend: ", placePrev);
+      console.log(placeRef.exists);
+      if (!placePrev.exists) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch (error) {
+      console.log("[Firestore] isValidPlace: ", error);
+    }
+  } else {
+    return db.hasOwnProperty(placeID);
   }
-  return db.hasOwnProperty(placeID);
 };
 
 const getDetails = async (placeID) => {
@@ -137,10 +146,12 @@ const getDetails = async (placeID) => {
       const placeData = await placeRef.get();
       if (!placeData.exists) {
         console.log("document does not exit!");
-        return null;
+
+        return { exists: false };
       } else {
         var details = placeData.get(DETAILS);
         console.log("async details", details);
+        details = { exists: true, ...details };
         return details;
       }
     } catch (err) {
@@ -155,7 +166,7 @@ const sendSMS = (toNumber, placeName, link, firstName) => {
   var text =
     "Hallo " +
     firstName +
-    "!\nWir haben dich soeben in der Praxis " +
+    "!\n\nWir haben dich soeben in der Praxis " +
     placeName +
     " angemeldet!\n \nHier findest du den digitalen Warteraum: \n" +
     link +
@@ -170,7 +181,7 @@ const sendSMS = (toNumber, placeName, link, firstName) => {
         to: toNumber,
         body: text,
       })
-      .then((messsage) => console.log(message.sid));
+      .then((message) => console.log(message.sid));
   } else {
     console.log("send sms to: " + toNumber + " " + placeName + " " + link);
     console.log(text);
@@ -236,15 +247,33 @@ const registerPatient = async (placeID, pd) => {
   }
 };
 
-const registerPraxis = async (placeID, details) => {
+const registerPraxis = async (placeID, details, password) => {
   if (PRODUCTION) {
-    // use firestore to insert PRAXIS
-    var success = await PLACES.doc(placeID).set(details);
-    console.log(
-      "[Firestore] succesfully added new place with id: ",
-      placeID,
-      success
-    );
+    try {
+      var success = await PLACES.doc(placeID).set({
+        password: password,
+        details: {
+          name: details.praxisName,
+          address:
+            details.street +
+            " " +
+            details.houseNumber +
+            ", " +
+            details.zipCode +
+            " " +
+            details.place,
+          field: details.field,
+          email: details.email,
+        },
+      });
+      console.log(
+        "[Firestore] succesfully added new place with id: ",
+        placeID,
+        success
+      );
+    } catch (err) {
+      console.log("[Firestore] registerPraxis", err, success);
+    }
   } else {
     db[placeID] = {
       password: details.password,
@@ -546,7 +575,6 @@ var getQueueWithInfo = async (placeID) => {
             ...patInfo,
           });
         }
-        console.log("queueData:", queueData);
         return queueData;
       } else {
         console.log("queue empty");
@@ -568,26 +596,22 @@ var getQueueWithInfo = async (placeID) => {
   }
 };
 
-const verifyPassword = (placeID, password) => {
+const verifyPassword = async (placeID, password) => {
   if (PRODUCTION) {
     console.log("FIRESORE: verifyPassword");
     const passRef = PLACES.doc(placeID);
-    passRef
-      .get()
-      .then((docPreview) => {
-        if (docPreview.exists) {
-          if (docPreview.get(PASS) == password) {
-            return true;
-          } else {
-            return false;
-          }
-        } else {
-          return false;
-        }
-      })
-      .catch((err) => {
-        console.log("firestore error on isValidPlace", err);
-      });
+
+    try {
+      var passDoc = await passRef.get();
+      if (passDoc.password == password) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log("[Firestore] verfiyPassword: ", err);
+      return false;
+    }
   }
 
   //console.log(db[placeID]["password"] + " ? " + password);
@@ -686,7 +710,6 @@ app.post("/admin/queue", async (req, res) => {
     res.send({ authConfirmed: false, queueData: null }).status(200);
   } else {
     var queueData = await getQueueWithInfo(placeID);
-    //console.log("returned queue:", queueData);
     res.send({ authConfirmed: true, queueData: queueData }).status(200);
   }
 });
@@ -721,26 +744,31 @@ app.post("/auth-email", async (req, res) => {
 
 app.post("/registerPraxis", async (req, res) => {
   console.log("registerPraxis requested");
-  newPlaceID = !isValidPlace(req.body.placeID); //check if placeID unique
+  var validNewName = isValidPlace(req.body.placeID); //check if placeID unique
   //console.log(newPlaceID);
-  if (newPlaceID) {
+  if (validNewName) {
     //anlegen
-    await registerPraxis(req.body.placeID, {
-      praxisName: req.body.praxisName,
-      place: req.body.place,
-      field: req.body.field,
-      zipCode: req.body.zipCode,
-      street: req.body.street,
-      houseNumber: req.body.houseNumber,
-      phoneNumber: req.body.phoneNumber,
-      email: req.body.email,
-      password: req.body.password,
-    });
+    await registerPraxis(
+      req.body.placeID,
+      {
+        praxisName: req.body.praxisName,
+        place: req.body.place,
+        field: req.body.field,
+        zipCode: req.body.zipCode,
+        street: req.body.street,
+        houseNumber: req.body.houseNumber,
+        phoneNumber: req.body.phoneNumber,
+        email: req.body.email,
+      },
+      req.body.password
+    );
     console.log("Praxis " + req.body.placeID + " added!");
     var accessToken = encodeToken({ userId: req.body.placeID });
-    res.send({ newPlaceID: newPlaceID, accessToken: accessToken }).status(200);
+    res
+      .send({ newPlaceID: validNewName, accessToken: accessToken })
+      .status(200);
   } else {
-    res.send({ newPlaceID: newPlaceID, accessToken: null }).status(200);
+    res.send({ newPlaceID: validNewName, accessToken: null }).status(200);
   }
 });
 

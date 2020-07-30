@@ -117,3 +117,39 @@ label {
 .login-greeting span {
   font-weight: bold;
 }
+
+.register-button input[type="submit"] {
+  border-radius: 10px;
+  height: 4vh;
+  max-width: none;
+  font-size: 1em;
+  font-weight: bold;
+  background-color: rgb(224, 146, 0);
+  box-shadow: none;
+  padding: 0;
+}
+
+.signin-switch input {
+  color: rgb(255, 255, 255);
+  width: fit-content + 1;
+  height: 4vh;
+  font-size: 1em;
+  font-weight: bold;
+  font-style: oblique;
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.signin-switch {
+  margin-top: 1em;
+  color: rgb(255, 255, 255);
+  width: fit-content + 1;
+  height: 4vh;
+  font-size: 1em;
+  font-weight: bold;
+  font-style: oblique;
+  background-color: transparent;
+  box-shadow: none;
+  padding: 0;
+}

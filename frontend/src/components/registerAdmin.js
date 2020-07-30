@@ -108,7 +108,7 @@ class RegisterAdmin extends Component {
     // this page is shown initially to create a new user with email and pwd
     return (
       <div className="login-img">
-        <div className="login-main">
+        <div className="login-main-admin">
           <div className="login-header">
             Digitaler Warteraum <br />
             <span>Registrierung</span>
@@ -140,7 +140,7 @@ class RegisterAdmin extends Component {
                   <input type="submit" value="neu Anmelden" />
                 </div>
                 <br />
-                <div className="register-button">
+                <div className="signin-switch">
                   <input
                     onClick={this.handleChangeToLogin}
                     defaultValue="Already have an Account?"

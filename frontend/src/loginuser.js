@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import LoginForUser from "./components/loginForUser.js";
 import { API_URL } from "./constants/all";
 
@@ -13,15 +13,19 @@ class LoginUser extends Component {
       name: null,
       address: null,
       field: null,
+
+      redirect: null,
     };
   }
   componentDidMount() {
-    console.log(this.props);
     var apicall = API_URL + "details/" + this.state.placeID;
     console.log(apicall);
     fetch(apicall)
       .then((response) => response.json())
       .then((data) => {
+        if (!data.exists) {
+          this.setState({ redirect: "/" });
+        }
         this.setState({
           name: data.name,
           address: data.address,
@@ -32,19 +36,17 @@ class LoginUser extends Component {
   }
 
   isGoodBye = () => {
-    console.log(this.props);
     if (this.props.location.state) {
       return (
-        <div className="login-greeting">
-          Vielen Dank für Ihren Besuch
-          <br />
-          Wir hoffen wir sehen sie nie wieder :D
-        </div>
+        <div className="login-greeting">Vielen Dank für Ihren Besuch!</div>
       );
     }
   };
 
   render() {
+    if (this.state.redirect) {
+      return <Redirect to={this.state.redirect} />;
+    }
     return (
       <div className="login-img">
         <div className="login-main">

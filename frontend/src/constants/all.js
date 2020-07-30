@@ -10,8 +10,8 @@ export const REGISTER_PLACE = "registerPraxis/";
 export const VERIFY_EMAIL_ROUTE = "auth-email/";
 
 if (PRODUCTION) {
-  API_URL = "https://wartezimmer-a2415.nw.r.appspot.com:8080/";
+  API_URL = "https://wartezimmer-a2415.nw.r.appspot.com/";
 } else {
-  API_URL = "http://127.0.0.1:8080/";
-  //API_URL = "http://0.0.0.0:8080/";
+  // API_URL = "http://127.0.0.1:8080/";
+  API_URL = "http://0.0.0.0:8080/";
 }
