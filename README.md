@@ -50,29 +50,37 @@ These two user stories exemplary show our envisioned use of the application.
    4. Mobile number
 3. Patient receives SMS with link to personal digital waiting room
 4. Several days in advance:
-   > Hallo  
-   >  Ihr Termin ist am  
-   >  25.05.2020  
-   >  um 12:30
+
+   ```text
+   Hallo
+   Ihr Termin ist am
+   25.05.2020
+   um 12:30
+   ```
+
 5. The same day
 
-   > Hallo  
-   > Sie haben ihren Termin heute  
-   >  um 12:30 bei Dr.Meier
+   ```text
+   Hallo
+   Sie haben ihren Termin heute
+   um 12:30 bei Dr.Meier
 
-   > Die Aktuelle Wartezeit beträgt heute:  
-   > 15min
+   Die Aktuelle Wartezeit beträgt heute:
+   15min
+   ```
 
-6. 30Minutes before the appointment-> possible to check into queue:
+6. 30 Minutes before the appointment-> possible to check into queue
 
-   > Hallo  
-   > Sie haben ihren Termin heute  
-   >  um 12:30 bei Dr.Meier
+   ```text
+   Hallo
+   Sie haben ihren Termin heute
+   um 12:30 bei Dr.Meier
 
-   > Die Aktuelle Wartezeit beträgt heute:  
-   > 15min
+   Die Aktuelle Wartezeit beträgt heute:
+   15min
 
-   > > Bitte klicken sie auf diesen Knopf um in die Wartelschlange aufgenommen zu werden, falls es ihnen Möglich ist in den nächsten '15min' in der Praxis einzutreffen
+   Bitte klicken sie auf diesen Knopf um in die Wartelschlange aufgenommen zu werden, falls es ihnen Möglich ist in den nächsten '15min' in der Praxis einzutreffen
+   ```
 
 7. Travel to areas of doctors office (outside waiting area or personal car)
 8. Enter waiting room by clicking Button on welcome page
