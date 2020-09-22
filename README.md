@@ -1,7 +1,5 @@
 # Digital Waitingroom
 
-
-
 - [Digital Waitingroom](#digital-waitingroom)
   - [Motivation|Idea](#motivationidea)
   - [User Stories](#user-stories)
@@ -14,6 +12,7 @@
   - [TODOs](#todos)
 
 ## Motivation|Idea
+
 Develop the digital waiting room!
 
 This product would tackle the problem of crowded waiting rooms and the therefrom arising problems like risk of infection and patient throughput bottlenecks. Also, we would contribute to reducing the staggering 9000+ hours of patient management in a 800 bed hospital.
@@ -22,10 +21,9 @@ The goal is to develop a progressive web app, which acts as a interface between 
 
 Find the current patient UI design draft at [our figma page](https://www.figma.com/file/NUWYQQ6T5zKVLng4IAdxSJ/digital-waiting?node-id=0%3A1).
 
-
 ## User Stories
 
-These two user stories exemplary show our envisioned use of the application. 
+These two user stories exemplary show our envisioned use of the application.
 
 ### Emergency visit without appointment
 
@@ -43,6 +41,7 @@ These two user stories exemplary show our envisioned use of the application.
 8. Patient view changes to "Bitte in die Praxis kommen"
 
 ### Scheduled appointment
+
 1. Calls doctors office and requests treatment
 2. Receptionist enters new patient user profile
    1. Checks calendar ->appointment->25.05.2020,12:30
@@ -51,43 +50,54 @@ These two user stories exemplary show our envisioned use of the application.
    4. Mobile number
 3. Patient receives SMS with link to personal digital waiting room
 4. Several days in advance:
-    >Hallo  
-      Ihr Termin ist am   
-      25.05.2020  
-      um 12:30
-5. The same day     
-    >Hallo  
-    >Sie haben ihren Termin heute  
-      um 12:30 bei Dr.Meier  
 
-    >Die Aktuelle Wartezeit beträgt heute:  
-    15min
-    
-6. 30Minutes before the appointment-> possible to check into queue:
-    >Hallo  
-    >Sie haben ihren Termin heute  
-      um 12:30 bei Dr.Meier  
+   ```text
+   Hallo
+   Ihr Termin ist am
+   25.05.2020
+   um 12:30
+   ```
 
-    >Die Aktuelle Wartezeit beträgt heute:  
-    15min
+5. The same day
 
-    >> Bitte klicken sie auf diesen Knopf um in die Wartelschlange aufgenommen zu werden, falls es ihnen Möglich ist in den nächsten '15min' in der Praxis einzutreffen
+   ```text
+   Hallo
+   Sie haben ihren Termin heute
+   um 12:30 bei Dr.Meier
+
+   Die Aktuelle Wartezeit beträgt heute:
+   15min
+   ```
+
+6. 30 Minutes before the appointment-> possible to check into queue
+
+   ```text
+   Hallo
+   Sie haben ihren Termin heute
+   um 12:30 bei Dr.Meier
+
+   Die Aktuelle Wartezeit beträgt heute:
+   15min
+
+   Bitte klicken sie auf diesen Knopf um in die Wartelschlange aufgenommen zu werden, falls es ihnen Möglich ist in den nächsten '15min' in der Praxis einzutreffen
+   ```
+
 7. Travel to areas of doctors office (outside waiting area or personal car)
 8. Enter waiting room by clicking Button on welcome page
-9.  App displays number of patients in front of you,waiting number, and updated estimated waiting time
+9. App displays number of patients in front of you,waiting number, and updated estimated waiting time
 10. When doctor is ready, receptionist clicks on "call patient"
 11. Patient view changes to "Bitte in die Praxis kommen"
 
-
 This is how the sms could look like:
 
-<img src="https://raw.githubusercontent.com/maxrohleder/AdvancedMI/master/SMS.jpeg" alt="alt text" width="200" height="222">
+![Screenshot of how the received SMS should be formatted](resources/SMS.jpg)
 
 ## Minimum Viable Product
 
 One waiting queue per doctors office. The welcome page can be accessed with the placeID appended to the base url. E.g.:
 
 `digitalwaiting.de/UK-Erlangen`
+
 - back-end
   - functionalities:
     - store patient pseudonyms, waiting number and status (waiting, called, done)
@@ -127,7 +137,7 @@ One waiting queue per doctors office. The welcome page can be accessed with the 
 
 ## Project Architecture
 
-This project is (as outlined before) structured into backend and front end. The used software stack is described in [Architecture](architecture.md). 
+This project is (as outlined before) structured into backend and front end. The used software stack is described in [Architecture](architecture.md).
 
 There is one flask-based webserver, which exposes the administrative functionality of the project via a REST-Api. The sources for these backend functions can be found in the folder `./backend`.
 
