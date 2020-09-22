@@ -90,7 +90,7 @@ These two user stories exemplary show our envisioned use of the application.
 
 This is how the sms could look like:
 
-![Screenshot of how the received SMS should be formatted](resources/SMS.jpeg)
+![Screenshot of how the received SMS should be formatted](resources/SMS.jpg)
 
 ## Minimum Viable Product
 
