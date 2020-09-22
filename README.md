@@ -90,7 +90,7 @@ These two user stories exemplary show our envisioned use of the application.
 
 This is how the sms could look like:
 
-<img src="https://raw.githubusercontent.com/maxrohleder/AdvancedMI/master/SMS.jpeg" alt="alt text" width="200" height="222">
+![Screenshot of how the received SMS should be formatted](resources/SMS.jpeg)
 
 ## Minimum Viable Product
 
